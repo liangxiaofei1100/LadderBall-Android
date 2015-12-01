@@ -1,11 +1,14 @@
 import com.android.builder.core.DefaultManifestParser
 
 apply plugin: 'com.android.application'
+apply plugin: 'bugly'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
+    //tencent bugly config,http://bugly.qq.com/
+    compile 'com.tencent.bugly:crashreport:1.2.7'
 }
 
 android {
@@ -102,5 +105,10 @@ task ladderBallDebug(type: org.gradle.api.tasks.Copy){
         apkFile.file.name.contains('unaligned')
     }
     rename '.apk', "_" + getDate() + "_debug.apk"
+}
+
+bugly{
+    appId='900014118'
+    appKey='TKU3zRxNL7crQVcb'
 }
 
