@@ -15,7 +15,6 @@ gen/
 # Gradle files
 .gradle/
 build/
-/*/build/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -26,12 +25,5 @@ proguard/
 # Log Files
 *.log
 
-# idea files
-.idea
-
-# iml files
-*.iml
-
-gradle/wrapper/gradle-wrapper.properties
-
-/captures
+# Class path
+.classpath

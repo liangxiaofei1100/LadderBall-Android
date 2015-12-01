@@ -1,0 +1,45 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        ReleaseKey {
+            keyAlias 'LadderBall'
+            keyPassword 'zhaoyantech'
+            storeFile file('keystore/ladderball.jks')
+            storePassword 'zhaoyantech'
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+    defaultConfig {
+        applicationId "com.zhaoyan.ladderball"
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.ReleaseKey
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // minifyEnabled和shrinkResources一同使用，用于去除没有使用的资源
+            shrinkResources true
+            debuggable false
+            zipAlignEnabled true
+        }
+        debug {
+            signingConfig signingConfigs.ReleaseKey
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources false
+            debuggable true
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+}
