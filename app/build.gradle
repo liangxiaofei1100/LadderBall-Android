@@ -1,14 +1,14 @@
+import com.android.builder.core.DefaultManifestParser
+
 apply plugin: 'com.android.application'
 
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+}
+
 android {
-    signingConfigs {
-        ReleaseKey {
-            keyAlias 'LadderBall'
-            keyPassword 'zhaoyantech'
-            storeFile file('keystore/ladderball.jks')
-            storePassword 'zhaoyantech'
-        }
-    }
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
     defaultConfig {
@@ -18,6 +18,16 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        ReleaseKey {
+            keyAlias 'LadderBall'
+            keyPassword 'zhaoyantech'
+            storeFile file('keystore/ladderball.jks')
+            storePassword 'zhaoyantech'
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.ReleaseKey
@@ -38,8 +48,59 @@ android {
     }
 }
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+//打包后自动将生产的apk重命名以及保存到指定目录
+//第一步：获取app版本号
+def getAppVersionNameFromManifest(){
+    def manifestParser = new DefaultManifestParser();
+    return manifestParser.getVersionName(android.sourceSets.main.manifest.srcFile);
 }
+
+//第二步：修改apk名称和路径
+android.applicationVariants.all{ variant ->
+    def buildType = "${variant.name}";
+    def versionName = "${android.defaultConfig.versionName}";
+    variant.outputs[0].outputFile = file("$project.buildDir/outputs/LadderBall"
+            + buildType
+            + "/LadderBall_"
+            + versionName
+            + ".apk")
+}
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMdd')
+    return formattedDate
+}
+
+// assembleRelease之后，执行发布版本任务
+assembleRelease << {
+    ladderBallRelease.execute()
+}
+
+task ladderBallRelease(type: org.gradle.api.tasks.Copy){
+    println("ladderballRelease")
+    from 'build/outputs/LadderBallRelease'
+    into 'build/outputs/release'
+    include '*.apk'
+    exclude { apkFile ->
+        apkFile.file.name.contains('unaligned')
+    }
+    rename '.apk', "_" + getDate() + ".apk"
+}
+
+// assembleDebug，执行发布Debug版本任务
+assembleDebug << {
+    ladderBallDebug.execute()
+}
+
+task ladderBallDebug(type: org.gradle.api.tasks.Copy){
+    println("ladderballDebug")
+    from 'build/outputs/LadderBallDebug'
+    into 'build/outputs/debug'
+    include '*.apk'
+    exclude { apkFile ->
+        apkFile.file.name.contains('unaligned')
+    }
+    rename '.apk', "_" + getDate() + "_debug.apk"
+}
+

@@ -10,17 +10,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try {
-            int i = 1 / 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            StackTraceElement[] traceElements = e.getStackTrace();
-            if (traceElements != null) {
-                for (int i = 0; i < traceElements.length; i++) {
-                    System.out.println(traceElements[i].toString());
-                }
-            }
-        }
-
+        System.out.println(BuildConfig.DEBUG);
     }
 }
