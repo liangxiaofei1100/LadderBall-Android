@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 
+import com.activeandroid.ActiveAndroid;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zhaoyan.ladderball.util.Log;
 
@@ -34,6 +35,8 @@ public class AppAplication extends Application {
         Log.d();
         //tencent bugly init
         CrashReport.initCrashReport(getApplicationContext(), BallConstants.BUGLY_APP_ID, BuildConfig.DEBUG);
+        //ActiveAndriod init
+        ActiveAndroid.initialize(this);
     }
 
     /**
@@ -51,5 +54,11 @@ public class AppAplication extends Application {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        ActiveAndroid.dispose();
     }
 }
