@@ -1,7 +1,9 @@
 package com.zhaoyan.ladderball.http;
 
 import com.zhaoyan.ladderball.http.request.LoginRequest;
+import com.zhaoyan.ladderball.http.request.ModifyPasswordRequest;
 import com.zhaoyan.ladderball.http.response.LoginResponse;
+import com.zhaoyan.ladderball.http.response.ModifyPasswordResponse;
 
 import retrofit.http.Body;
 import retrofit.http.POST;
@@ -16,5 +18,8 @@ public interface LadderBallApi {
     /**retrofit，登录请求*/
     @POST("account/recorderlogin")
     Observable<LoginResponse> doLogin(@Body LoginRequest loginRequest);
+
+    @POST("account/recorderSetPassword")
+    Observable<ModifyPasswordResponse> doModifyPassword(@Body ModifyPasswordRequest request);
 
 }

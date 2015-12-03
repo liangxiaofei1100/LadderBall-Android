@@ -193,6 +193,8 @@ public class LoginActivity extends BaseActivity {
         } else {
             Snackbar.make(mPasswordView, "登录成功", Snackbar.LENGTH_SHORT).show();
 
+            CommonUtil.setUserHttpHeaderToken(getApplicationContext(), response.userToken);
+
             SharedPreferencesManager.put(getApplicationContext(), CommonUtil.KEY_USER_PHONE, response.phone);
 
             UserManager.saveOrUpdateUser(response);

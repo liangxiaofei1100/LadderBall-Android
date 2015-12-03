@@ -10,8 +10,6 @@ import com.zhaoyan.ladderball.util.CommonUtil;
  */
 public class BaseRequest {
 
-    private Context mContext;
-
     public RequestHeader header;
 
     public BaseRequest(Context context) {
@@ -19,9 +17,12 @@ public class BaseRequest {
         header.clientVersion = getClientVersion(context);
         header.requestTime = getRequestTime();
         header.serviceVersion = getServieVersion();
-        header.userToken = "";
+        header.userToken = getUserToken(context);
     }
 
+    private String getUserToken(Context context) {
+        return CommonUtil.getUserHttpHeaderToken(context);
+    }
 
     private int getServieVersion() {
         return 1;

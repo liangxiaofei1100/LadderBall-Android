@@ -16,6 +16,9 @@ import java.util.List;
  */
 public class AppAplication extends Application {
 
+    /**接口返回的userToken*/
+    private String mUserToken="";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -54,6 +57,14 @@ public class AppAplication extends Application {
             }
         }
         return null;
+    }
+
+    public void setUserToken(String userToken) {
+        mUserToken = userToken;
+    }
+
+    public String getUserToken() {
+        return mUserToken;
     }
 
     @Override

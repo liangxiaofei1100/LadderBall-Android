@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.zhaoyan.ladderball.AppAplication;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,12 +47,38 @@ public class CommonUtil {
         return version;
     }
 
+    /**
+     * @description 获取AppApplication对象
+     * @param context
+     * @return AppApplication对象
+     */
+    private static AppAplication getApp(Context context){
+        return (AppAplication)context.getApplicationContext();
+    }
+
     /**SharedPrefenrence：记录登录用户的电话号码*/
     public static final String KEY_USER_PHONE = "ladderball_phone";
     /**判断当前是否登录状态*/
     public static boolean isLogin(Context context) {
         String phone = SharedPreferencesManager.get(context, KEY_USER_PHONE, "-1");
         return !phone.equals("-1");
+    }
+
+    /**
+     * @description 该token是服务端返回的标识登录用户的id，客户端发送Http请求是需要在header头添加该token，标识是登录用户
+     * @param context
+     */
+    public static String getUserHttpHeaderToken(Context context){
+        return getApp(context).getUserToken();
+    }
+
+    /**
+     * @description 设定用户token
+     * @param context
+     * @param userToken 用户token
+     */
+    public static void setUserHttpHeaderToken(Context context, String userToken){
+        getApp(context).setUserToken(userToken);
     }
 
 }
