@@ -7,7 +7,6 @@
              tools:context="com.zhaoyan.ladderball.ui.fragments.UserCenterFragment"
     >
 
-    <!-- TODO: Update blank fragment layout -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -35,6 +34,7 @@
                     />
 
                 <TextView
+                    android:id="@+id/tv_user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -60,6 +60,7 @@
                     />
 
                 <TextView
+                    android:id="@+id/tv_user_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -85,6 +86,7 @@
                     />
 
                 <TextView
+                    android:id="@+id/tv_user_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -110,6 +112,7 @@
                     />
 
                 <TextView
+                    android:id="@+id/tv_user_gender"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -122,6 +125,7 @@
                 android:id="@+id/rl_user_modify_passwd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/item_background"
                 android:layout_marginTop="16dp"
                 android:paddingBottom="12dp"
                 android:paddingLeft="16dp"

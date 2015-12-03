@@ -98,7 +98,7 @@ public class ModifyPasswordActivity extends BaseActivity {
 
     private void doModifyPassword(String oldPassword, String newPassword) {
 
-        ModifyPasswordRequest request = new ModifyPasswordRequest(getApplicationContext());
+        ModifyPasswordRequest request = new ModifyPasswordRequest(this);
         request.password = oldPassword;
         request.newPassword = newPassword;
 

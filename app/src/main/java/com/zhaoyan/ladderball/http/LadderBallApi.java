@@ -19,6 +19,7 @@ public interface LadderBallApi {
     @POST("account/recorderlogin")
     Observable<LoginResponse> doLogin(@Body LoginRequest loginRequest);
 
+    /**修改密码请求*/
     @POST("account/recorderSetPassword")
     Observable<ModifyPasswordResponse> doModifyPassword(@Body ModifyPasswordRequest request);
 

@@ -31,5 +31,14 @@ public class User extends Model{
     @Column(name = "gender")
     public int mGender;
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "mAddress='" + mAddress + '\'' +
+                ", mUserToken='" + mUserToken + '\'' +
+                ", mUserName='" + mUserName + '\'' +
+                ", mPhone='" + mPhone + '\'' +
+                ", mGender=" + mGender +
+                '}';
+    }
 }
