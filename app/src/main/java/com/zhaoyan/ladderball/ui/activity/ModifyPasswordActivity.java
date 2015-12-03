@@ -12,6 +12,7 @@ import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.request.ModifyPasswordRequest;
 import com.zhaoyan.ladderball.http.response.ModifyPasswordResponse;
 import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.ToastUtil;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -90,14 +91,16 @@ public class ModifyPasswordActivity extends BaseActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            doModifyPassword();
+            doModifyPassword(oldPassword, newPassword);
         }
 
     }
 
-    private void doModifyPassword() {
+    private void doModifyPassword(String oldPassword, String newPassword) {
 
         ModifyPasswordRequest request = new ModifyPasswordRequest(getApplicationContext());
+        request.password = oldPassword;
+        request.newPassword = newPassword;
 
         Observable<ModifyPasswordResponse> observable = mLadderBallApi.doModifyPassword(request);
         observable.subscribeOn(Schedulers.newThread())
@@ -132,7 +135,7 @@ public class ModifyPasswordActivity extends BaseActivity {
                         }
 
                         if (response.header.resultCode == 0) {
-                            Snackbar.make(mOldPwEditText, "密码修改成功", Snackbar.LENGTH_SHORT).show();
+                            ToastUtil.showToast(getApplicationContext(), "修改密码成功");
 
                             ModifyPasswordActivity.this.finish();
                         } else {

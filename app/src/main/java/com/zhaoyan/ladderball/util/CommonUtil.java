@@ -3,8 +3,11 @@ package com.zhaoyan.ladderball.util;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.text.TextUtils;
 
+import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.AppAplication;
+import com.zhaoyan.ladderball.model.User;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,12 +67,27 @@ public class CommonUtil {
         return !phone.equals("-1");
     }
 
+    public static String getUserPhone(Context context) {
+        String phone = SharedPreferencesManager.get(context, KEY_USER_PHONE, "-1");
+        return phone;
+    }
+
     /**
      * @description 该token是服务端返回的标识登录用户的id，客户端发送Http请求是需要在header头添加该token，标识是登录用户
      * @param context
      */
     public static String getUserHttpHeaderToken(Context context){
-        return getApp(context).getUserToken();
+        String userToken = getApp(context).getUserToken();
+        if (TextUtils.isEmpty(userToken)) {
+            String phone = getUserPhone(context);
+            User user = new Select().from(User.class).where("phone=?", phone).executeSingle();
+            if (user == null){
+                return null;
+            }
+            userToken = user.mUserToken;
+        }
+
+        return userToken;
     }
 
     /**
