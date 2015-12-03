@@ -1,5 +1,9 @@
 package com.zhaoyan.ladderball.util;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,4 +25,32 @@ public class CommonUtil {
         Matcher m = p.matcher(number);
         return m.find();
     }
+
+    /**
+     * 获取应用版本号
+     * @param context
+     * @return 当前版本号
+     * @throws PackageManager.NameNotFoundException
+     */
+    public static String getAppVersion(Context context){
+        String version = "";
+        try{
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo packInfo = packageManager.getPackageInfo(
+                    context.getPackageName(), 0);
+            version = packInfo.versionName;
+        }catch(Exception e){
+            Log.e("get app version error...");
+        }
+        return version;
+    }
+
+    /**SharedPrefenrence：记录登录用户的电话号码*/
+    public static final String KEY_USER_PHONE = "ladderball_phone";
+    /**判断当前是否登录状态*/
+    public static boolean isLogin(Context context) {
+        String phone = SharedPreferencesManager.get(context, KEY_USER_PHONE, "-1");
+        return !phone.equals("-1");
+    }
+
 }

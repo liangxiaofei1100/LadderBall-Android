@@ -22,3 +22,16 @@
 
 #tencent bugly
 -keep public class com.tencent.bugly.**{*;}
+
+-dontwarn com.activeandroid.**
+-keep class com.activeandroid.** {*; }
+-keep interface com.activeandroid.** {*; }
+
+-dontwarn com.zhaoyan.ladderball.model.**
+-keep class com.zhaoyan.ladderball.model.** {*; }
+-keep interface com.zhaoyan.ladderball.model.** {*; }
+
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions

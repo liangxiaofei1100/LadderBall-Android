@@ -1,20 +1,25 @@
 package com.zhaoyan.ladderball.ui.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
-import com.zhaoyan.ladderball.model.User;
+import com.zhaoyan.ladderball.http.request.LoginRequest;
+import com.zhaoyan.ladderball.http.response.LoginResponse;
 import com.zhaoyan.ladderball.util.CommonUtil;
 import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.SharedPreferencesManager;
+import com.zhaoyan.ladderball.util.UserManager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -28,7 +33,7 @@ import rx.schedulers.Schedulers;
 /**
  * A login screen that offers login via phone/password.
  */
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     // UI references.
     @Bind(R.id.phone)
@@ -36,11 +41,17 @@ public class LoginActivity extends AppCompatActivity {
     @Bind(R.id.password)
     EditText mPasswordView;
 
+    private ProgressDialog mProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
+        if (CommonUtil.isLogin(getApplicationContext())) {
+            goToMain();
+        }
 
         //支持用户点击虚拟键盘的回车键直接登录
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -53,6 +64,12 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage("正在登录...");
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(false);
+
     }
 
 
@@ -97,6 +114,10 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             //doLoginAction
             Log.d("doLoginAction");
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mPhoneView.getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(mPasswordView.getWindowToken(), 0);
+
             doLoginAction();
         }
     }
@@ -107,70 +128,87 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean isPasswordValid(String password) {
         //TODO: 确定密码的格式逻辑
-        return password.length() > 4;
+        return password.length() >= 6;
     }
 
     public void doLoginAction() {
         //使用RxJava执行登录
-        Observable<User> observable = Observable.create(new Observable.OnSubscribe<User>() {
-            @Override
-            public void call(Subscriber<? super User> subscriber) {
-                Log.d("start");
-                User user;
-                for (int i=0; i < 2; i++) {
-                    Log.d("start>>>>" + i);
-                    user = new User();
-                    user.mUserName = "username" + i;
-                    subscriber.onNext(user);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        Log.d(e.toString());
-                        e.printStackTrace();
-                    }
-                }
-                subscriber.onCompleted();
-                Log.d("end");
-            }
-        });
+        LoginRequest request = new LoginRequest(getApplicationContext());
+        request.loginType = 1;
+        request.userName = mPhoneView.getText().toString();
+        request.password = mPasswordView.getText().toString();
+        Observable<LoginResponse> observable = mLadderBallApi.doLogin(request);
         observable.subscribeOn(Schedulers.newThread())
                 .doOnSubscribe(new Action0() {
                     @Override
                     public void call() {
                         //在这里执行加载等待动画
-                        ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                        progressDialog.setMessage("正在登录中...");
-                        progressDialog.show();
+                        mProgressDialog.show();
                     }
                 })
                 //加载等待动画必须在UI线程中执行
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<User>() {
+                .subscribe(new Subscriber<LoginResponse>() {
                     @Override
                     public void onCompleted() {
-                        Log.d();
-                        Intent intent = new Intent();
-                        intent.setClass(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
 
-                        LoginActivity.this.finish();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(e.toString());
+                        if (mProgressDialog != null) {
+                            mProgressDialog.cancel();
+                        }
+
+                        Log.e(e.toString());
+                        Snackbar.make(mPasswordView, "网络错误，请重试！", Snackbar.LENGTH_SHORT).show();
                     }
 
                     @Override
-                    public void onNext(User user) {
-                        Log.d("user.name:" + user.mUserName);
-
+                    public void onNext(LoginResponse response) {
+                        onLoginOver(response);
                     }
                 });
 
     }
 
+    /**
+     * 跳转主界面
+     */
+    private void goToMain() {
+        Intent intent = new Intent();
+        intent.setClass(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        LoginActivity.this.finish();
+    }
+
+    private void onLoginOver(LoginResponse response) {
+        if (mProgressDialog != null) {
+            mProgressDialog.cancel();
+        }
+
+        if (response.header.resultCode != 0) {
+            Snackbar.make(mPasswordView, "用户名或密码错误，登录失败", Snackbar.LENGTH_SHORT).show();
+        } else {
+            Snackbar.make(mPasswordView, "登录成功", Snackbar.LENGTH_SHORT).show();
+
+            SharedPreferencesManager.put(getApplicationContext(), CommonUtil.KEY_USER_PHONE, response.phone);
+
+            UserManager.saveOrUpdateUser(response);
+
+            goToMain();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mProgressDialog != null) {
+            mProgressDialog.cancel();
+            mProgressDialog = null;
+        }
+    }
 }
 
