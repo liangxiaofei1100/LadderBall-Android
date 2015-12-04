@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         String[] titleArray = getResources().getStringArray(R.array.tab_titles);
 
         List<Fragment> fragments = new ArrayList<>();
-        TaskFragment taskFragment = TaskFragment.newInstance("", "");
+        TaskFragment taskFragment = TaskFragment.newInstance();
         PracticeFragment practiceFragment = PracticeFragment.newInstance("", "");
         UserCenterFragment userCenterFragment = UserCenterFragment.newInstance();
         fragments.add(taskFragment);
