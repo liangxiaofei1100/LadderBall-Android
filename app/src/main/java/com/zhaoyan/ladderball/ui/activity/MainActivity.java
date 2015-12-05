@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         titles.add(titleArray[2]);
         MainPagerAdaper adaper = new MainPagerAdaper(getSupportFragmentManager(), titles, fragments);
 
+        mViewPager.setOffscreenPageLimit(2);
         mViewPager.setAdapter(adaper);
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabsFromPagerAdapter(adaper);

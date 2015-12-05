@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.activeandroid.query.Select;
-import com.zhaoyan.ladderball.AppAplication;
+import com.zhaoyan.ladderball.AppApplication;
 import com.zhaoyan.ladderball.model.User;
 
 import java.util.regex.Matcher;
@@ -55,8 +55,8 @@ public class CommonUtil {
      * @param context
      * @return AppApplication对象
      */
-    private static AppAplication getApp(Context context){
-        return (AppAplication)context.getApplicationContext();
+    private static AppApplication getApp(Context context){
+        return (AppApplication)context.getApplicationContext();
     }
 
     /**SharedPrefenrence：记录登录用户的电话号码*/

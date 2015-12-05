@@ -14,7 +14,7 @@ import java.util.List;
  * 自定义Application用于一些数据初始化
  * Created by Yuri on 2015/12/1.
  */
-public class AppAplication extends Application {
+public class AppApplication extends Application {
 
     /**接口返回的userToken*/
     private String mUserToken="";
