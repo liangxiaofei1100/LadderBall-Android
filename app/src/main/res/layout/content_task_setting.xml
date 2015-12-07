@@ -203,7 +203,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@drawable/btn_bg_selector"
-            android:text="预览数据"
+            android:text="提交"
             android:textColor="@android:color/white"
             />
     </FrameLayout>
