@@ -15,4 +15,14 @@
         <attr name="verticalGap" format="dimension|reference" />
     </declare-styleable>
 
+    <declare-styleable name="SettingItemView">
+        <attr name="itemIcon" format="reference" />
+        <attr name="itemTitle" format="string|reference" />
+        <attr name="itemSummary" format="string|reference" />
+        <attr name="itemSummaryColor" format="color|reference" />
+        <attr name="itemUnderLine" format="boolean" />
+        <attr name="itemSwitch" format="boolean" />
+        <attr name="itemRightArrow" format="boolean" />
+    </declare-styleable>
+
 </resources>

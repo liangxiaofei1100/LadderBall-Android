@@ -16,7 +16,7 @@
         app:direction="horizontal"
         app:horizonGap="8dp"
         app:texts="未完成|已完成"
-        app:verticalGap="8dp"
+        app:verticalGap="12dp"
         />
 
     <android.support.v4.widget.SwipeRefreshLayout

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:fillViewport="true"-->
+    <!--&gt;-->
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.zhaoyan.ladderball.ui.activity.TaskSettingActivity"
+        tools:showIn="@layout/activity_task_setting">
+
+        <LinearLayout
+            android:id="@+id/ll_task_setting_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="10dp"
+            android:background="@android:color/white"
+            >
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                >
+
+                <ImageView
+                    android:id="@+id/iv_task_item_visitor_team_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@mipmap/ic_launcher"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_task_item_visitor_team_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:text="已领取"
+                    />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="狗仔队"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="(主队)"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:text="红色"
+                />
+        </LinearLayout>
+
+
+        <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:layout_below="@+id/ll_task_setting_top"-->
+        <!--android:background="@color/divider"/>-->
+
+        <LinearLayout
+            android:id="@+id/ll_task_setting_item1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll_task_setting_top"
+            android:background="@android:color/white"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            >
+
+            <!--<include layout="@layout/layout_divider" />-->
+            <com.zhaoyan.ladderball.ui.view.SettingItemView
+                android:id="@+id/stv_rule"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:itemRightArrow="true"
+                app:itemSummary="8人制"
+                app:itemTitle="设置赛制人数"
+                />
+
+            <com.zhaoyan.ladderball.ui.view.SettingItemView
+                android:id="@+id/stv_jie"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:itemRightArrow="true"
+                app:itemSummary="3节"
+                app:itemTitle="设置比赛节数"
+                />
+
+            <com.zhaoyan.ladderball.ui.view.SettingItemView
+                android:id="@+id/stv_jie_time"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:itemRightArrow="true"
+                app:itemSummary="30分钟"
+                app:itemTitle="设置每节时长"
+                />
+            <!--<include layout="@layout/layout_divider" />-->
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_task_setting_total_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll_task_setting_item1"
+            android:gravity="right"
+            android:background="@android:color/white"
+            android:padding="8dp"
+            android:text="比赛共90分钟"
+            />
+
+        <RelativeLayout
+            android:id="@+id/rl_task_setting_player_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_task_setting_total_time"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/white"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="设置首发(3/8)"
+                />
+
+            <Button
+                android:id="@+id/btn_add_player"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="新增球员"
+                />
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rlv_task_setting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_task_setting_player_header"
+            android:layout_above="@+id/btn_task_setting_commit"
+            android:background="@android:color/white"
+            >
+
+        </android.support.v7.widget.RecyclerView>
+
+    <!--<FrameLayout-->
+        <!--android:id="@+id/fl_task_setting_bottom"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:background="@android:color/white"-->
+        <!--android:paddingLeft="16dp"-->
+        <!--android:paddingRight="16dp"-->
+        <!--android:paddingBottom="8dp"-->
+        <!--&gt;-->
+        <Button
+            android:id="@+id/btn_task_setting_commit"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/btn_bg_selector"
+            android:textColor="@android:color/white"
+            android:text="提交"
+            />
+    <!--</FrameLayout>-->
+
+    </RelativeLayout>
+<!--</ScrollView>-->

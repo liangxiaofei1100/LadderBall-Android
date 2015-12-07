@@ -16,6 +16,7 @@ import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
 import com.zhaoyan.ladderball.model.Task;
+import com.zhaoyan.ladderball.ui.activity.TaskMainActivity;
 import com.zhaoyan.ladderball.ui.adapter.TaskAdapter;
 import com.zhaoyan.ladderball.ui.view.SegmentControl;
 import com.zhaoyan.ladderball.util.Log;
@@ -83,8 +84,10 @@ public class TaskFragment extends BaseFragment {
         mItemObservable.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<Integer>() {
                     @Override
-                    public void call(Integer integer) {
-                        ToastUtil.showToast(getActivity(), "Click " + integer);
+                    public void call(Integer position) {
+                        Task task = mAdapter.getItem(position);
+
+                        startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));
                     }
                 });
     }
@@ -146,16 +149,16 @@ public class TaskFragment extends BaseFragment {
      * do get task from server
      */
     private void doGetTasks() {
-        mUnCompleteTaskList.clear();
-        mCompleteTaskList.clear();
         Observable<TaskListResponse> responseObservable = mLadderBallApi.doGetTaskList(new BaseRequest(getActivity()));
         responseObservable
+                .subscribeOn(Schedulers.io())
                 .flatMap(new Func1<TaskListResponse, Observable<TaskListResponse.HttpMatch>>() {
                     @Override
                     public Observable<TaskListResponse.HttpMatch> call(TaskListResponse taskListResponse) {
                         return Observable.from(taskListResponse.matches);
                     }
                 })
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<TaskListResponse.HttpMatch, Task>() {
                     @Override
                     public Task call(TaskListResponse.HttpMatch httpMatch) {
@@ -186,9 +189,17 @@ public class TaskFragment extends BaseFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Task>() {
                     @Override
+                    public void onStart() {
+                        super.onStart();
+                        Log.d();
+                        mUnCompleteTaskList.clear();
+                        mCompleteTaskList.clear();
+                    }
+
+                    @Override
                     public void onCompleted() {
                         Log.d();
-                        ToastUtil.showToast(getActivity(), "获取任务完成");
+//                        ToastUtil.showToast(getActivity(), "获取任务完成");
                         mSwipeRefreshLayout.setRefreshing(false);
                         showData();
                     }

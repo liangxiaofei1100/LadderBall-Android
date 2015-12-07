@@ -7,4 +7,6 @@ package com.zhaoyan.ladderball.util.rx;
 public class RxBusTag {
 
     public static final String TASK_ITEM_CLICK = "task_item_click";
+
+    public static final String PlAYER_ITEM_REMOVE = "player_item_remove";
 }
