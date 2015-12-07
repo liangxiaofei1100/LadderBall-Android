@@ -6,7 +6,7 @@ import android.os.Looper;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -73,8 +73,12 @@ public class TaskSettingActivity extends AppCompatActivity {
         }
         //test
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
         mAdapter = new TaskSettingAdapter(this, mPlayerList);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+//        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         mRecyclerView.setAdapter(mAdapter);
 
         mItemObservable = RxBus.get().register(RxBusTag.PlAYER_ITEM_REMOVE, Integer.class);

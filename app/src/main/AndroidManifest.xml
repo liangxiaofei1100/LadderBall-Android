@@ -55,6 +55,13 @@
         <activity
             android:name=".ui.activity.TaskSettingActivity"
             android:label="任务设置"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".ui.activity.DataRecoderActivity"
+            android:label="@string/title_activity_data_recoder"
+            android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

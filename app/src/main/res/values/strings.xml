@@ -19,4 +19,5 @@
     <string name="title_activity_modify_password">ModifyPasswordActivity</string>
     <string name="title_activity_task_main">TaskMainActivity</string>
     <string name="title_activity_task_setting">TaskSettingActivity</string>
+    <string name="title_activity_data_recoder">DataRecoderActivity</string>
 </resources>
