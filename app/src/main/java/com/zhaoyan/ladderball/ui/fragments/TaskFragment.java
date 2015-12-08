@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
@@ -163,7 +164,10 @@ public class TaskFragment extends BaseFragment {
                     @Override
                     public Task call(TaskListResponse.HttpMatch httpMatch) {
                         Log.d("mattchid:" + httpMatch.id + ",address:" + httpMatch.address);
-                        Task task = new Task();
+                        Task task = new Select().from(Task.class).where("matchId=?", httpMatch.id).executeSingle();
+                        if (task == null) {
+                            task = new Task();
+                        }
                         task.mMatchId = httpMatch.id;
 
                         task.mTeamHomeName = httpMatch.teamHome.name;
@@ -182,6 +186,38 @@ public class TaskFragment extends BaseFragment {
                         task.mAddress = httpMatch.address;
                         task.mIsComplete = httpMatch.complete;
                         task.mStartTime = httpMatch.startTime;
+
+                        task.save();
+
+                        //本来想分表保存的，但是team这个字段，服务端没有返回id，有点不好处理
+//                        Match match = new Match();
+//                        match.matchId = httpMatch.id;
+//                        match.address = httpMatch.address;
+//                        match.startTime = httpMatch.startTime;
+//                        match.playerNumber = httpMatch.playerNumber;
+//
+//                        Team teamHome = new Team();
+//                        teamHome.matchId = httpMatch.id;
+//                        teamHome.color = httpMatch.teamHome.color;
+//                        teamHome.score = httpMatch.teamHome.score;
+//                        teamHome.isAssiged = httpMatch.teamHome.isAsigned;
+//                        teamHome.logoUrl = httpMatch.teamHome.logoURL;
+//                        teamHome.save();
+//
+//                        Team teamVisitor = new Team();
+//                        teamVisitor.matchId = httpMatch.id;
+//                        teamVisitor.color = httpMatch.teamVisitor.color;
+//                        teamVisitor.score = httpMatch.teamVisitor.score;
+//                        teamVisitor.isAssiged = httpMatch.teamVisitor.isAsigned;
+//                        teamVisitor.logoUrl = httpMatch.teamVisitor.logoURL;
+//                        teamVisitor.save();
+//
+//                        match.teamHome = teamHome;
+//                        match.teamVisitor = teamVisitor;
+//
+//                        match.save();
+                        Log.d("finish saved");
+
                         return task;
                     }
                 })

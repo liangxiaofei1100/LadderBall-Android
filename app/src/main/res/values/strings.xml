@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">天梯足球</string>
     <string name="title_activity_login">Sign in</string>
@@ -20,4 +21,8 @@
     <string name="title_activity_task_main">TaskMainActivity</string>
     <string name="title_activity_task_setting">TaskSettingActivity</string>
     <string name="title_activity_data_recoder">DataRecoderActivity</string>
+
+    <!-- 任务主页 -->
+    <string name="starting_lineup">首发阵容(%1$d)</string>
+    <string name="record_title">比赛记录(%1$d节*%2$d分钟)</string>
 </resources>

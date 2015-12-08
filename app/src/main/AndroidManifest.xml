@@ -25,7 +25,14 @@
             android:value="1"/>
         <meta-data
             android:name="AA_MODELS"
-            android:value="com.zhaoyan.ladderball.model.User"/>
+            android:value="
+                com.zhaoyan.ladderball.model.User,
+                com.zhaoyan.ladderball.model.Task,
+                com.zhaoyan.ladderball.model.Match,
+                com.zhaoyan.ladderball.model.Team,
+                com.zhaoyan.ladderball.model.Player,
+                com.zhaoyan.ladderball.model.PartData
+                "/>
 
         <activity
             android:name=".ui.activity.LoginActivity"

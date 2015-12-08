@@ -1,5 +1,6 @@
 package com.zhaoyan.ladderball.model;
 
+import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
@@ -8,7 +9,7 @@ import com.activeandroid.annotation.Table;
  * Created by Yuri on 2015/12/4.
  */
 @Table(name = "task")
-public class Task {
+public class Task extends Model{
 
     //一场比赛有唯一的id
     @Column(name = "matchId")

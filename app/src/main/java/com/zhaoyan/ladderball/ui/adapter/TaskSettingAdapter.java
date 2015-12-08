@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.util.rx.RxBus;
@@ -54,10 +53,10 @@ public class TaskSettingAdapter extends RecyclerView.Adapter<TaskSettingAdapter.
 
         holder.textView.setText(player.number + "号");
 
-        Picasso.with(mContext)
-                .load(player.mPlayerAvatarUrl)
-                .placeholder(R.mipmap.ic_launcher)
-                .into(holder.imageView);
+//        Picasso.with(mContext)
+//                .load(player.mPlayerAvatarUrl)
+//                .placeholder(R.mipmap.ic_launcher)
+//                .into(holder.imageView);
     }
 
     @Override

@@ -33,6 +33,7 @@ public class SettingItemView extends FrameLayout {
      * */
     private View mRedDotView;
     private TextView mSummaryView;
+    private TextView mTitleView;
 
 //    private SlideButton mSlideButton;
 
@@ -63,11 +64,20 @@ public class SettingItemView extends FrameLayout {
 //        }
     }
 
-    private void init(Context context) {
+    public SettingItemView(Context context) {
+        super(context);
+        mIconResId = -1;
+        mSummaryColor = getResources().getColor(R.color.textSecondary);
+        mHasUnderLine = true;
+        mHasRightArrow = true;
+        init(context);
+    }
+
+    public void init(Context context) {
         View rootView = inflate(context, R.layout.layout_setting_item, null);
         View iconFrameView = rootView.findViewById(R.id.layout_frame);
         ImageView iconView = (ImageView) rootView.findViewById(R.id.iv_setting_icon);
-        TextView titleView = (TextView) rootView.findViewById(R.id.tv_setting_title);
+        mTitleView = (TextView) rootView.findViewById(R.id.tv_setting_title);
         mSummaryView = (TextView) rootView.findViewById(R.id.tv_setting_summary);
         View underLineView = rootView.findViewById(R.id.underLineView);
         View indicatorView = rootView.findViewById(R.id.indicator);
@@ -82,7 +92,7 @@ public class SettingItemView extends FrameLayout {
             mRedDotView = rootView.findViewById(R.id.iv_icon_dot);
             iconView.setImageResource(mIconResId);
         }
-        titleView.setText(mTitle);
+        mTitleView.setText(mTitle);
         mSummaryView.setText(mSummary);
         mSummaryView.setTextColor(mSummaryColor);
         underLineView.setVisibility(mHasUnderLine ? VISIBLE : INVISIBLE);
@@ -125,6 +135,12 @@ public class SettingItemView extends FrameLayout {
     public void setHasNew(boolean hsNew) {
         if (mRedDotView != null) {
             mRedDotView.setVisibility(hsNew ? VISIBLE : GONE);
+        }
+    }
+
+    public void setTitleText(String text) {
+        if (mTitleView != null) {
+            mTitleView.setText(text);
         }
     }
 

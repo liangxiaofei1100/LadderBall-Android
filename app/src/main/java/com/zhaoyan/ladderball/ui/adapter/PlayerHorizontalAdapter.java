@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.util.Log;
@@ -37,6 +36,15 @@ public class PlayerHorizontalAdapter extends RecyclerView.Adapter<PlayerHorizont
         mInflater = LayoutInflater.from(context);
     }
 
+    public void setDataList(List<Player> dataList) {
+        //过滤掉非首发的
+        for (Player player: dataList) {
+            if (player.isFirst) {
+                mDataList.add(player);
+            }
+        }
+    }
+
     public void addItem(Player player) {
         mDataList.add(mDataList.size(), player);
         notifyItemInserted(mDataList.size());
@@ -52,13 +60,9 @@ public class PlayerHorizontalAdapter extends RecyclerView.Adapter<PlayerHorizont
     public void onBindViewHolder(PlayerViewHolder holder, int position) {
 
         Player player = mDataList.get(position);
-        Log.d(">>" + player.number);
+        Log.d(">>" + player.number + ",isFirst:" + player.isFirst);
         holder.textView.setText(player.number + "号");
 
-        Picasso.with(mContext)
-                .load(player.mPlayerAvatarUrl)
-                .placeholder(R.mipmap.ic_launcher)
-                .into(holder.imageView);
     }
 
     @Override

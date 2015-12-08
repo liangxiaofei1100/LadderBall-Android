@@ -82,38 +82,39 @@
                 >
 
                 <TextView
+                    android:id="@+id/tv_task_main_record_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="16dp"
                     android:text="比赛记录(3节*30分钟)"
                     />
 
-                <com.zhaoyan.ladderball.ui.view.SettingItemView
-                    android:id="@+id/stv_task_main_first"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    app:itemRightArrow="true"
-                    app:itemSummary="第一节"
-                    app:itemTitle="未开始"
-                    />
+                <!--<com.zhaoyan.ladderball.ui.view.SettingItemView-->
+                    <!--android:id="@+id/stv_task_main_first"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="48dp"-->
+                    <!--app:itemRightArrow="true"-->
+                    <!--app:itemSummary="第一节"-->
+                    <!--app:itemTitle="未开始"-->
+                    <!--/>-->
 
-                <com.zhaoyan.ladderball.ui.view.SettingItemView
-                    android:id="@+id/stv_task_main_second"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    app:itemRightArrow="true"
-                    app:itemSummary="第二节"
-                    app:itemTitle="未开始"
-                    />
+                <!--<com.zhaoyan.ladderball.ui.view.SettingItemView-->
+                    <!--android:id="@+id/stv_task_main_second"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="48dp"-->
+                    <!--app:itemRightArrow="true"-->
+                    <!--app:itemSummary="第二节"-->
+                    <!--app:itemTitle="未开始"-->
+                    <!--/>-->
 
-                <com.zhaoyan.ladderball.ui.view.SettingItemView
-                    android:id="@+id/stv_task_main_third"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    app:itemRightArrow="true"
-                    app:itemSummary="第三节"
-                    app:itemTitle="未开始"
-                    />
+                <!--<com.zhaoyan.ladderball.ui.view.SettingItemView-->
+                    <!--android:id="@+id/stv_task_main_third"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="48dp"-->
+                    <!--app:itemRightArrow="true"-->
+                    <!--app:itemSummary="第三节"-->
+                    <!--app:itemTitle="未开始"-->
+                    <!--/>-->
             </LinearLayout>
 
         </LinearLayout>
@@ -147,7 +148,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        style="@android:style/Widget.ProgressBar.Large.Inverse"
+        style="@android:style/Widget.Holo.ProgressBar.Large"
         android:visibility="gone"
         />
 
