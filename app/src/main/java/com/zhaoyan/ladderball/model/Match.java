@@ -33,4 +33,18 @@ public class Match extends Model{
 
     public List<PartData> partDatas = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "Match{" +
+                "address='" + address + '\'' +
+                ", matchId=" + matchId +
+                ", startTime=" + startTime +
+                ", playerNumber=" + playerNumber +
+                ", totalPart=" + totalPart +
+                ", partMinutes=" + partMinutes +
+                ", teamHome=" + teamHome +
+                ", teamVisitor=" + teamVisitor +
+                ", partDatas=" + partDatas +
+                '}';
+    }
 }

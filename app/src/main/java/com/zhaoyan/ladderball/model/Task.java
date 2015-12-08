@@ -13,7 +13,7 @@ public class Task extends Model{
 
     //一场比赛有唯一的id
     @Column(name = "matchId")
-    public int mMatchId;
+    public long mMatchId;
 
     @Column(name = "teamHomeName")
     public String mTeamHomeName;//主场队伍的名称

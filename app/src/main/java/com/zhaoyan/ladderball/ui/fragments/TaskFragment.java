@@ -57,6 +57,7 @@ public class TaskFragment extends BaseFragment {
     private LinearLayoutManager mLayoutManager;
     private TaskAdapter mAdapter;
 
+    public static final int REGET_DATA = -2;
     private Observable<Integer> mItemObservable;
 
     public static final int TYPE_UNCOMPLETEED = 0;
@@ -86,6 +87,11 @@ public class TaskFragment extends BaseFragment {
                 .subscribe(new Action1<Integer>() {
                     @Override
                     public void call(Integer position) {
+                        if (position == REGET_DATA) {
+                            Log.d("refresh data");
+                            doGetTasks();
+                            return;
+                        }
                         Task task = mAdapter.getItem(position);
 
                         startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));

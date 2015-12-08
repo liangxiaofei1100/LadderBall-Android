@@ -28,7 +28,7 @@ public class MatchDetailResponse extends BaseResponse {
         public List<HttpPlayer> players;
     }
 
-    public class HttpPlayer{
+    public static class HttpPlayer{
         public long id;
         public String name;
         public int number;

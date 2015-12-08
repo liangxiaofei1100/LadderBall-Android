@@ -44,6 +44,7 @@ import rx.schedulers.Schedulers;
 public class TaskMainActivity extends BaseActivity {
 
     public static final String EXTRA_MATCH_ID = "match_id";
+    private static final int REQUEST_CODE_SETTING = 0;
 
     @Bind(R.id.task_main_recyclerview)
     RecyclerView mRecyclerView;
@@ -89,9 +90,9 @@ public class TaskMainActivity extends BaseActivity {
 
     private PlayerHorizontalAdapter mAdapter;
 
-    private int mMatchId;
+    private long mMatchId;
 
-    public static Intent getStartIntent(Context context, int matchId) {
+    public static Intent getStartIntent(Context context, long matchId) {
         Intent intent = new Intent();
         intent.setClass(context, TaskMainActivity.class);
         intent.putExtra(EXTRA_MATCH_ID, matchId);
@@ -104,7 +105,7 @@ public class TaskMainActivity extends BaseActivity {
         setContentView(R.layout.activity_task_main);
         ButterKnife.bind(this);
 
-        mMatchId = getIntent().getIntExtra(EXTRA_MATCH_ID, -1);
+        mMatchId = getIntent().getLongExtra(EXTRA_MATCH_ID, -1);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -252,6 +253,7 @@ public class TaskMainActivity extends BaseActivity {
                         Log.e(e);
                         mLoadingBar.setVisibility(View.GONE);
                         ToastUtil.showToast(getApplicationContext(), "获取失败，请重试");
+                        TaskMainActivity.this.finish();
                     }
 
                     @Override
@@ -278,6 +280,7 @@ public class TaskMainActivity extends BaseActivity {
         //显示首发阵容情况
         mStartingLineupView.setText(getString(R.string.starting_lineup, match.playerNumber));
         if (mAdapter != null) {
+            mAdapter.clear();
             if (match.teamHome.isAssiged) {
                 mAdapter.setDataList(match.teamHome.players);
             } else if (match.teamVisitor.isAssiged) {
@@ -298,6 +301,7 @@ public class TaskMainActivity extends BaseActivity {
 
         PartItemClickListener itemClickListener = new PartItemClickListener();
 
+        mRecordLayout.removeAllViews();
         for (PartData pardData: match.partDatas) {
             if (pardData.partNumber > matchParts.length) {
                 //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
@@ -376,9 +380,14 @@ public class TaskMainActivity extends BaseActivity {
 
     @OnClick(R.id.tv_task_main_setting)
     void doTaskSetting() {
-        Intent intent = new Intent();
-        intent.setClass(this, TaskSettingActivity.class);
-        startActivity(intent);
+        startActivityForResult(TaskSettingActivity.getStartIntent(this, mMatchId), REQUEST_CODE_SETTING);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SETTING && resultCode == RESULT_OK) {
+            getMatchDetail();
+        }
+    }
 }

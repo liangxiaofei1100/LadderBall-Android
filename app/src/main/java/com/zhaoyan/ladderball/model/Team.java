@@ -28,4 +28,18 @@ public class Team extends Model{
     public int score;
 
     public List<Player> players = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "color='" + color + '\'' +
+                ", teamId=" + teamId +
+                ", matchId=" + matchId +
+                ", name='" + name + '\'' +
+                ", isAssiged=" + isAssiged +
+                ", logoUrl='" + logoUrl + '\'' +
+                ", score=" + score +
+                ", players=" + players +
+                '}';
+    }
 }

@@ -10,7 +10,7 @@ public class TaskListResponse extends BaseResponse {
     public List<HttpMatch> matches;
 
     public class HttpMatch {
-        public int id;
+        public long id;
 
         public HttpTeam teamHome;//主队
         public HttpTeam teamVisitor;//客队

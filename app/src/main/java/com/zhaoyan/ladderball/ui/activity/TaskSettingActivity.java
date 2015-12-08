@@ -1,11 +1,13 @@
 package com.zhaoyan.ladderball.ui.activity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -13,8 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
+import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
+import com.zhaoyan.ladderball.http.response.BaseResponse;
+import com.zhaoyan.ladderball.http.response.MatchDetailResponse;
+import com.zhaoyan.ladderball.model.Match;
 import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.ui.adapter.TaskSettingAdapter;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
@@ -31,9 +39,15 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
-public class TaskSettingActivity extends AppCompatActivity {
+public class TaskSettingActivity extends BaseActivity {
+    public static final String EXTRA_MATCH_ID = "match_id";
+    private static final int REQUEST_CODE_PLAYER_CHOOSE = 0;
 
     @Bind(R.id.stv_rule)
     SettingItemView mRuleItemView;
@@ -48,11 +62,33 @@ public class TaskSettingActivity extends AppCompatActivity {
     @Bind(R.id.btn_task_setting_commit)
     Button mCommitButton;
 
+    @Bind(R.id.tv_task_setting_team_status)
+    TextView mTeamAssigned;
+    @Bind(R.id.tv_task_setting_team_info)
+    TextView mTeamInfo;
+
+    @Bind(R.id.tv_task_setting_total_time)
+    TextView mTotalTime;
+
+    @Bind(R.id.tv_task_setting_first_title)
+    TextView mStartingUpTitle;
+
     private TaskSettingAdapter mAdapter;
 
-    private List<Player> mPlayerList = new ArrayList<>();
+    private List<Player> mFirstPlayerList = new ArrayList<>();
 
     private Observable<Integer> mItemObservable;
+
+    private Match mDetailMatch;
+
+    private boolean mHasChanged = false;
+
+    public static Intent getStartIntent(Context context,long matchId) {
+        Intent intent = new Intent();
+        intent.setClass(context, TaskSettingActivity.class);
+        intent.putExtra(EXTRA_MATCH_ID, matchId);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,20 +100,52 @@ public class TaskSettingActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //test
-        Player player;
-        for (int i=0; i<6; i++) {
-            player = new Player();
-            player.number = i;
-            mPlayerList.add(player);
+        long matchId = getIntent().getLongExtra(EXTRA_MATCH_ID, -1);
+        Log.d("matchId:" + matchId);
+        if (matchId == -1) {
+            ToastUtil.showToast(getApplicationContext(), "数据错误");
+            finish();
         }
-        //test
+        mDetailMatch = new Select().from(Match.class).where("matchId=?", matchId).executeSingle();
+        if (mDetailMatch == null) {
+            ToastUtil.showToast(getApplicationContext(), "数据错误");
+            finish();
+        }
+
+
+        Log.d("teamHome:" + mDetailMatch.teamHome.toString());
+        Log.d("teamVisitor:" + mDetailMatch.teamVisitor.toString());
+        if (mDetailMatch.teamHome.isAssiged) {
+            mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  " + mDetailMatch.teamHome.color);
+            Log.d("teamHome.size:" + mDetailMatch.teamHome.players.size());
+            for (Player player: mDetailMatch.teamHome.players) {
+                if (player.isFirst) {
+                    mFirstPlayerList.add(player);
+                }
+            }
+        } else if (mDetailMatch.teamVisitor.isAssiged) {
+            mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  " + mDetailMatch.teamVisitor.color);
+            Log.d("teamVisitor.size:" + mDetailMatch.teamVisitor.players.size());
+            for (Player player: mDetailMatch.teamVisitor.players) {
+                if (player.isFirst) {
+                    mFirstPlayerList.add(player);
+                }
+            }
+        }
+
+        mRuleItemView.setSummaryText(mDetailMatch.playerNumber + "人制");
+        mJieItemView.setSummaryText(mDetailMatch.totalPart + "节");
+        mJieTimeItemView.setSummaryText(mDetailMatch.partMinutes + "分钟");
+        mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
+
+        mStartingUpTitle.setText("设置首发（" + mFirstPlayerList.size() + "/" + mDetailMatch.playerNumber + "）");
+
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mAdapter = new TaskSettingAdapter(this, mPlayerList);
+        mAdapter = new TaskSettingAdapter(this, mFirstPlayerList);
 //        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         mRecyclerView.setAdapter(mAdapter);
 
@@ -100,12 +168,27 @@ public class TaskSettingActivity extends AppCompatActivity {
             }
         });
 
-//        mCommitButton.setEnabled(false);
+        setResult(RESULT_CANCELED);
+
     }
 
     @OnClick(R.id.btn_add_player)
     void addPlayer() {
-        showAddNewPlayerDialog();
+//        showAddNewPlayerDialog();
+        if (mDetailMatch == null)
+            return;
+
+        long teamId;
+        String teamName;
+        if (mDetailMatch.teamHome.isAssiged) {
+            teamId = mDetailMatch.teamHome.teamId;
+            teamName = mDetailMatch.teamHome.name;
+        } else {
+            teamId = mDetailMatch.teamVisitor.teamId;
+            teamName = mDetailMatch.teamVisitor.name;
+        }
+        startActivityForResult(ChooseStartingUpPlayerActivity.getStartIntent(this, mDetailMatch.matchId,
+                teamId, mDetailMatch.playerNumber, teamName), REQUEST_CODE_PLAYER_CHOOSE);
     }
 
     @Override
@@ -132,6 +215,86 @@ public class TaskSettingActivity extends AppCompatActivity {
     @OnClick(R.id.stv_jie_time)
     void doSetJieTime() {
         showEditDialog(2);
+    }
+
+    @OnClick(R.id.btn_task_setting_commit)
+    void doModifyMatch() {
+        if (mDetailMatch == null) {
+            return;
+        }
+        MatchModifyRequest request = new MatchModifyRequest(getApplicationContext());
+        request.matchId = mDetailMatch.matchId;
+        request.partMinutes = mDetailMatch.partMinutes;
+        request.totalPart = mDetailMatch.totalPart;
+        request.playerNumber = mDetailMatch.playerNumber;
+        MatchDetailResponse.HttpPlayer httpPlayer;
+        if (mDetailMatch.teamHome.isAssiged) {
+            for (Player player: mDetailMatch.teamHome.players) {
+                httpPlayer = new MatchDetailResponse.HttpPlayer();
+                httpPlayer.id = player.playerId;
+                httpPlayer.name = player.name;
+                httpPlayer.number = player.number;
+                httpPlayer.isFirst = player.isFirst;
+                request.players.add(httpPlayer);
+            }
+        } else if (mDetailMatch.teamVisitor.isAssiged) {
+            for (Player player: mDetailMatch.teamVisitor.players) {
+                httpPlayer = new MatchDetailResponse.HttpPlayer();
+                httpPlayer.id = player.playerId;
+                httpPlayer.name = player.name;
+                httpPlayer.number = player.number;
+                httpPlayer.isFirst = player.isFirst;
+                request.players.add(httpPlayer);
+            }
+        }
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("正在提交，请等待...");
+        Observable<BaseResponse> observable = mLadderBallApi.doModifyMatch(request)
+                .subscribeOn(Schedulers.io());
+
+        observable
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(e.toString());
+                        e.printStackTrace();
+                        Log.e(e);
+                        progressDialog.cancel();
+                        ToastUtil.showToast(getApplicationContext(), "提交失败，请检查网络");
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        progressDialog.cancel();
+                        if (baseResponse.header.resultCode == 0) {
+                            ToastUtil.showToast(getApplicationContext(), "设置修改成功");
+
+                            setResult(RESULT_OK);
+
+                            RxBus.get().post(RxBusTag.TASK_ITEM_CLICK, -2);
+
+                            TaskSettingActivity.this.finish();
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), baseResponse.header.resultText);
+                        }
+                    }
+                });
     }
 
     public void showEditDialog(final int type) {
@@ -168,12 +331,27 @@ public class TaskSettingActivity extends AppCompatActivity {
                         setDialogDismiss(dialog, false);
                         return;
                     }
+
                     mRuleItemView.setSummaryText(num + "人制");
+
+                    mDetailMatch.playerNumber = num;
                 } else if (type == 1) {
                     mJieItemView.setSummaryText(num + "节");
+                    mDetailMatch.totalPart = num;
+
+                    mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
                 } else if (type == 2){
                     mJieTimeItemView.setSummaryText(num + "分钟");
+
+                    mDetailMatch.partMinutes = num;
+
+                    mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
                 }
+
+                mHasChanged = true;
+
+                mDetailMatch.save();
+
                 dialog.dismiss();
             }
         });
@@ -220,6 +398,67 @@ public class TaskSettingActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CODE_PLAYER_CHOOSE) {
+                mHasChanged = true;
+                mDetailMatch = new Select().from(Match.class).where("matchId=?", mDetailMatch.matchId).executeSingle();
+
+                if (mDetailMatch != null) {
+                    mAdapter.clear();
+                    if (mDetailMatch.teamHome.isAssiged) {
+                        mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  " + mDetailMatch.teamHome.color);
+                        Log.d("teamHome.size:" + mDetailMatch.teamHome.players.size());
+                        for (Player player: mDetailMatch.teamHome.players) {
+                            if (player.isFirst) {
+                                mFirstPlayerList.add(player);
+                            }
+                        }
+                    } else if (mDetailMatch.teamVisitor.isAssiged) {
+                        mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  " + mDetailMatch.teamVisitor.color);
+                        Log.d("teamVisitor.size:" + mDetailMatch.teamVisitor.players.size());
+                        for (Player player: mDetailMatch.teamVisitor.players) {
+                            if (player.isFirst) {
+                                mFirstPlayerList.add(player);
+                            }
+                        }
+                    }
+                    mAdapter.setDataList(mFirstPlayerList);
+                    mAdapter.notifyDataSetChanged();
+
+                    mStartingUpTitle.setText("设置首发（" + mFirstPlayerList.size() + "/" + mDetailMatch.playerNumber + "）");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mHasChanged) {
+            new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("是否保存当前修改？")
+                    .setPositiveButton("保存", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            doModifyMatch();
+                        }
+                    })
+                    .setNegativeButton("不保存", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            TaskSettingActivity.this.finish();
+                        }
+                    })
+                    .create().show();
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override

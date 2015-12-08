@@ -45,6 +45,10 @@ public class PlayerHorizontalAdapter extends RecyclerView.Adapter<PlayerHorizont
         }
     }
 
+    public void clear() {
+        mDataList.clear();
+    }
+
     public void addItem(Player player) {
         mDataList.add(mDataList.size(), player);
         notifyItemInserted(mDataList.size());

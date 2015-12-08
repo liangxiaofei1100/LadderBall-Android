@@ -25,14 +25,7 @@
             android:value="1"/>
         <meta-data
             android:name="AA_MODELS"
-            android:value="
-                com.zhaoyan.ladderball.model.User,
-                com.zhaoyan.ladderball.model.Task,
-                com.zhaoyan.ladderball.model.Match,
-                com.zhaoyan.ladderball.model.Team,
-                com.zhaoyan.ladderball.model.Player,
-                com.zhaoyan.ladderball.model.PartData
-                "/>
+            android:value="                 com.zhaoyan.ladderball.model.User,                 com.zhaoyan.ladderball.model.Task,                 com.zhaoyan.ladderball.model.Match,                 com.zhaoyan.ladderball.model.Team,                 com.zhaoyan.ladderball.model.Player,                 com.zhaoyan.ladderball.model.PartData                 "/>
 
         <activity
             android:name=".ui.activity.LoginActivity"
@@ -69,6 +62,12 @@
             android:name=".ui.activity.DataRecoderActivity"
             android:label="@string/title_activity_data_recoder"
             android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".ui.activity.ChooseStartingUpPlayerActivity"
+            android:label="@string/title_activity_choose_starting_up_player"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

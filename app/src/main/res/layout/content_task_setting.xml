@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--android:layout_width="match_parent"-->
-<!--android:layout_height="match_parent"-->
-<!--android:fillViewport="true"-->
-<!--&gt;-->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -46,14 +41,14 @@
                     >
 
                     <ImageView
-                        android:id="@+id/iv_task_item_visitor_team_icon"
+                        android:id="@+id/iv_task_setting_team_logo"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@mipmap/ic_launcher"
                         />
 
                     <TextView
-                        android:id="@+id/tv_task_item_visitor_team_status"
+                        android:id="@+id/tv_task_setting_team_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|center_horizontal"
@@ -62,26 +57,27 @@
                 </FrameLayout>
 
                 <TextView
+                    android:id="@+id/tv_task_setting_team_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="狗仔队"
                     />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="(主队)"
-                    />
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_vertical"-->
+                    <!--android:text="(主队)"-->
+                    <!--/>-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="16dp"
-                    android:text="红色"
-                    />
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_vertical"-->
+                    <!--android:layout_marginLeft="16dp"-->
+                    <!--android:text="红色"-->
+                    <!--/>-->
             </LinearLayout>
 
 
@@ -153,6 +149,7 @@
                 >
 
                 <TextView
+                    android:id="@+id/tv_task_setting_first_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -168,7 +165,7 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:paddingTop="2dp"
-                    android:text="新增球员"
+                    android:text="调整首发"
                     />
             </RelativeLayout>
 
@@ -209,4 +206,3 @@
     </FrameLayout>
 
 </RelativeLayout>
-    <!--</ScrollView>-->

@@ -33,7 +33,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
-                android:text="已领取"
                 />
         </FrameLayout>
 
@@ -46,7 +45,6 @@
             android:gravity="center"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:text="狗仔队\n(红)"
             />
 
         <LinearLayout
@@ -64,14 +62,12 @@
                 android:id="@+id/tv_task_item_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="VS"
                 />
 
             <TextView
                 android:id="@+id/tv_task_item_rule"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="8人制"
                 />
 
         </LinearLayout>
@@ -85,7 +81,6 @@
             android:gravity="center"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:text="笑队\n(蓝)"
             />
 
         <FrameLayout
@@ -106,7 +101,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
-                android:text="已领取"
                 />
         </FrameLayout>
 
@@ -122,7 +116,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:text="8月20日(周日) 20:30"
             />
 
         <TextView
@@ -130,7 +123,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:text="上海虹口到场"
             />
     </LinearLayout>
 </LinearLayout>

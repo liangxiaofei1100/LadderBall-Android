@@ -35,6 +35,14 @@ public class TaskSettingAdapter extends RecyclerView.Adapter<TaskSettingAdapter.
         mInflater = LayoutInflater.from(context);
     }
 
+    public void setDataList(List<Player> list) {
+        mDataList = list;
+    }
+
+    public void clear() {
+        mDataList.clear();
+    }
+
     public void addItem(Player player) {
         mDataList.add(mDataList.size(), player);
         notifyItemInserted(mDataList.size());
