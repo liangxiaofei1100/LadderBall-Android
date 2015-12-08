@@ -117,6 +117,14 @@ public class TaskSettingActivity extends BaseActivity {
         Log.d("teamVisitor:" + mDetailMatch.teamVisitor.toString());
         if (mDetailMatch.teamHome.isAssiged) {
             mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  " + mDetailMatch.teamHome.color);
+
+            //查询该场比赛，该只队伍的人员
+            List<Player> playerList = new Select().from(Player.class).where("matchId=? and teamId=?"
+                    , mDetailMatch.matchId, mDetailMatch.teamHome.teamId).execute();
+            if (playerList == null) {
+                playerList = new ArrayList<>();
+            }
+            mDetailMatch.teamHome.players = playerList;
             Log.d("teamHome.size:" + mDetailMatch.teamHome.players.size());
             for (Player player: mDetailMatch.teamHome.players) {
                 if (player.isFirst) {
@@ -125,6 +133,15 @@ public class TaskSettingActivity extends BaseActivity {
             }
         } else if (mDetailMatch.teamVisitor.isAssiged) {
             mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  " + mDetailMatch.teamVisitor.color);
+
+            //查询该场比赛，该只队伍的人员
+            List<Player> playerList = new Select().from(Player.class).where("matchId=? and teamId=?"
+                    , mDetailMatch.matchId, mDetailMatch.teamVisitor.teamId).execute();
+            if (playerList == null) {
+                playerList = new ArrayList<>();
+            }
+            mDetailMatch.teamVisitor.players = playerList;
+
             Log.d("teamVisitor.size:" + mDetailMatch.teamVisitor.players.size());
             for (Player player: mDetailMatch.teamVisitor.players) {
                 if (player.isFirst) {
@@ -412,7 +429,6 @@ public class TaskSettingActivity extends BaseActivity {
                 if (mDetailMatch != null) {
                     mAdapter.clear();
                     if (mDetailMatch.teamHome.isAssiged) {
-                        mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  " + mDetailMatch.teamHome.color);
                         Log.d("teamHome.size:" + mDetailMatch.teamHome.players.size());
                         for (Player player: mDetailMatch.teamHome.players) {
                             if (player.isFirst) {
@@ -420,7 +436,6 @@ public class TaskSettingActivity extends BaseActivity {
                             }
                         }
                     } else if (mDetailMatch.teamVisitor.isAssiged) {
-                        mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  " + mDetailMatch.teamVisitor.color);
                         Log.d("teamVisitor.size:" + mDetailMatch.teamVisitor.players.size());
                         for (Player player: mDetailMatch.teamVisitor.players) {
                             if (player.isFirst) {
