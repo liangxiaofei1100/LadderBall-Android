@@ -45,6 +45,7 @@ public class TaskMainActivity extends BaseActivity {
 
     public static final String EXTRA_MATCH_ID = "match_id";
     private static final int REQUEST_CODE_SETTING = 0;
+    private static final int REQUEST_CODE_DATA_RECORD = 1;
 
     @Bind(R.id.task_main_recyclerview)
     RecyclerView mRecyclerView;
@@ -91,6 +92,9 @@ public class TaskMainActivity extends BaseActivity {
     private PlayerHorizontalAdapter mAdapter;
 
     private long mMatchId;
+    private long mTeamId;
+
+//    private List<PartData> mPartDataList = new ArrayList<>();
 
     public static Intent getStartIntent(Context context, long matchId) {
         Intent intent = new Intent();
@@ -113,7 +117,7 @@ public class TaskMainActivity extends BaseActivity {
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mAdapter= new PlayerHorizontalAdapter(this, new ArrayList<Player>());
+        mAdapter = new PlayerHorizontalAdapter(this, new ArrayList<Player>());
         mRecyclerView.setAdapter(mAdapter);
 
         getMatchDetail();
@@ -142,7 +146,7 @@ public class TaskMainActivity extends BaseActivity {
                             match = new Match();
                         }
                         match.matchId = response.id;
-                        match.playerNumber  = response.playerNumber;
+                        match.playerNumber = response.playerNumber;
                         match.startTime = response.startTime;
                         match.address = response.address;
                         match.totalPart = response.totalPart;
@@ -181,13 +185,16 @@ public class TaskMainActivity extends BaseActivity {
 
                         Player player;
                         if (teamHome.isAssiged) {
+                            mTeamId = teamHome.teamId;
                             match.teamHome.players.clear();
                             for (MatchDetailResponse.HttpPlayer httpPlayer : response.teamHome.players) {
                                 player = new Select().from(Player.class).where("matchId=? and teamId=?" +
-                                        " and playerId=?",
+                                                " and playerId=?",
                                         response.id, response.teamHome.id, httpPlayer.id).executeSingle();
                                 if (player == null) {
                                     player = new Player();
+                                    //默认情况，首发球员即上场球员
+                                    player.isOnPitch = httpPlayer.isFirst;
                                 }
                                 player.matchId = response.id;
                                 player.teamId = response.teamHome.id;
@@ -202,6 +209,7 @@ public class TaskMainActivity extends BaseActivity {
                         }
 
                         if (teamVisitor.isAssiged) {
+                            mTeamId = teamVisitor.teamId;
                             match.teamVisitor.players.clear();
                             for (MatchDetailResponse.HttpPlayer httpPlayer : response.teamVisitor.players) {
                                 player = new Select().from(Player.class).where("matchId=? and teamId=?" +
@@ -209,6 +217,8 @@ public class TaskMainActivity extends BaseActivity {
                                         response.id, response.teamVisitor.id, httpPlayer.id).executeSingle();
                                 if (player == null) {
                                     player = new Player();
+                                    //默认情况，首发球员即上场球员
+                                    player.isOnPitch = httpPlayer.isFirst;
                                 }
                                 player.matchId = response.id;
                                 player.teamId = response.teamVisitor.id;
@@ -267,9 +277,9 @@ public class TaskMainActivity extends BaseActivity {
     private void showData(Match match) {
         Log.d("parts:" + match.totalPart + "," + match.partDatas.size());
         //show top
-        mTeamHomeAssignedView.setVisibility(match.teamHome.isAssiged?
+        mTeamHomeAssignedView.setVisibility(match.teamHome.isAssiged ?
                 View.VISIBLE : View.GONE);
-        mTeamVisitorAssignedView.setVisibility(match.teamVisitor.isAssiged?
+        mTeamVisitorAssignedView.setVisibility(match.teamVisitor.isAssiged ?
                 View.VISIBLE : View.GONE);
         mTeamHomeName.setText(match.teamHome.name + "\n" + "(" + match.teamHome.color + ")");
         mTeamVisitorName.setText(match.teamVisitor.name + "\n" + "(" + match.teamVisitor.color + ")");
@@ -302,7 +312,7 @@ public class TaskMainActivity extends BaseActivity {
         PartItemClickListener itemClickListener = new PartItemClickListener();
 
         mRecordLayout.removeAllViews();
-        for (PartData pardData: match.partDatas) {
+        for (PartData pardData : match.partDatas) {
             if (pardData.partNumber > matchParts.length) {
                 //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
                 break;
@@ -321,22 +331,8 @@ public class TaskMainActivity extends BaseActivity {
         @Override
         public void onClick(View v) {
             int id = v.getId();
-            switch (id) {
-                case 1:
-                    ToastUtil.showToast(getApplicationContext(), "click " + 1);
-                    doRecordSectionOne();
-                    break;
-                case 2:
-                    doRecordSectionTwo();
-                    ToastUtil.showToast(getApplicationContext(), "click " + 2);
-                    break;
-                case 3:
-                    doRecordSectionThree();
-                    ToastUtil.showToast(getApplicationContext(), "click " + 3);
-                    break;
-                default:
-                    break;
-            }
+            startActivityForResult(DataRecoderActivity.getStartIntent(TaskMainActivity.this,
+                    mMatchId, mTeamId, id), REQUEST_CODE_DATA_RECORD);
         }
     }
 
@@ -359,23 +355,6 @@ public class TaskMainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-//    @OnClick(R.id.stv_task_main_first)
-    void doRecordSectionOne() {
-        Intent intent = new Intent();
-        intent.setClass(this, DataRecoderActivity.class);
-        startActivity(intent);
-    }
-
-//    @OnClick(R.id.stv_task_main_second)
-    void doRecordSectionTwo() {
-
-    }
-
-//    @OnClick(R.id.stv_task_main_third)
-    void doRecordSectionThree() {
-
     }
 
     @OnClick(R.id.tv_task_main_setting)

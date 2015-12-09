@@ -14,4 +14,23 @@
         <item>第五节</item>
         <item>第六节</item>
     </string-array>
+
+    <string-array name="events_name">
+        <item>进球/助攻</item>
+        <item>角/任意/边界</item>
+        <item>越位/失误</item>
+        <item>过人成功/失败</item>
+        <item>射正/偏/封堵</item>
+        <item>传球成功</item>
+        <item>威胁球</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+        <item>进球/助攻</item>
+    </string-array>
 </resources>

@@ -248,8 +248,9 @@ public class TaskFragment extends BaseFragment {
 
                     @Override
                     public void onError(Throwable e) {
+                        e.printStackTrace();
                         Log.d(e.toString());
-                        ToastUtil.showToast(getActivity(), "获取任务出错，请重试");
+                        ToastUtil.showToast(getActivity(), "网络连接失败，请重试");
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
 

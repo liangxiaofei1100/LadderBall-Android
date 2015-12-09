@@ -161,6 +161,9 @@ public class PlayerChooseAdapter extends RecyclerView.Adapter<PlayerChooseAdapte
                     }
 
                     mDataList.get(position).isFirst = isChecked;
+                    //修改比赛设置，调整首发阵容的时候，默认首发球员即为上场球员
+                    //比赛已经开始是不能再修改比赛规则的
+                    mDataList.get(position).isOnPitch = isChecked;
                     mCheckedArray.put(position, isChecked);
                     RxBus.get().post(RxBusTag.PLAYER_CHOOSE_CHANGE, "" + position);
                 }

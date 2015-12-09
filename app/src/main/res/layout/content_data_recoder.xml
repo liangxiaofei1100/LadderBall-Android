@@ -12,8 +12,37 @@
     <FrameLayout
         android:id="@+id/fl_players"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        >
     </FrameLayout>
 
+    <!--<FrameLayout-->
+        <!--android:id="@+id/fl_player_record"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_toRightOf="@+id/fl_players"-->
+        <!--android:layout_above="@+id/recent_event_recyclerview"-->
+        <!--android:visibility="gone"-->
+        <!--&gt;-->
+    <!--</FrameLayout>-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/event_record_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/fl_players"
+        android:layout_above="@+id/recent_event_recyclerview"
+        >
+    </android.support.v7.widget.RecyclerView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recent_event_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_toRightOf="@+id/fl_players"
+        android:layout_alignParentBottom="true"
+        >
+    </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>

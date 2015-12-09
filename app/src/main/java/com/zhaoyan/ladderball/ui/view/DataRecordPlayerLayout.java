@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
+import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.util.DensityUtil;
 import com.zhaoyan.ladderball.util.Log;
 
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickListener {
 
-    private List<Integer> mPlayNumbers = new ArrayList<>();
+    private List<Player> mPlayerList = new ArrayList<>();
 
     private HashMap<Integer, TextView> mViews = new HashMap<>();
 
@@ -29,9 +30,9 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
         super(context);
     }
 
-    public DataRecordPlayerLayout(Context context, List<Integer> playerNum) {
+    public DataRecordPlayerLayout(Context context, List<Player> playerList) {
         super(context);
-        mPlayNumbers = playerNum;
+        mPlayerList = playerList;
         initView(context);
     }
 
@@ -46,11 +47,11 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
         Log.d("statusBarHeight:" + statusBarHeight);
 
         int column;
-        if (mPlayNumbers.size() <= 8) {
+        if (mPlayerList.size() <= 8) {
             column = 4;
         } else {
-            Log.d("numbers:" + mPlayNumbers.size());
-            double size = mPlayNumbers.size() / 2.0;
+            Log.d("numbers:" + mPlayerList.size());
+            double size = mPlayerList.size() / 2.0;
             Log.d("ceil:" + size);
             column = (int) Math.ceil(size);
         }
@@ -75,9 +76,9 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
 
         int currentColumn;
         for (int i = 0; i <= column; i++) {
-            Log.d("i:" + i);
+//            Log.d("i:" + i);
             currentColumn = i * 2;
-            Log.d("currentColumn:" + currentColumn);
+//            Log.d("currentColumn:" + currentColumn);
             itemView = inflater.inflate(R.layout.layout_data_record_player, null);
             itemView.setLayoutParams(itemParams);
 
@@ -89,13 +90,13 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
             int firstPlayer = -1;
             int secondPlayer = -1;
             try {
-                firstPlayer = mPlayNumbers.get(currentColumn);
-                secondPlayer = mPlayNumbers.get(currentColumn + 1);
+                firstPlayer = mPlayerList.get(currentColumn).number;
+                secondPlayer = mPlayerList.get(currentColumn + 1).number;
             } catch (IndexOutOfBoundsException e) {
             }
 
-            Log.d("firstPlayer:" + firstPlayer);
-            Log.d("secondPlayer:" + secondPlayer);
+//            Log.d("firstPlayer:" + firstPlayer);
+//            Log.d("secondPlayer:" + secondPlayer);
 
             if (firstPlayer != -1) {
                 textOneView.setId(firstPlayer);
@@ -128,8 +129,8 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
 
         TextView textView;
         int playerNum;
-        for (int i = 0; i < mPlayNumbers.size(); i++ ) {
-            playerNum = mPlayNumbers.get(i);
+        for (int i = 0; i < mPlayerList.size(); i++ ) {
+            playerNum = mPlayerList.get(i).number;
             textView = mViews.get(playerNum);
             if (playerNum == id) {
                 textView.setSelected(true);
