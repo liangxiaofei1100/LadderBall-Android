@@ -1,6 +1,7 @@
 package com.zhaoyan.ladderball.http;
 
 import com.zhaoyan.ladderball.http.request.BaseRequest;
+import com.zhaoyan.ladderball.http.request.EventCollectionRequest;
 import com.zhaoyan.ladderball.http.request.LoginRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
 import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
@@ -40,5 +41,9 @@ public interface LadderBallApi {
     /**修改比赛设置请求*/
     @POST("match/modify")
     Observable<BaseResponse> doModifyMatch(@Body MatchModifyRequest request);
+
+    /**比赛时间数据采集*/
+    @POST("match/eventcollection")
+    Observable<BaseResponse> doCommitEventData(@Body EventCollectionRequest request);
 
 }

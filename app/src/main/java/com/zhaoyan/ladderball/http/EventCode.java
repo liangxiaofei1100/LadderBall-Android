@@ -145,4 +145,6 @@ public class EventCode {
      * 换人
      */
     public static final int EVENT_HUAN_REN = 10028;
+
+    public static final int EVENT_PART_OVER = 20001;
 }

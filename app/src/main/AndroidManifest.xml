@@ -27,13 +27,11 @@
         <meta-data
             android:name="AA_MODELS"
             android:value="com.zhaoyan.ladderball.model.User,
-            com.zhaoyan.ladderball.model.Task,
-            com.zhaoyan.ladderball.model.Match,
-            com.zhaoyan.ladderball.model.Team,
-            com.zhaoyan.ladderball.model.Player,
-            com.zhaoyan.ladderball.model.PartData,
-            com.zhaoyan.ladderball.model.Event
-                             "/>
+            com.zhaoyan.ladderball.model.Task,com.zhaoyan.ladderball.model.Match,
+            com.zhaoyan.ladderball.model.Team,com.zhaoyan.ladderball.model.Player,
+            com.zhaoyan.ladderball.model.PartData,com.zhaoyan.ladderball.model.EventItem,
+            com.zhaoyan.ladderball.model.PlayerEvent,
+            "/>
 
         <activity
             android:name=".ui.activity.LoginActivity"

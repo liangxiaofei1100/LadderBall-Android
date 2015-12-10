@@ -5,10 +5,10 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
 /**
- * Created by Yuri on 2015/12/9.
+ * Created by Yuri on 2015/12/10.
  */
-@Table(name = "event")
-public class Event extends Model {
+@Table(name = "player_event")
+public class PlayerEvent extends Model {
 
     @Column(name = "matchId")
     public long matchId;//比赛id
@@ -16,6 +16,8 @@ public class Event extends Model {
     public long teamId;//队伍id
     @Column(name = "playerId")
     public long playerId;//球员id
+    @Column(name = "playerNumber")
+    public int playerNumber;//球员号码
     @Column(name = "partNumber")
     public int partNumber;//节数
     @Column(name = "timeSecond")
@@ -119,4 +121,5 @@ public class Event extends Model {
                 ", huanRen=" + huanRen +
                 '}';
     }
+
 }

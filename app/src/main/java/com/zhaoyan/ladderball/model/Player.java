@@ -29,7 +29,7 @@ public class Player extends Model{
     @Column(name = "number")
     public int number;
 
-    List<Event> eventList = new ArrayList<>();
+    List<PlayerEvent> eventList = new ArrayList<>();
 
     @Override
     public String toString() {

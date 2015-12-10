@@ -7,7 +7,7 @@ import com.activeandroid.annotation.Table;
 /**
  * Created by Yuri on 2015/12/7.
  */
-@Table(name = "partData")
+@Table(name = "part_data")
 public class PartData extends Model {
     @Column(name = "matchId")
     public long matchId;
