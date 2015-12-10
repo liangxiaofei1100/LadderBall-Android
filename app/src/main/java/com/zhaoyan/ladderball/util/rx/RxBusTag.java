@@ -11,4 +11,6 @@ public class RxBusTag {
     public static final String PlAYER_ITEM_REMOVE = "player_item_remove";
 
     public static final String PLAYER_CHOOSE_CHANGE = "player_choose_change";
+
+    public static final String EVENT_RECORD_ITEM = "event_record_item";
 }

@@ -1,7 +1,9 @@
 package com.zhaoyan.ladderball.ui.activity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,6 +20,8 @@ import com.zhaoyan.ladderball.ui.adapter.EventRecordAdapter;
 import com.zhaoyan.ladderball.ui.view.DataRecordPlayerLayout;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.ToastUtil;
+import com.zhaoyan.ladderball.util.rx.RxBus;
+import com.zhaoyan.ladderball.util.rx.RxBusTag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +33,7 @@ import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class DataRecoderActivity extends BaseActivity {
@@ -58,6 +63,8 @@ public class DataRecoderActivity extends BaseActivity {
     private ProgressDialog mProgressDialog;
 
     private List<Event> mOnPitchPlayerEventList;
+
+    private Observable<Integer> mItemObservable;
 
     public static Intent getStartIntent(Context context, long matchId, long teamId, int partNumber) {
         Intent intent = new Intent();
@@ -111,9 +118,41 @@ public class DataRecoderActivity extends BaseActivity {
         DataRecordPlayerLayout playerLayout = new DataRecordPlayerLayout(this, mOnPitchPlayerList);
         mPlayersLayout.addView(playerLayout);
 
+        playerLayout.setOnItemClickListener(new DataRecordPlayerLayout.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Event event = mOnPitchPlayerEventList.get(position);
+                Log.d("matchId:" + event.matchId + ",teamId:" + event.teamId + ",playerId:" + event.playerId);
+                mRecordAdapter.setDataList(event);
+                mRecordAdapter.notifyDataSetChanged();
+            }
+        });
+
         mOnPitchPlayerEventList = new ArrayList<>();
 
+//        registerForContextMenu(mRecordRecyclerView);
+
         initEvents();
+
+        mItemObservable = RxBus.get().register(RxBusTag.EVENT_RECORD_ITEM, Integer.class);
+        mItemObservable.subscribe(new Action1<Integer>() {
+            @Override
+            public void call(final Integer integer) {
+                Log.d("position:" + integer);
+
+                String[] menus = getItemMenu(integer);
+                new AlertDialog.Builder(DataRecoderActivity.this)
+                        .setItems(menus, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Event event = mRecordAdapter.getItem();
+                                handleEvent(integer, which, event);
+                            }
+                        })
+                        .setNegativeButton("取消", null)
+                        .create().show();
+            }
+        });
     }
 
     private void initEvents() {
@@ -123,7 +162,11 @@ public class DataRecoderActivity extends BaseActivity {
                 //初始化场上球员的数据
                 Event event = null;
                 for (Player player : mOnPitchPlayerList) {
-                    event = new Event();
+                    event = new Select().from(Event.class).where("matchId=? and teamId=? and playerId=?",
+                            mMatchId, mTeamId, player.playerId).executeSingle();
+                    if (event == null) {
+                        event = new Event();
+                    }
                     event.matchId = mMatchId;
                     event.teamId = mTeamId;
                     event.playerId = player.playerId;
@@ -170,15 +213,131 @@ public class DataRecoderActivity extends BaseActivity {
                         }
                         ToastUtil.showToast(getApplicationContext(), s);
                         Log.d("player.size:" + mOnPitchPlayerEventList.size());
-                        mRecordAdapter.setDataList(mOnPitchPlayerEventList);
+                        //默认加载第一个球员的Event
+                        Event event = mOnPitchPlayerEventList.get(0);
+                        mRecordAdapter.setDataList(event);
                         mRecordAdapter.notifyDataSetChanged();
                     }
                 });
     }
 
+    private String[] getItemMenu(int position) {
+        switch (position) {
+            case 0:
+                return getResources().getStringArray(R.array.event_jinqiu);
+            case 1:
+                return getResources().getStringArray(R.array.event_jiaoqiu);
+            case 2:
+                return getResources().getStringArray(R.array.event_yuewei);
+            case 3:
+                return getResources().getStringArray(R.array.event_guoren);
+            case 4:
+                return getResources().getStringArray(R.array.event_shezheng);
+            case 12:
+                return getResources().getStringArray(R.array.event_pujiushemen);
+            case 13:
+                return getResources().getStringArray(R.array.event_shoupaoqiu);
+            case 14:
+                return getResources().getStringArray(R.array.event_huangpai);
+            case 15:
+                return getResources().getStringArray(R.array.event_function);
+        }
+        return  null;
+    }
+
+    private void handleEvent(int position, int menuPosition, Event event) {
+        switch (position) {
+            case 0:
+                if (menuPosition == 0) {
+                    event.jinQiu += 1;
+                } else {
+                    event.zhuGong += 1;
+                }
+                break;
+            case 1:
+                if (menuPosition == 0) {
+                    event.jiaoQiu += 1;
+                } else if (menuPosition == 1) {
+                    event.renYiQiu += 1;
+                } else {
+                    event.bianJieQiu += 1;
+                }
+                break;
+            case 2:
+                if (menuPosition == 0) {
+                    event.yueWei += 1;
+                } else {
+                    event.shiWu += 1;
+                }
+                break;
+            case 3:
+                if (menuPosition == 0) {
+                    event.guoRenChengGong += 1;
+                } else {
+                    event.guoRenShiBai += 1;
+                }
+                break;
+            case 4:
+                if (menuPosition == 0) {
+                    event.sheZheng += 1;
+                } else if (menuPosition == 1) {
+                    event.shePian += 1;
+                } else {
+                    event.sheMenBeiDu += 1;
+                }
+                break;
+            case 12:
+                if (menuPosition == 0) {
+                    event.puJiuSheMen += 1;
+                } else {
+                    event.danDao += 1;
+                }
+                break;
+            case 13:
+                if (menuPosition == 0) {
+                    event.shouPaoQiu += 1;
+                } else {
+                    event.qiuMenQiu += 1;
+                }
+                break;
+            case 14:
+                if (menuPosition == 0) {
+                    event.huangPai += 1;
+                } else if (menuPosition == 1){
+                    event.hongPai += 1;
+                } else if (menuPosition == 2) {
+                    event.fanGui += 1;
+                } else {
+                    event.wuLongQiu += 1;
+                }
+                break;
+            case 15:
+                if (menuPosition == 0) {
+                    //换人
+                } else {
+                    //提交数据
+                }
+                break;
+        }
+        if (position != 15) {
+            event.save();
+            mRecordAdapter.notifyItemChanged(position);
+        }
+    }
+
+    private void doCommitEventData() {
+
+    }
 
     @Override
     public void onBackPressed() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        RxBus.get().unregister(RxBusTag.EVENT_RECORD_ITEM, mItemObservable);
     }
 }

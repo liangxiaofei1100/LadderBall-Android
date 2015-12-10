@@ -99,14 +99,18 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
 //            Log.d("secondPlayer:" + secondPlayer);
 
             if (firstPlayer != -1) {
-                textOneView.setId(firstPlayer);
+                textOneView.setId(currentColumn);
                 textOneView.setOnClickListener(this);
                 textOneView.setText(firstPlayer + "");
+                if (currentColumn == 0) {
+                    //默认选中第一个
+                    textOneView.setSelected(true);
+                }
                 mViews.put(firstPlayer, textOneView);
             }
 
             if (secondPlayer != -1) {
-                textTwoView.setId(secondPlayer);
+                textTwoView.setId(currentColumn + 1);
                 textTwoView.setOnClickListener(this);
                 textTwoView.setText(secondPlayer + "");
                 mViews.put(secondPlayer, textTwoView);
@@ -128,16 +132,27 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
         int id = v.getId();
 
         TextView textView;
-        int playerNum;
+        int playerNum = 0;
         for (int i = 0; i < mPlayerList.size(); i++ ) {
             playerNum = mPlayerList.get(i).number;
             textView = mViews.get(playerNum);
-            if (playerNum == id) {
+            if (i == id) {
                 textView.setSelected(true);
             } else {
                 textView.setSelected(false);
             }
         }
 
+        if (mListener != null) {
+            mListener.onItemClick(id);
+        }
+    }
+
+    public OnItemClickListener mListener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
+    public interface OnItemClickListener{
+        void onItemClick(int number);
     }
 }

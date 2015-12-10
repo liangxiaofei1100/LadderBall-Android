@@ -61,10 +61,10 @@ public class Event extends Model {
     public int qiangDuan;
     @Column(name = "jieWei")
     public int jieWei;
-    @Column(name = "buJiuSheMen")
-    public int buJiuSheMen;
-    @Column(name = "buJiuDanDao")
-    public int buJiuDanDao;
+    @Column(name = "puJiuSheMen")
+    public int puJiuSheMen;
+    @Column(name = "danDao")
+    public int danDao;
     @Column(name = "shouPaoQiu")
     public int shouPaoQiu;
     @Column(name = "qiuMenQiu")
@@ -80,4 +80,43 @@ public class Event extends Model {
     @Column(name = "huanRen")
     public int huanRen;
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "additionalData='" + additionalData + '\'' +
+                ", matchId=" + matchId +
+                ", teamId=" + teamId +
+                ", playerId=" + playerId +
+                ", partNumber=" + partNumber +
+                ", timeSecond=" + timeSecond +
+                ", jinQiu=" + jinQiu +
+                ", zhuGong=" + zhuGong +
+                ", jiaoQiu=" + jiaoQiu +
+                ", renYiQiu=" + renYiQiu +
+                ", bianJieQiu=" + bianJieQiu +
+                ", yueWei=" + yueWei +
+                ", shiWu=" + shiWu +
+                ", guoRenChengGong=" + guoRenChengGong +
+                ", guoRenShiBai=" + guoRenShiBai +
+                ", sheZheng=" + sheZheng +
+                ", shePian=" + shePian +
+                ", sheMenBeiDu=" + sheMenBeiDu +
+                ", chuanQiuChengGong=" + chuanQiuChengGong +
+                ", chuanQiuShiBai=" + chuanQiuShiBai +
+                ", weiXieQiu=" + weiXieQiu +
+                ", fengDuSheMen=" + fengDuSheMen +
+                ", lanJie=" + lanJie +
+                ", qiangDuan=" + qiangDuan +
+                ", jieWei=" + jieWei +
+                ", puJiuSheMen=" + puJiuSheMen +
+                ", danDao=" + danDao +
+                ", shouPaoQiu=" + shouPaoQiu +
+                ", qiuMenQiu=" + qiuMenQiu +
+                ", huangPai=" + huangPai +
+                ", hongPai=" + hongPai +
+                ", fanGui=" + fanGui +
+                ", wuLongQiu=" + wuLongQiu +
+                ", huanRen=" + huanRen +
+                '}';
+    }
 }
