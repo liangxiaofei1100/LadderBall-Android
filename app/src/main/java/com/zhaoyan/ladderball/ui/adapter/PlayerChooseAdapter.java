@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -148,15 +147,16 @@ public class PlayerChooseAdapter extends RecyclerView.Adapter<PlayerChooseAdapte
 
             ButterKnife.bind(this, itemView);
 
-            mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            mCheckBox.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                public void onClick(View v) {
                     int position = getLayoutPosition();
                     Log.d("position:" + position);
-
-                    if (isChecked && !canChoosePlayer()) {
+                    CheckBox checkBox = (CheckBox) v;
+                    boolean isChecked = checkBox.isChecked();
+                    if (checkBox.isChecked() && !canChoosePlayer()) {
                         ToastUtil.showToast(mContext, "最多选择" + mPlayerNum + "位首发球员");
-                        mCheckBox.setChecked(false);
+                        checkBox.setChecked(false);
                         return;
                     }
 
