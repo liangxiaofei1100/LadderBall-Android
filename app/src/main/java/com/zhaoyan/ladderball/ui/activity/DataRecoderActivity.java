@@ -130,7 +130,7 @@ public class DataRecoderActivity extends BaseActivity {
         mOnPitchPlayerList = new ArrayList<>();
         mUnOnPitchPlayerList = new ArrayList<>();
         for (Player player : allPlayerList) {
-            Log.d(player.toString());
+//            Log.d(player.toString());
             if (player.isOnPitch) {
                 mOnPitchPlayerList.add(player);
             } else {
@@ -523,16 +523,18 @@ public class DataRecoderActivity extends BaseActivity {
         progressDialog.setCancelable(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
-        final EventCollectionRequest requeset = new EventCollectionRequest(getApplicationContext());
+//        final EventCollectionRequest requeset = new EventCollectionRequest(getApplicationContext());
 
-        Observable<EventCollectionRequest.HttpEvent> requestObservable =
-                Observable.create(new Observable.OnSubscribe<EventCollectionRequest.HttpEvent>() {
+        Observable<EventCollectionRequest> requestObservable =
+                Observable.create(new Observable.OnSubscribe<EventCollectionRequest>() {
                     @Override
-                    public void call(Subscriber<? super EventCollectionRequest.HttpEvent> subscriber) {
+                    public void call(Subscriber<? super EventCollectionRequest> subscriber) {
                         //查询本场比赛，本支队伍，本节的数据事件，然后提交
                         List<EventItem> events = new Select().from(EventItem.class).where("matchId=? and teamId=?" +
                                 " and partNumber=?", mMatchId, mTeamId, mPartNumber).execute();
                         Log.d("total evet size:" + events.size());
+
+                        EventCollectionRequest requeset = new EventCollectionRequest(getApplicationContext());
 
                         EventCollectionRequest.HttpEvent httpEvent;
                         for (EventItem eventItem : events) {
@@ -545,7 +547,8 @@ public class DataRecoderActivity extends BaseActivity {
                             httpEvent.timeSecond = eventItem.timeSecond;
                             httpEvent.uuid = eventItem.uuid;
                             httpEvent.additionalData = null;
-                            subscriber.onNext(httpEvent);
+//                            subscriber.onNext(httpEvent);
+                            requeset.events.add(httpEvent);
                         }
 
                         //生成一个小节结束的事件
@@ -558,8 +561,9 @@ public class DataRecoderActivity extends BaseActivity {
                         httpEvent.timeSecond = System.currentTimeMillis() - mMatchStartTime;
                         httpEvent.uuid = UUID.randomUUID().toString();
                         httpEvent.additionalData = null;
-                        subscriber.onNext(httpEvent);
+                        requeset.events.add(httpEvent);
 
+                        subscriber.onNext(requeset);
                         subscriber.onCompleted();
                     }
                 }).subscribeOn(Schedulers.io());
@@ -572,23 +576,25 @@ public class DataRecoderActivity extends BaseActivity {
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<EventCollectionRequest.HttpEvent, EventCollectionRequest>() {
-                    @Override
-                    public EventCollectionRequest call(EventCollectionRequest.HttpEvent httpEvent) {
-                        Log.d("httpEvent:" + httpEvent.eventCode);
-                        requeset.events.add(httpEvent);
-                        return requeset;
-                    }
-                })
+//                .map(new Func1<EventCollectionRequest.HttpEvent, EventCollectionRequest>() {
+//                    @Override
+//                    public EventCollectionRequest call(EventCollectionRequest.HttpEvent httpEvent) {
+//                        Log.d("httpEvent:" + httpEvent.eventCode);
+//                        requeset.events.add(httpEvent);
+//                        return requeset;
+//                    }
+//                })
                 .flatMap(new Func1<EventCollectionRequest, Observable<BaseResponse>>() {
                     @Override
                     public Observable<BaseResponse> call(EventCollectionRequest request) {
+                        Log.d("start commit event data");
                         return mLadderBallApi.doCommitEventData(request);
                     }
                 })
                 .map(new Func1<BaseResponse, Boolean>() {
                     @Override
                     public Boolean call(BaseResponse baseResponse) {
+                        Log.d("commit data over:" + baseResponse.header.resultCode);
                         if (baseResponse.header.resultCode == 0) {
                             //上传成功，删除本地记录
                             List<EventItem> events = new Select().from(EventItem.class).where("matchId=? and teamId=?" +
