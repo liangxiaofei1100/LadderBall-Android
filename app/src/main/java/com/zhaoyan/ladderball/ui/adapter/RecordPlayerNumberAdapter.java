@@ -123,10 +123,10 @@ public class RecordPlayerNumberAdapter extends RecyclerView.Adapter<RecordPlayer
         holder.numberView.setText(player.number + "");
 
         if (mSelectPosition == position) {
-            holder.itemView.setBackgroundResource(R.drawable.player_number_item_selected);
+            holder.cardView.setCardBackgroundColor(Color.RED);
             holder.numberView.setTextColor(Color.WHITE);
         } else {
-            holder.itemView.setBackgroundResource(R.drawable.player_number_item_normal);
+            holder.cardView.setCardBackgroundColor(Color.WHITE);
             holder.numberView.setTextColor(Color.BLACK);
         }
 
@@ -147,6 +147,10 @@ public class RecordPlayerNumberAdapter extends RecyclerView.Adapter<RecordPlayer
     }
 
     public class SingleChooseViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.playerCardView)
+        CardView cardView;
+
         @Bind(R.id.tv_event_player_number)
         TextView numberView;
 

@@ -64,7 +64,7 @@ public class PlayerHorizontalAdapter extends RecyclerView.Adapter<PlayerHorizont
     public void onBindViewHolder(PlayerViewHolder holder, int position) {
 
         Player player = mDataList.get(position);
-        Log.d(">>" + player.number + ",isFirst:" + player.isFirst);
+//        Log.d(">>" + player.number + ",isFirst:" + player.isFirst);
         holder.textView.setText(player.number + "号");
 
     }

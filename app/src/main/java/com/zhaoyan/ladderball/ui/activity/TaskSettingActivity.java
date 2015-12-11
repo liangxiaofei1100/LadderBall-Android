@@ -323,6 +323,7 @@ public class TaskSettingActivity extends BaseActivity {
             textInputLayout.setHint("请输入1到11的整数");
             dialog.setTitle("赛制人数设置");
         } else if (type == 1) {
+            textInputLayout.setHint("请输入1到6的整数");
             dialog.setTitle("比赛节数设置");
         } else if (type == 2){
             dialog.setTitle("每节时长设置");
@@ -353,16 +354,20 @@ public class TaskSettingActivity extends BaseActivity {
 
                     mDetailMatch.playerNumber = num;
                 } else if (type == 1) {
-                    mJieItemView.setSummaryText(num + "节");
-                    mDetailMatch.totalPart = num;
+                    if (num < 1 || num > 6) {
+                        editText.setError("请输入1到6的整数");
+                        ToastUtil.showToast(getApplicationContext(), "请输入1到6的整数");
+                        setDialogDismiss(dialog, false);
+                        return;
+                    }
 
+                    mJieItemView.setSummaryText(num + "节");
                     mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
+                    mDetailMatch.totalPart = num;
                 } else if (type == 2){
                     mJieTimeItemView.setSummaryText(num + "分钟");
-
-                    mDetailMatch.partMinutes = num;
-
                     mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
+                    mDetailMatch.partMinutes = num;
                 }
 
                 mHasChanged = true;

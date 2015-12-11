@@ -235,7 +235,11 @@ public class TaskMainActivity extends BaseActivity {
                         PartData partData;
                         match.partDatas.clear();
                         for (MatchDetailResponse.HttpPartData httpPartData : response.partDatas) {
-                            partData = new PartData();
+                            partData = new Select().from(PartData.class).where("matchId=? and partNumber=?",
+                                    mMatchId, httpPartData.partNumber).executeSingle();
+                            if (partData == null) {
+                                partData = new PartData();
+                            }
                             partData.matchId = response.id;
                             partData.partNumber = httpPartData.partNumber;
                             partData.isComplete = httpPartData.isComplete;
@@ -325,14 +329,42 @@ public class TaskMainActivity extends BaseActivity {
             itemView.setOnClickListener(itemClickListener);
             mRecordLayout.addView(itemView);
         }
+
+//        for (int i = 0; i < match.partDatas.size(); i++) {
+//            PartData partData = match.partDatas.get(i);
+//            if (partData.partNumber > matchParts.length) {
+//                //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
+//                break;
+//            }
+//            itemView = new SettingItemView(this);
+//            itemView.setLayoutParams(params);
+//            itemView.setId(i);
+//            itemView.setTitleText(matchParts[partData.partNumber - 1]);
+//            itemView.setSummaryText(partData.isComplete ? "已完成录入" : "未开始");
+//            itemView.setOnClickListener(itemClickListener);
+//            mRecordLayout.addView(itemView);
+//        }
     }
 
     private class PartItemClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             int id = v.getId();
-            startActivityForResult(DataRecoderActivity.getStartIntent(TaskMainActivity.this,
-                    mMatchId, mTeamId, id), REQUEST_CODE_DATA_RECORD);
+            Log.d("partNumber:" + id);
+            PartData partData = new Select().from(PartData.class).where("matchId=? and partNumber=?",
+                    mMatchId, id).executeSingle();
+            if (partData == null) {
+                Log.e("Can not find this pard data");
+                return;
+            }
+
+            Log.d("isPardComplete:" + partData.isComplete);
+            if (partData.isComplete) {
+                ToastUtil.showToast(getApplicationContext(), "数据已提交");
+            } else {
+                startActivityForResult(DataRecoderActivity.getStartIntent(TaskMainActivity.this,
+                        mMatchId, mTeamId, id), REQUEST_CODE_DATA_RECORD);
+            }
         }
     }
 
@@ -365,8 +397,12 @@ public class TaskMainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SETTING && resultCode == RESULT_OK) {
-            getMatchDetail();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CODE_SETTING) {
+                getMatchDetail();
+            } else if (requestCode == REQUEST_CODE_DATA_RECORD) {
+                getMatchDetail();
+            }
         }
     }
 }

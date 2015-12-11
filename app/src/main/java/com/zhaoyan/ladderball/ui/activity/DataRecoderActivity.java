@@ -630,6 +630,7 @@ public class DataRecoderActivity extends BaseActivity {
                         Log.d("result:" + result);
                         progressDialog.cancel();
                         if (result) {
+                            setResult(RESULT_OK);
                             ToastUtil.showToast(getApplicationContext(), "提交成功");
                             DataRecoderActivity.this.finish();
                         } else {

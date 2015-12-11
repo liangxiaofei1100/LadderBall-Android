@@ -25,7 +25,7 @@ public class EventCollectionRequest extends BaseRequest {
         public long playerId;
         public int partNumber;
         public long timeSecond;
-        public String additionalData;
+        public String additionalData;//{"id":1,"number":10}
         public String uuid;
     }
 }
