@@ -26,12 +26,18 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
 
     private HashMap<Integer, TextView> mViews = new HashMap<>();
 
+    private LinearLayout mLinearLayout;
+    private Context mContext;
+
+    private int mSelectionPosition = 0;
+
     public DataRecordPlayerLayout(Context context) {
         super(context);
     }
 
     public DataRecordPlayerLayout(Context context, List<Player> playerList) {
         super(context);
+        mContext = context;
         mPlayerList = playerList;
         initView(context);
     }
@@ -59,10 +65,10 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
         int itemHeight = (int) ((height - statusBarHeight) / column);
         ;
         Log.d("itemHeight:" + itemHeight + ",column:" + column);
-        LinearLayout linearLayout = new LinearLayout(context);
+        mLinearLayout = new LinearLayout(context);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(itemHeight * 2, ViewGroup.LayoutParams.MATCH_PARENT);
-        linearLayout.setLayoutParams(params);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        mLinearLayout.setLayoutParams(params);
+        mLinearLayout.setOrientation(LinearLayout.VERTICAL);
 
         ViewGroup.LayoutParams itemParams = new ViewGroup.LayoutParams(itemHeight * 2, itemHeight);
 
@@ -119,10 +125,32 @@ public class DataRecordPlayerLayout extends FrameLayout implements View.OnClickL
             textOneView.setBackgroundResource(R.drawable.record_player_bg);
             textTwoView.setBackgroundResource(R.drawable.record_player_bg);
 
-            linearLayout.addView(itemView);
+            mLinearLayout.addView(itemView);
         }
-        addView(linearLayout);
+        addView(mLinearLayout);
     }
+
+    public void replace(int position, Player player) {
+
+//        mPlayerList.remove(position);//删掉原来的
+//        mPlayerList.add(position, player);//添加新来的
+//
+//        int index;
+//        if (position % 2 == 0) {
+//            index = position * 2;
+//        } else {
+//            index = position * 2 + 1;
+//        }
+//
+//        Log.d("position:"+ position +",index:" + index);
+//        mLinearLayout.removeViewAt(index);
+//        mLinearLayout.addView();
+
+    }
+
+//    private TextView getItemView() {
+//        View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_data_record_player, null);
+//    }
 
     @Override
     public void onClick(View v) {

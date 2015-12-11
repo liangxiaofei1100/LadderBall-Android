@@ -1,12 +1,12 @@
 package com.zhaoyan.ladderball.ui.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +22,8 @@ import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.model.PlayerEvent;
 import com.zhaoyan.ladderball.ui.adapter.EventRecentAdapter;
 import com.zhaoyan.ladderball.ui.adapter.EventRecordAdapter;
+import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
+import com.zhaoyan.ladderball.ui.dialog.ReplaceDialog;
 import com.zhaoyan.ladderball.ui.view.DataRecordPlayerLayout;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.ToastUtil;
@@ -65,11 +67,14 @@ public class DataRecoderActivity extends BaseActivity {
     private long mTeamId;
     private int mPartNumber;
 
-    private List<Player> mOnPitchPlayerList;
+    private List<Player> mOnPitchPlayerList;//场上球员
+    private List<Player> mUnOnPitchPlayerList;//场下球员
 
     private ProgressDialog mProgressDialog;
 
     private List<PlayerEvent> mOnPitchPlayerEventList;
+
+
 
     private Observable<Integer> mRecordObserverable;
     private Observable<Integer> mRecentObserverable;
@@ -117,10 +122,13 @@ public class DataRecoderActivity extends BaseActivity {
                 mMatchId, mTeamId).execute();
 
         mOnPitchPlayerList = new ArrayList<>();
+        mUnOnPitchPlayerList = new ArrayList<>();
         for (Player player : allPlayerList) {
             Log.d(player.toString());
             if (player.isOnPitch) {
                 mOnPitchPlayerList.add(player);
+            } else {
+                mUnOnPitchPlayerList.add(player);
             }
         }
         //
@@ -428,18 +436,10 @@ public class DataRecoderActivity extends BaseActivity {
             case 15:
                 if (menuPosition == 0) {
                     //换人
+                    repickPlayer(playerEvent);
                 } else {
                     //提交数据
-                    new AlertDialog.Builder(this)
-                            .setMessage("确定提交本节数据")
-                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    doCommitEventData();
-                                }
-                            })
-                            .setNegativeButton("取消", null)
-                            .create().show();
+                    gameOver();
                 }
                 break;
         }
@@ -551,7 +551,6 @@ public class DataRecoderActivity extends BaseActivity {
                     @Override
                     public EventCollectionRequest call(EventCollectionRequest.HttpEvent httpEvent) {
                         Log.d("httpEvent:" + httpEvent.eventCode);
-                        Log.d("111  isMainLoop:" + (Looper.myLooper() == Looper.getMainLooper()));
                         requeset.events.add(httpEvent);
                         return requeset;
                     }
@@ -559,7 +558,6 @@ public class DataRecoderActivity extends BaseActivity {
                 .flatMap(new Func1<EventCollectionRequest, Observable<BaseResponse>>() {
                     @Override
                     public Observable<BaseResponse> call(EventCollectionRequest request) {
-                        Log.d("2222  isMainLoop:" + (Looper.myLooper() == Looper.getMainLooper()));
                         return mLadderBallApi.doCommitEventData(request);
                     }
                 })
@@ -610,9 +608,51 @@ public class DataRecoderActivity extends BaseActivity {
                 });
     }
 
+    /**
+     * 换人
+     * @param playerEvent
+     */
+    private void repickPlayer(final PlayerEvent playerEvent) {
+        ReplaceDialog replaceDialog = new ReplaceDialog(this, mUnOnPitchPlayerList);
+        replaceDialog.setOnAddNewClickListener(new ReplaceDialog.OnAddNewPlayerClickListener() {
+            @Override
+            public void onAddNew() {
+                Log.d();
+            }
+        });
+        replaceDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
+            @Override
+            public void onClick(Dialog dialog) {
+                Player player = ((ReplaceDialog)dialog).getSelectPlayer();
+                if (player == null) {
+                    ToastUtil.showToast(getApplicationContext(), "请至少选择一个球员");
+                } else {
+                    createEventRecord(EventCode.EVENT_HUAN_REN, playerEvent);//添加一条换人记录
+                    //
+                    dialog.dismiss();
+                }
+            }
+        });
+        replaceDialog.setNegativeButton("取消", null);
+        replaceDialog.show();
+    }
+
+    private void gameOver() {
+        new AlertDialog.Builder(this)
+                .setMessage("本节比赛已结束，开始提交数据？")
+                .setPositiveButton("提交数据", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doCommitEventData();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create().show();
+    }
+
     @Override
     public void onBackPressed() {
-
+        gameOver();
     }
 
     @Override

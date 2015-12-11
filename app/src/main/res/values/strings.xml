@@ -26,4 +26,5 @@
     <string name="starting_lineup">首发阵容(%1$d)</string>
     <string name="record_title">比赛记录(%1$d节*%2$d分钟)</string>
     <string name="title_activity_choose_starting_up_player">调整首发球员</string>
+    <string name="title_activity_replace">换人</string>
 </resources>
