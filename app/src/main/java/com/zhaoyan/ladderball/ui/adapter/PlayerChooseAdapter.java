@@ -2,8 +2,6 @@ package com.zhaoyan.ladderball.ui.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,19 +34,12 @@ public class PlayerChooseAdapter extends RecyclerView.Adapter<PlayerChooseAdapte
 
     private int mPlayerNum;
 
-    private SparseBooleanArray mCheckedArray;
-
     public PlayerChooseAdapter(Context context, List<Player> playerList, int playerNum) {
         mContext = context;
         mDataList = playerList;
         mInflater = LayoutInflater.from(context);
 
         mPlayerNum = playerNum;
-
-        mCheckedArray = new SparseBooleanArray(playerList.size());
-        for (int i = 0; i < playerList.size(); i++) {
-            mCheckedArray.put(i, playerList.get(i).isFirst);
-        }
     }
 
     public void setDataList(List<Player> dataList) {
@@ -67,7 +58,7 @@ public class PlayerChooseAdapter extends RecyclerView.Adapter<PlayerChooseAdapte
         int count = 0;
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < mDataList.size(); i++) {
-            if (mCheckedArray.get(i)) {
+            if (mDataList.get(i).isFirst) {
                 count++;
                 list.add(mDataList.get(i).number);
             }
@@ -77,8 +68,8 @@ public class PlayerChooseAdapter extends RecyclerView.Adapter<PlayerChooseAdapte
 
     public boolean canChoosePlayer() {
         int count = 0;
-        for (int i = 0; i < mCheckedArray.size(); i++) {
-            if (mCheckedArray.get(i)) {
+        for (int i = 0; i < mDataList.size(); i++) {
+            if (mDataList.get(i).isFirst) {
                 count++;
             }
         }
@@ -100,13 +91,15 @@ public class PlayerChooseAdapter extends RecyclerView.Adapter<PlayerChooseAdapte
     public void onBindViewHolder(PlayerChooseViewHolder holder, int position) {
 
         Player player = mDataList.get(position);
-        Log.d(">>" + player.number + ",isFirst:" + player.isFirst);
+        Log.d(">>" + player.number + ",isFirst:" + player.isFirst + ",name:" + player.name);
         holder.numberView.setText(player.number + "号");
-        if (!TextUtils.isEmpty(player.name)) {
+        if (player.name == null || player.name.equals("")) {
+            holder.nameView.setText("");
+        } else {
             holder.nameView.setText(player.name);
         }
 
-        if (mCheckedArray.get(position)) {
+        if (player.isFirst) {
             holder.mCheckBox.setChecked(true);
         } else {
             holder.mCheckBox.setChecked(false);
@@ -164,7 +157,6 @@ public class PlayerChooseAdapter extends RecyclerView.Adapter<PlayerChooseAdapte
                     //修改比赛设置，调整首发阵容的时候，默认首发球员即为上场球员
                     //比赛已经开始是不能再修改比赛规则的
                     mDataList.get(position).isOnPitch = isChecked;
-                    mCheckedArray.put(position, isChecked);
                     RxBus.get().post(RxBusTag.PLAYER_CHOOSE_CHANGE, "" + position);
                 }
             });

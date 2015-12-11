@@ -1,11 +1,13 @@
 package com.zhaoyan.ladderball.http;
 
+import com.zhaoyan.ladderball.http.request.AddPlayerRequest;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
 import com.zhaoyan.ladderball.http.request.EventCollectionRequest;
 import com.zhaoyan.ladderball.http.request.LoginRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
 import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
 import com.zhaoyan.ladderball.http.request.ModifyPasswordRequest;
+import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.LoginResponse;
 import com.zhaoyan.ladderball.http.response.MatchDetailResponse;
@@ -45,5 +47,9 @@ public interface LadderBallApi {
     /**比赛时间数据采集*/
     @POST("match/eventcollection")
     Observable<BaseResponse> doCommitEventData(@Body EventCollectionRequest request);
+
+    /**新增球员请求*/
+    @POST("match/addplayer")
+    Observable<AddPlayerResponse> doAddPlayer(@Body AddPlayerRequest request);
 
 }

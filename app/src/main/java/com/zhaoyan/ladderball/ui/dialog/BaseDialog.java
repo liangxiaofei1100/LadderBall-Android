@@ -3,6 +3,7 @@ package com.zhaoyan.ladderball.ui.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.View;
@@ -128,7 +129,7 @@ public class BaseDialog extends Dialog implements View.OnClickListener {
             topView.setVisibility(View.GONE);
         }
 
-        if (mMenuText.isEmpty()) {
+        if (TextUtils.isEmpty(mMenuText)) {
             mMenuView.setVisibility(View.GONE);
         } else {
             mMenuView.setText(mMenuText);

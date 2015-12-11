@@ -1,5 +1,6 @@
 package com.zhaoyan.ladderball.ui.dialog;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -43,7 +44,8 @@ public class ReplaceDialog extends BaseDialog implements BaseDialog.OnMenuClickL
         mRecyclerView = (RecyclerView) view.findViewById(R.id.replace_recyclerview);
         mEmptyView= (TextView) view.findViewById(tv_replace_dialog_empty);
         setDialogTitle("换人");
-        setRightMenu("新增球员");
+        //换人界面暂时不做新增球员动作，太复杂了
+//        setRightMenu("新增球员");
 
         mPlayerList = playerList;
 
@@ -62,12 +64,12 @@ public class ReplaceDialog extends BaseDialog implements BaseDialog.OnMenuClickL
     @Override
     public void onMenuClick() {
         if (mListener != null) {
-            mListener.onAddNew();
+            mListener.onAddNew(this);
         }
     }
 
     public interface OnAddNewPlayerClickListener{
-        void onAddNew();
+        void onAddNew(Dialog dialog);
     }
 
     @Override

@@ -103,7 +103,10 @@ public class EventRecentAdapter extends RecyclerView.Adapter<EventRecentAdapter.
         void removeEvent() {
             int position = getLayoutPosition();
             Log.d("remove:" + position);
-            RxBus.get().post(RxBusTag.EVENT_REMOVE_RECENT_ITEM, position);
+            RxBusTag.DataRecord dataRecord = new RxBusTag.DataRecord();
+            dataRecord.itemType = RxBusTag.DataRecord.ITEM_EVENT_RECENT_REMOVE;
+            dataRecord.position = position;
+            RxBus.get().post(RxBusTag.DATA_RECORD_ACTIVITY, dataRecord);
         }
 
     }

@@ -164,7 +164,10 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
         }
 
         private void postEvent(int position) {
-            RxBus.get().post(RxBusTag.EVENT_RECORD_ITEM, position);
+            RxBusTag.DataRecord dataRecord = new RxBusTag.DataRecord();
+            dataRecord.itemType = RxBusTag.DataRecord.ITEM_EVENT_RECORD_CLICK;
+            dataRecord.position = position;
+            RxBus.get().post(RxBusTag.DATA_RECORD_ACTIVITY, dataRecord);
         }
     }
 
