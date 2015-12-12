@@ -21,7 +21,7 @@
         android:padding="12dp"
         >
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -29,9 +29,11 @@
             >
 
             <FrameLayout
+                android:id="@+id/fl_task_item_left_logo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="4dp"
+                android:layout_alignParentLeft="true"
                 >
                 <ImageView
                     android:id="@+id/iv_task_item_home_team_icon"
@@ -55,19 +57,22 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical"
+                android:layout_toRightOf="@+id/fl_task_item_left_logo"
+                android:layout_toLeftOf="@+id/ll_task_item_center"
+                android:layout_centerVertical="true"
                 android:gravity="center"
-                android:text="狗仔队\n(红)"
+                android:text="新建练习赛队伍\n(红)"
                 />
 
             <LinearLayout
+                android:id="@+id/ll_task_item_center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"
-                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
                 >
@@ -94,15 +99,18 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical"
+                android:layout_toRightOf="@+id/ll_task_item_center"
+                android:layout_toLeftOf="@+id/fl_task_item_right_logo"
+                android:layout_centerVertical="true"
                 android:gravity="center"
                 android:text="笑队\n(蓝)"
                 />
 
             <FrameLayout
+                android:id="@+id/fl_task_item_right_logo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_marginLeft="4dp"
                 >
                 <ImageView
@@ -121,7 +129,7 @@
                     />
             </FrameLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

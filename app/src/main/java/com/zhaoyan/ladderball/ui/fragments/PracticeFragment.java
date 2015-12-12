@@ -258,6 +258,7 @@ public class PracticeFragment extends BaseFragment {
                         }
 
                         mSwipeRefreshLayout.setRefreshing(false);
+
                         showData();
                     }
 
@@ -287,11 +288,11 @@ public class PracticeFragment extends BaseFragment {
      * 根据当前选择标签的不同，决定显示未完成的还是已完成的数据
      */
     private void showData() {
-        Log.d();
+        Log.d("isAssigned:" + isAssigned());
         if (isAssigned()) {
-            mAdapter.setDataList(mUnAssignedTaskList);
-        } else {
             mAdapter.setDataList(mAssignedTaskList);
+        } else {
+            mAdapter.setDataList(mUnAssignedTaskList);
         }
 
         if (mAdapter.getDataList().size() == 0) {
@@ -329,8 +330,6 @@ public class PracticeFragment extends BaseFragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d();
-
-
 
         RxBus.get().unregister(RxBusTag.PRACTICE_ITEM_CLICK, mItemObservable);
         mItemObservable = null;

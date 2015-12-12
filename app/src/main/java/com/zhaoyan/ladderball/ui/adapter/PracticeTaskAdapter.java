@@ -93,7 +93,7 @@ public class PracticeTaskAdapter extends RecyclerView.Adapter<PracticeTaskAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RxBus.get().post(RxBusTag.TASK_ITEM_CLICK, position);
+                RxBus.get().post(RxBusTag.PRACTICE_ITEM_CLICK, position);
             }
         });
     }
