@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         List<Fragment> fragments = new ArrayList<>();
         TaskFragment taskFragment = TaskFragment.newInstance();
-        PracticeFragment practiceFragment = PracticeFragment.newInstance("", "");
+        PracticeFragment practiceFragment = PracticeFragment.newInstance();
         UserCenterFragment userCenterFragment = UserCenterFragment.newInstance();
         fragments.add(taskFragment);
         fragments.add(practiceFragment);

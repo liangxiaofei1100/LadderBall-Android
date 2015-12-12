@@ -52,4 +52,12 @@ public interface LadderBallApi {
     @POST("match/addplayer")
     Observable<AddPlayerResponse> doAddPlayer(@Body AddPlayerRequest request);
 
+    /**已领取的练习赛列表请求*/
+    @POST("tmpmatch/list")
+    Observable<TaskListResponse> doGetPracticeList(@Body BaseRequest request);
+
+    /**未被领取的练习赛列表请求*/
+    @POST("tmpmatch/toasignlist")
+    Observable<TaskListResponse> doGetUnAssignPracticeList(@Body BaseRequest request);
+
 }

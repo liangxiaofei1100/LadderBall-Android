@@ -2,65 +2,321 @@ package com.zhaoyan.ladderball.ui.fragments;
 
 
 import android.os.Bundle;
+import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
+import com.zhaoyan.ladderball.http.request.BaseRequest;
+import com.zhaoyan.ladderball.http.response.TaskListResponse;
+import com.zhaoyan.ladderball.model.PracticeTask;
+import com.zhaoyan.ladderball.ui.adapter.PracticeTaskAdapter;
+import com.zhaoyan.ladderball.ui.view.SegmentControl;
+import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.ToastUtil;
+import com.zhaoyan.ladderball.util.rx.RxBus;
+import com.zhaoyan.ladderball.util.rx.RxBusTag;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link PracticeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PracticeFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class PracticeFragment extends BaseFragment {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    @Bind(R.id.segmentControl)
+    SegmentControl mSegmentControl;
 
+    @Bind(R.id.task_swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
+    @Bind(R.id.task_recyclerview)
+    RecyclerView mRecyclerView;
+
+    @Bind(R.id.tv_task_empty)
+    TextView mEmptyView;
+
+    private LinearLayoutManager mLayoutManager;
+    private PracticeTaskAdapter mAdapter;
+
+    public static final int REGET_DATA = -2;
+    private Observable<Integer> mItemObservable;
+
+    public static final int TYPE_UNASSIGNED = 0;
+    public static final int TYPE_ASSIGNED = 1;
+    private int mTaskType = TYPE_ASSIGNED;
+
+    private List<PracticeTask> mUnAssignedTaskList = new ArrayList<>();
+    private List<PracticeTask> mAssignedTaskList = new ArrayList<>();
+
+    private boolean mUnAssignedPracticeHasGet = false;
 
     public PracticeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PracticeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PracticeFragment newInstance(String param1, String param2) {
-        PracticeFragment fragment = new PracticeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static PracticeFragment newInstance() {
+        return new PracticeFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        mItemObservable = RxBus.get().register(RxBusTag.PRACTICE_ITEM_CLICK, Integer.class);
+        mItemObservable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer position) {
+                        if (position == REGET_DATA) {
+                            Log.d("refresh data");
+                            doGetTasks();
+                            return;
+                        }
+                        PracticeTask task = mAdapter.getItem(position);
+
+//                        startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));
+                    }
+                });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_practice, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_task, container, false);
+        ButterKnife.bind(this, rootView);
+
+        mSegmentControl.setText("已领取", "未领取");
+        mSegmentControl.setOnSegmentControlClickListener(new SegmentControl.OnSegmentControlClickListener() {
+            @Override
+            public void onSegmentControlClick(int index) {
+                Log.d("index:" + index);
+                if (index == 0) {
+                    mTaskType = TYPE_ASSIGNED;
+                    showData();
+                } else {
+                    mTaskType = TYPE_UNASSIGNED;
+                    if (mUnAssignedPracticeHasGet) {
+                        showData();
+                    } else {
+                        mSwipeRefreshLayout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSwipeRefreshLayout.setRefreshing(true);
+                            }
+                        });
+                        doGetTasks();
+                    }
+                }
+            }
+        });
+
+        return rootView;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new PracticeTaskAdapter(getActivity(), new ArrayList<PracticeTask>());
+        mRecyclerView.setAdapter(mAdapter);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                doGetTasks();
+            }
+        });
+
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+        });
+        doGetTasks();
+    }
+
+    /**
+     * do get task from server
+     */
+    private void doGetTasks() {
+
+        Observable<TaskListResponse> responseObservable;
+        if (isAssigned()) {
+            responseObservable = mLadderBallApi.doGetPracticeList(new BaseRequest(getActivity()));
+        } else {
+            responseObservable = mLadderBallApi.doGetUnAssignPracticeList(new BaseRequest(getActivity()));
+        }
+
+        responseObservable
+                .subscribeOn(Schedulers.io())
+                .flatMap(new Func1<TaskListResponse, Observable<TaskListResponse.HttpMatch>>() {
+                    @Override
+                    public Observable<TaskListResponse.HttpMatch> call(TaskListResponse taskListResponse) {
+                        return Observable.from(taskListResponse.matches);
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<TaskListResponse.HttpMatch, PracticeTask>() {
+                    @Override
+                    public PracticeTask call(TaskListResponse.HttpMatch httpMatch) {
+                        Log.d("mattchid:" + httpMatch.id + ",address:" + httpMatch.address);
+                        PracticeTask task = new Select().from(PracticeTask.class).where("matchId=?", httpMatch.id).executeSingle();
+                        if (task == null) {
+                            task = new PracticeTask();
+                        }
+                        task.mMatchId = httpMatch.id;
+
+                        task.mTeamHomeName = httpMatch.teamHome.name;
+                        task.mTeamHomeColor = httpMatch.teamHome.color;
+                        task.mTeamHomeScore = httpMatch.teamHome.score;
+                        task.mTeamHomeIsAssigned = httpMatch.teamHome.isAsigned;
+                        task.mTeamHomeLogoUrl = httpMatch.teamHome.logoURL;
+
+                        task.mTeamVisitorName = httpMatch.teamVisitor.name;
+                        task.mTeamVisitorColor = httpMatch.teamVisitor.color;
+                        task.mTeamVisitorScore = httpMatch.teamVisitor.score;
+                        task.mTeamVisitorIsAssigned = httpMatch.teamVisitor.isAsigned;
+                        task.mTeamVisitorLogoUrl = httpMatch.teamVisitor.logoURL;
+
+                        task.mPlayerNum = httpMatch.playerNumber;
+                        task.mAddress = httpMatch.address;
+                        task.mIsComplete = httpMatch.complete;
+                        task.mStartTime = httpMatch.startTime;
+                        task.mIsAssigned = isAssigned();
+
+                        task.save();
+
+                        Log.d("finish saved");
+
+                        return task;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<PracticeTask>() {
+                    @Override
+                    public void onStart() {
+                        super.onStart();
+                        Log.d();
+                        if (isAssigned()) {
+                            mAssignedTaskList.clear();
+                        } else {
+                            mUnAssignedTaskList.clear();
+                        }
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+//                        ToastUtil.showToast(getActivity(), "获取任务完成");
+                        if (!isAssigned()) {
+                            mUnAssignedPracticeHasGet = true;
+                        }
+
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        showData();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Log.d(e.toString());
+                        ToastUtil.showToast(getActivity(), "网络连接失败，请重试");
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onNext(PracticeTask task) {
+                        Log.d(task.toString());
+                        if (task.mIsAssigned) {
+                            mAssignedTaskList.add(task);
+                        } else {
+                            mUnAssignedTaskList.add(task);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 根据当前选择标签的不同，决定显示未完成的还是已完成的数据
+     */
+    private void showData() {
+        Log.d();
+        if (isAssigned()) {
+            mAdapter.setDataList(mUnAssignedTaskList);
+        } else {
+            mAdapter.setDataList(mAssignedTaskList);
+        }
+
+        if (mAdapter.getDataList().size() == 0) {
+            mEmptyView.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+        }
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private boolean isAssigned() {
+        return mTaskType == TYPE_ASSIGNED;
+    }
+
+    private boolean isMainLooper() {
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d();
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d();
+
+        RxBus.get().unregister(RxBusTag.PRACTICE_ITEM_CLICK, mItemObservable);
+        mItemObservable = null;
+    }
 }

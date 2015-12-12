@@ -112,6 +112,7 @@ public class TaskFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_task, container, false);
         ButterKnife.bind(this, rootView);
 
+        mSegmentControl.setText("未完成", "完成");
         mSegmentControl.setOnSegmentControlClickListener(new SegmentControl.OnSegmentControlClickListener() {
             @Override
             public void onSegmentControlClick(int index) {
