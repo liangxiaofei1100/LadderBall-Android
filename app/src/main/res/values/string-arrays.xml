@@ -34,6 +34,30 @@
         <item>功能</item>
     </string-array>
 
+    <string-array name="all_events">
+        <item>进球</item>
+        <item>助攻</item>
+        <item>角球</item>
+        <item>任意球</item>
+        <item>边界球</item>
+        <item>越位</item>
+        <item>失误</item>
+        <item>过人成功</item>
+        <item>过人失败</item>
+        <item>射正</item>
+        <item>射偏</item>
+        <item>射门被封堵</item>
+        <item>扑救射门</item>
+        <item>单刀</item>
+        <item>手抛球</item>
+        <item>球门球</item>
+        <item>黄牌</item>
+        <item>红牌</item>
+        <item>犯规</item>
+        <item>乌龙球</item>
+        <item>换人</item>
+    </string-array>
+
     <string-array name="event_jinqiu">
         <item>进球</item>
         <item>助攻</item>

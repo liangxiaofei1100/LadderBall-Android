@@ -360,7 +360,7 @@ public class TaskMainActivity extends BaseActivity {
 
             Log.d("isPardComplete:" + partData.isComplete);
             if (partData.isComplete) {
-                ToastUtil.showToast(getApplicationContext(), "数据已提交");
+                startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id));
             } else {
                 startActivityForResult(DataRecoderActivity.getStartIntent(TaskMainActivity.this,
                         mMatchId, mTeamId, id), REQUEST_CODE_DATA_RECORD);
