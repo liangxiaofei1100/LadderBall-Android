@@ -3,12 +3,14 @@ package com.zhaoyan.ladderball.http;
 import com.zhaoyan.ladderball.http.request.AddPlayerRequest;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
 import com.zhaoyan.ladderball.http.request.EventCollectionRequest;
+import com.zhaoyan.ladderball.http.request.EventPartListRequest;
 import com.zhaoyan.ladderball.http.request.LoginRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
 import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
 import com.zhaoyan.ladderball.http.request.ModifyPasswordRequest;
 import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
+import com.zhaoyan.ladderball.http.response.EventPartListResponse;
 import com.zhaoyan.ladderball.http.response.LoginResponse;
 import com.zhaoyan.ladderball.http.response.MatchDetailResponse;
 import com.zhaoyan.ladderball.http.response.ModifyPasswordResponse;
@@ -52,6 +54,10 @@ public interface LadderBallApi {
     @POST("match/addplayer")
     Observable<AddPlayerResponse> doAddPlayer(@Body AddPlayerRequest request);
 
+    /**获取一场比赛一小节的数据记录*/
+    @POST("match/eventpartlist")
+    Observable<EventPartListResponse> doGetEvetPartList(@Body EventPartListRequest request);
+
     /**已领取的练习赛列表请求*/
     @POST("tmpmatch/list")
     Observable<TaskListResponse> doGetPracticeList(@Body BaseRequest request);
@@ -59,5 +65,6 @@ public interface LadderBallApi {
     /**未被领取的练习赛列表请求*/
     @POST("tmpmatch/toasignlist")
     Observable<TaskListResponse> doGetUnAssignPracticeList(@Body BaseRequest request);
+
 
 }

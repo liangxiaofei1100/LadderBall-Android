@@ -1,32 +1,44 @@
 package com.zhaoyan.ladderball.ui.activity;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
-import com.zhaoyan.ladderball.model.Player;
+import com.zhaoyan.ladderball.http.request.EventPartListRequest;
+import com.zhaoyan.ladderball.http.response.EventPartListResponse;
 import com.zhaoyan.ladderball.ui.adapter.DataRepairAdapter;
 import com.zhaoyan.ladderball.ui.adapter.OnItemClickListener;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.dialog.DataRepairDialog;
 import com.zhaoyan.ladderball.ui.dialog.MenuDialog;
 import com.zhaoyan.ladderball.ui.view.ItemDivider;
+import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import rx.Observable;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.schedulers.Schedulers;
 
-public class DataRepairActivity extends AppCompatActivity implements OnItemClickListener {
+public class DataRepairActivity extends BaseActivity implements OnItemClickListener {
     private static final String EXTRA_MATCH_ID = "matchId";
     private static final String EXTRA_TEAM_ID = "teamId";
     private static final String EXTRA_PART_NUMBER = "part_number";
@@ -37,6 +49,11 @@ public class DataRepairActivity extends AppCompatActivity implements OnItemClick
 
     @Bind(R.id.data_repair_recyclerview)
     RecyclerView mRecyclerView;
+
+    @Bind(R.id.btn_data_repair_retry)
+    Button mRetryButton;
+    @Bind(R.id.tv_data_repair_empty)
+    TextView mEmptyView;
 
     DataRepairAdapter mAdapter;
 
@@ -71,13 +88,76 @@ public class DataRepairActivity extends AppCompatActivity implements OnItemClick
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new ItemDivider(getApplicationContext()));
 
-        mAdapter = new DataRepairAdapter(getApplicationContext(), new ArrayList<Player>());
+        mAdapter = new DataRepairAdapter(getApplicationContext(), new ArrayList<EventPartListResponse.HttpEvent>());
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(this);
 
         mMenuList.add("编辑");
         mMenuList.add("删除");
         mMenuList.add("取消");
+
+        doGetEventList();
+    }
+
+    private void doGetEventList() {
+        EventPartListRequest request = new EventPartListRequest(getApplicationContext());
+        request.matchId = mMatchId;
+        request.teamId = mTeamId;
+        request.partNumber = mPartNumber;
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("获取数据中...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+
+        Observable<EventPartListResponse> responseObservable
+                = mLadderBallApi.doGetEvetPartList(request).subscribeOn(Schedulers.io());
+
+        responseObservable
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<EventPartListResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        progressDialog.cancel();
+
+                        e.printStackTrace();
+                        Log.e(e.toString());
+
+                        mRetryButton.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onNext(EventPartListResponse response) {
+                        progressDialog.cancel();
+                        if (response.header.resultCode == 0) {
+                            mRetryButton.setVisibility(View.GONE);
+
+                            mAdapter.setDataList(response.events);
+                            mAdapter.notifyDataSetChanged();
+
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), response.header.resultText);
+                            mRetryButton.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+    }
+
+    @OnClick(R.id.btn_data_repair_retry)
+    public void doRetry() {
+        doGetEventList();
     }
 
     @Override

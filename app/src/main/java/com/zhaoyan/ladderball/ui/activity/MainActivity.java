@@ -51,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(adaper);
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabsFromPagerAdapter(adaper);
+
+    }
+
+    public int getSelectTabPosition() {
+        if (mTabLayout != null) {
+            return mTabLayout.getSelectedTabPosition();
+        }
+        return 0;
     }
 
 }

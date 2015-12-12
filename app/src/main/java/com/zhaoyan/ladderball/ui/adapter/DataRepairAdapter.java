@@ -8,7 +8,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
-import com.zhaoyan.ladderball.model.Player;
+import com.zhaoyan.ladderball.http.EventCode;
+import com.zhaoyan.ladderball.http.response.EventPartListResponse;
+import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.TimeUtil;
 
 import java.util.List;
 
@@ -21,31 +24,26 @@ import butterknife.ButterKnife;
 public class DataRepairAdapter extends RecyclerView.Adapter<DataRepairAdapter.RepairViewHolder> {
 
     private Context mContext;
-    private List<Player> mDataList;
+    private List<EventPartListResponse.HttpEvent> mDataList;
 
     private LayoutInflater mInflater;
 
-    public DataRepairAdapter(Context context, List<Player> playerList) {
+    public DataRepairAdapter(Context context, List<EventPartListResponse.HttpEvent> playerList) {
         mContext = context;
         mDataList = playerList;
         mInflater = LayoutInflater.from(context);
     }
 
-    public void setDataList(List<Player> dataList) {
-        //过滤掉非首发的
-        for (Player player: dataList) {
-            if (player.isFirst) {
-                mDataList.add(player);
-            }
-        }
+    public void setDataList(List<EventPartListResponse.HttpEvent> dataList) {
+        mDataList = dataList;
     }
 
     public void clear() {
         mDataList.clear();
     }
 
-    public void addItem(Player player) {
-        mDataList.add(mDataList.size(), player);
+    public void addItem(EventPartListResponse.HttpEvent httpEvent) {
+        mDataList.add(mDataList.size(), httpEvent);
         notifyItemInserted(mDataList.size());
     }
 
@@ -57,19 +55,19 @@ public class DataRepairAdapter extends RecyclerView.Adapter<DataRepairAdapter.Re
 
     @Override
     public void onBindViewHolder(RepairViewHolder holder, int position) {
+        EventPartListResponse.HttpEvent httpEvent = mDataList.get(position);
 
-//        Player player = mDataList.get(position);
-//        Log.d(">>" + player.number + ",isFirst:" + player.isFirst);
-//        holder.textView.setText(player.number + "号");
-
+        holder.timeView.setText(TimeUtil.timeFormat(httpEvent.timeSecond));
+        holder.numberView.setText(httpEvent.partNumber);
+        holder.evetNameView.setText(getEventName(httpEvent.eventCode));
     }
 
     @Override
     public int getItemCount() {
-        return 20;
+        return mDataList.size();
     }
 
-    public Player getItem(int position) {
+    public EventPartListResponse.HttpEvent getItem(int position) {
         return mDataList.get(position);
     }
 
@@ -111,4 +109,95 @@ public class DataRepairAdapter extends RecyclerView.Adapter<DataRepairAdapter.Re
         mListener = listener;
     }
 
+    private String getEventName(int eventCode) {
+        Log.d("eventCode:" + eventCode);
+        String eventName = "";
+        switch (eventCode) {
+            case EventCode.EVENT_JIN_QIU:
+                eventName = "进球";
+                break;
+            case EventCode.EVENT_ZHU_GONG:
+                eventName = "助攻";
+                break;
+            case EventCode.EVENT_JIAO_QIU:
+                eventName = "角球";
+                break;
+            case EventCode.EVENT_REN_YI_QIU:
+                eventName = "任意球";
+                break;
+            case EventCode.EVENT_BIAN_JIE_QIU:
+                eventName = "边界球";
+                break;
+            case EventCode.EVENT_YUE_WEI:
+                eventName = "越位";
+                break;
+            case EventCode.EVENT_SHI_WU:
+                eventName = "失误";
+                break;
+            case EventCode.EVENT_GUO_REN_CHENG_GONG:
+                eventName = "过人成功";
+                break;
+            case EventCode.EVENT_GUO_REN_SHI_BAI:
+                eventName = "过人失败";
+                break;
+            case EventCode.EVENT_SHE_ZHENG:
+                eventName = "射正";
+                break;
+            case EventCode.EVENT_SHE_PIAN:
+                eventName = "射偏";
+                break;
+            case EventCode.EVENT_SHE_MEN_BEI_DU:
+                eventName = "射门被封堵";
+                break;
+            case EventCode.EVENT_CHUAN_QIU_CHENG_GONG:
+                eventName = "传球成功";
+                break;
+            case EventCode.EVENT_WEI_XIE_QIU:
+                eventName = "威胁球";
+                break;
+            case EventCode.EVENT_CHUAN_QIU_SHI_BAI:
+                eventName = "传球失败";
+                break;
+            case EventCode.EVENT_FENG_DU_SHE_MEN:
+                eventName = "封堵射门";
+                break;
+            case EventCode.EVENT_LAN_JIE:
+                eventName = "拦截";
+                break;
+            case EventCode.EVENT_QIANG_DUAN:
+                eventName = "抢断";
+                break;
+            case EventCode.EVENT_JIE_WEI:
+                eventName = "解围";
+                break;
+            case EventCode.EVENT_BU_JIU_SHE_MEN:
+                eventName = "扑救射门";
+                break;
+            case EventCode.EVENT_BU_JIU_DAN_DAO:
+                eventName = "单刀";
+                break;
+            case EventCode.EVENT_SHOU_PAO_QIU:
+                eventName = "手抛球";
+                break;
+            case EventCode.EVENT_QIU_MEN_QIU:
+                eventName = "球门球";
+                break;
+            case EventCode.EVENT_HUANG_PAI:
+                eventName = "黄牌";
+                break;
+            case EventCode.EVENT_HONG_PAI:
+                eventName = "红牌";
+                break;
+            case EventCode.EVENT_FAN_GUI:
+                eventName = "犯规";
+                break;
+            case EventCode.EVENT_WU_LONG_QIU:
+                eventName = "乌龙球";
+                break;
+            case EventCode.EVENT_HUAN_REN:
+                eventName = "换人";
+                break;
+        }
+        return  eventName;
+    }
 }

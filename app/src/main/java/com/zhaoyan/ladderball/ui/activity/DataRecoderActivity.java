@@ -32,6 +32,9 @@ import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
 import com.zhaoyan.ladderball.util.rx.RxBusTag;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -563,6 +566,36 @@ public class DataRecoderActivity extends BaseActivity {
                 });
     }
 
+    private void createHuanRenEventRecord(PlayerEvent downEvent, PlayerEvent upEvent) {
+        EventItem eventItem = new EventItem();
+        eventItem.eventCode = EventCode.EVENT_HUAN_REN;
+        eventItem.matchId = downEvent.matchId;
+        eventItem.teamId = downEvent.teamId;
+        eventItem.playerId = downEvent.playerId;
+        eventItem.playerNumber = downEvent.playerNumber;
+        eventItem.partNumber = downEvent.partNumber;
+        eventItem.timeSecond = System.currentTimeMillis() - mMatchStartTime;
+        eventItem.uuid = UUID.randomUUID().toString();
+
+        //换人的event需要在additionalData添加被换上场球员的基本信息
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("id", upEvent.playerId);
+            jsonObject.put("playerNumber", upEvent.playerNumber);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        eventItem.additionalData = jsonObject.toString();
+        Log.d("additionalData:" + eventItem.additionalData);
+
+        eventItem.save();
+
+        if (mRecentAdapter != null) {
+            mRecentAdapter.addItem(eventItem);
+            mRecentRecyclerView.scrollToPosition(mRecentAdapter.getItemCount() - 1);
+        }
+    }
+
     private void doCommitEventData() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交数据...");
@@ -592,7 +625,7 @@ public class DataRecoderActivity extends BaseActivity {
                             httpEvent.partNumber = eventItem.partNumber;
                             httpEvent.timeSecond = eventItem.timeSecond;
                             httpEvent.uuid = eventItem.uuid;
-                            httpEvent.additionalData = null;
+                            httpEvent.additionalData = eventItem.additionalData;
 //                            subscriber.onNext(httpEvent);
                             requeset.events.add(httpEvent);
                         }
@@ -606,7 +639,6 @@ public class DataRecoderActivity extends BaseActivity {
                         httpEvent.partNumber = mPartNumber;
                         httpEvent.timeSecond = System.currentTimeMillis() - mMatchStartTime;
                         httpEvent.uuid = UUID.randomUUID().toString();
-                        httpEvent.additionalData = null;
                         requeset.events.add(httpEvent);
 
                         subscriber.onNext(requeset);
@@ -750,7 +782,8 @@ public class DataRecoderActivity extends BaseActivity {
                     mRecordAdapter.setDataList(upPlayerEvent);
                     mRecordAdapter.notifyDataSetChanged();
 
-                    createEventRecord(EventCode.EVENT_HUAN_REN, downPlayerEvent);//添加一条换人记录
+//                    createEventRecord(EventCode.EVENT_HUAN_REN, downPlayerEvent);//添加一条换人记录
+                    createHuanRenEventRecord(downPlayerEvent, upPlayerEvent);//添加一条换人记录
                     //将被换上场的球员显示在界面上
 
                     dialog.dismiss();

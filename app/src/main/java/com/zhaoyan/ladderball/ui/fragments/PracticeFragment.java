@@ -1,6 +1,7 @@
 package com.zhaoyan.ladderball.ui.fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
 import com.zhaoyan.ladderball.model.PracticeTask;
+import com.zhaoyan.ladderball.ui.activity.MainActivity;
 import com.zhaoyan.ladderball.ui.adapter.PracticeTaskAdapter;
 import com.zhaoyan.ladderball.ui.view.SegmentControl;
 import com.zhaoyan.ladderball.util.Log;
@@ -77,6 +79,15 @@ public class PracticeFragment extends BaseFragment {
 
     public static PracticeFragment newInstance() {
         return new PracticeFragment();
+    }
+
+    private MainActivity mMainActivity;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mMainActivity = (MainActivity) context;
     }
 
     @Override
@@ -254,7 +265,9 @@ public class PracticeFragment extends BaseFragment {
                     public void onError(Throwable e) {
                         e.printStackTrace();
                         Log.d(e.toString());
-                        ToastUtil.showToast(getActivity(), "网络连接失败，请重试");
+                        if (mMainActivity.getSelectTabPosition() == 1) {
+                            ToastUtil.showToast(getActivity(), "网络连接失败，请重试");
+                        }
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
 
@@ -309,12 +322,15 @@ public class PracticeFragment extends BaseFragment {
         super.onDetach();
         Log.d();
 
+        mMainActivity = null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d();
+
+
 
         RxBus.get().unregister(RxBusTag.PRACTICE_ITEM_CLICK, mItemObservable);
         mItemObservable = null;

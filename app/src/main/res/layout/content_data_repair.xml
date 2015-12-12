@@ -116,4 +116,22 @@
             />
     </FrameLayout>
 
+    <Button
+        android:id="@+id/btn_data_repair_retry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="点击重试"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/tv_data_repair_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="暂无数据记录..."
+        android:visibility="gone"
+        />
+
 </RelativeLayout>
