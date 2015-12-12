@@ -2,6 +2,7 @@ package com.zhaoyan.ladderball.ui.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,8 +63,18 @@ public class PracticeTaskAdapter extends RecyclerView.Adapter<PracticeTaskAdapte
 
         PracticeTask task = getItem(position);
 
-        holder.homeTeamNameColor.setText(task.mTeamHomeName + "\n" + "(" + task.mTeamHomeColor + ")");
-        holder.visitorTeamNameColor.setText(task.mTeamVisitorName + "\n" + "(" + task.mTeamVisitorColor + ")");
+        if (TextUtils.isEmpty(task.mTeamHomeColor)) {
+            holder.homeTeamNameColor.setText(task.mTeamHomeName);
+        } else {
+            holder.homeTeamNameColor.setText(task.mTeamHomeName + "\n" + "(" + task.mTeamHomeColor + ")");
+        }
+
+        if (TextUtils.isEmpty(task.mTeamVisitorColor)) {
+            holder.visitorTeamNameColor.setText(task.mTeamVisitorName);
+        } else {
+            holder.visitorTeamNameColor.setText(task.mTeamVisitorName + "\n" + "(" + task.mTeamVisitorColor + ")");
+        }
+
         if (task.mIsComplete) {
             holder.score.setText(task.mTeamHomeScore + ":" + task.mTeamVisitorScore);
         } else {

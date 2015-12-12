@@ -26,10 +26,10 @@
         <meta-data
             android:name="AA_MODELS"
             android:value="com.zhaoyan.ladderball.model.User,com.zhaoyan.ladderball.model.Task,
-            com.zhaoyan.ladderball.model.Match,com.zhaoyan.ladderball.model.Team,
-            com.zhaoyan.ladderball.model.Player,com.zhaoyan.ladderball.model.PartData,
-            com.zhaoyan.ladderball.model.EventItem,com.zhaoyan.ladderball.model.PlayerEvent,
-            com.zhaoyan.ladderball.model.PracticeTask"/>
+                         com.zhaoyan.ladderball.model.Match,com.zhaoyan.ladderball.model.Team,
+                         com.zhaoyan.ladderball.model.Player,com.zhaoyan.ladderball.model.PartData,
+                         com.zhaoyan.ladderball.model.EventItem,com.zhaoyan.ladderball.model.PlayerEvent,
+                         com.zhaoyan.ladderball.model.PracticeTask"/>
 
         <activity
             android:name=".ui.activity.LoginActivity"
@@ -77,6 +77,13 @@
         <activity
             android:name=".ui.activity.DataRepairActivity"
             android:label="@string/title_activity_data_repair"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".ui.activity.CreatePracticeActivity"
+            android:label="@string/title_activity_create_practice"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

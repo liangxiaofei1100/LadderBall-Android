@@ -104,11 +104,14 @@ public class PracticeFragment extends BaseFragment {
                     public void call(Integer position) {
                         if (position == REGET_DATA) {
                             Log.d("refresh data");
+                            mTaskType = TYPE_ASSIGNED;
+                            mSegmentControl.setSelectedIndex(0);
                             doGetTasks();
                             return;
                         }
                         PracticeTask task = mAdapter.getItem(position);
 
+                        ToastUtil.showToast(getActivity(), "正在努力开发中...");
 //                        startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));
                     }
                 });

@@ -28,4 +28,5 @@
     <string name="title_activity_choose_starting_up_player">调整首发球员</string>
     <string name="title_activity_replace">换人</string>
     <string name="title_activity_data_repair">数据修复</string>
+    <string name="title_activity_create_practice">创建练习赛</string>
 </resources>

@@ -2,6 +2,7 @@ package com.zhaoyan.ladderball.http;
 
 import com.zhaoyan.ladderball.http.request.AddPlayerRequest;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
+import com.zhaoyan.ladderball.http.request.CreatePracticeRequest;
 import com.zhaoyan.ladderball.http.request.EventCollectionRequest;
 import com.zhaoyan.ladderball.http.request.EventPartListRequest;
 import com.zhaoyan.ladderball.http.request.LoginRequest;
@@ -66,5 +67,7 @@ public interface LadderBallApi {
     @POST("tmpmatch/toasignlist")
     Observable<TaskListResponse> doGetUnAssignPracticeList(@Body BaseRequest request);
 
-
+    /**创建练习赛*/
+    @POST("tmpmatch/add")
+    Observable<BaseResponse> doCreatePracticeTask(@Body CreatePracticeRequest request);
 }
