@@ -57,6 +57,15 @@ public class EventRecentAdapter extends RecyclerView.Adapter<EventRecentAdapter.
         notifyItemInserted(mDataList.size());
     }
 
+    public void removeItem(int position) {
+        mDataList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public EventItem getItem(int position) {
+        return mDataList.get(position);
+    }
+
     @Override
     public RecentRecordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView = mInflater.inflate(R.layout.layout_recent_record_item, parent, false);
@@ -75,15 +84,6 @@ public class EventRecentAdapter extends RecyclerView.Adapter<EventRecentAdapter.
         return mDataList.size();
     }
 
-//    public Player getItem(int position) {
-//        return mDataList.get(position);
-//    }
-
-    public void removeItem(int position) {
-        mDataList.remove(position);
-        notifyItemRemoved(position);
-    }
-
     public class RecentRecordViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.tv_recent_record_number)
@@ -95,8 +95,6 @@ public class EventRecentAdapter extends RecyclerView.Adapter<EventRecentAdapter.
             super(itemView);
 
             ButterKnife.bind(this, itemView);
-
-
         }
 
         @OnClick(R.id.iv_recent_record_remove)

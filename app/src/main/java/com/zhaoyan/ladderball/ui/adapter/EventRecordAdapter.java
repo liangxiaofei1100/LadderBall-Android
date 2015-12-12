@@ -8,13 +8,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
-import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.model.PlayerEvent;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.rx.RxBus;
 import com.zhaoyan.ladderball.util.rx.RxBusTag;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,8 +29,6 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
 
     private String[] mEventsName;
 
-    private long mStartTime;
-
     public EventRecordAdapter(Context context) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -43,22 +38,6 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
 
     public void setDataList(PlayerEvent playerEvent) {
         mPlayerEvent = playerEvent;
-    }
-
-    public void setStartTime(long startTime) {
-        mStartTime = startTime;
-    }
-
-    public List<Player> getDataList() {
-        return null;
-    }
-
-    public void clear() {
-    }
-
-    public void addItem(Player player) {
-//        mDataList.add(mDataList.size(), player);
-//        notifyItemInserted(mDataList.size());
     }
 
     @Override
@@ -74,6 +53,7 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
             return;
         }
 
+        Log.d("position:" + position);
         holder.eventNameView.setText(mEventsName[position]);
         String eventNum = "";
         switch (position) {
@@ -91,6 +71,7 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
                 break;
             case 4:
                 eventNum = mPlayerEvent.sheZheng + "/" + mPlayerEvent.shePian + "/" + mPlayerEvent.sheMenBeiDu;
+                Log.d("shezheng:eventNum:" + eventNum);
                 break;
             case 5:
                 eventNum = mPlayerEvent.chuanQiuChengGong + "";
@@ -125,12 +106,18 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
                 break;
             case 15:
                 //功能按钮没有数字
-                holder.eventCountView.setVisibility(View.GONE);
+                Log.d(">>>>>>>>>>>>");
                 break;
             default:
+                Log.d("default");
                 break;
         }
+        Log.d("eventNum:" + eventNum);
         holder.eventCountView.setText(eventNum);
+    }
+
+    private void setEventCountText(String text, TextView textView) {
+        textView.setText(text);
     }
 
     @Override

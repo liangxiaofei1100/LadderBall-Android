@@ -18,6 +18,7 @@
         android:orientation="vertical"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
+        android:layout_gravity="center"
         android:gravity="center"
         >
 
@@ -25,7 +26,6 @@
             android:id="@+id/tv_event_record_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="传球成功"
             android:textColor="@color/textPrimary"
             />
 
@@ -33,7 +33,6 @@
             android:id="@+id/tv_event_record_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="42"
             android:textColor="@color/textPrimary"
             />
 

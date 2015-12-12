@@ -146,6 +146,10 @@ public class RecordPlayerNumberAdapter extends RecyclerView.Adapter<RecordPlayer
         notifyItemRemoved(position);
     }
 
+    public long getSelectItemId() {
+        return  mDataList.get(mSelectPosition).playerId;
+    }
+
     public class SingleChooseViewHolder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.playerCardView)

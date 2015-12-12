@@ -3,6 +3,8 @@ package com.zhaoyan.ladderball.model;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.zhaoyan.ladderball.http.EventCode;
+import com.zhaoyan.ladderball.util.Log;
 
 /**
  * Created by Yuri on 2015/12/10.
@@ -81,6 +83,97 @@ public class PlayerEvent extends Model {
     public int wuLongQiu;
     @Column(name = "huanRen")
     public int huanRen;
+
+    public void rollback(int eventCode) {
+        Log.d("eventCode：" + eventCode);
+        switch (eventCode) {
+            case EventCode.EVENT_JIN_QIU:
+                jinQiu -= 1;
+                break;
+            case EventCode.EVENT_ZHU_GONG:
+                zhuGong -= 1;
+                break;
+            case EventCode.EVENT_JIAO_QIU:
+                jiaoQiu -= 1;
+                break;
+            case EventCode.EVENT_REN_YI_QIU:
+                renYiQiu -= 1;
+                break;
+            case EventCode.EVENT_BIAN_JIE_QIU:
+                bianJieQiu -= 1;
+                break;
+            case EventCode.EVENT_YUE_WEI:
+                yueWei -= 1;
+                break;
+            case EventCode.EVENT_SHI_WU:
+                shiWu -= 1;
+                break;
+            case EventCode.EVENT_GUO_REN_CHENG_GONG:
+                guoRenChengGong -= 1;
+                break;
+            case EventCode.EVENT_GUO_REN_SHI_BAI:
+                guoRenShiBai -= 1;
+                break;
+            case EventCode.EVENT_SHE_ZHENG:
+                sheZheng -= 1;
+                break;
+            case EventCode.EVENT_SHE_PIAN:
+                shePian -= 1;
+                break;
+            case EventCode.EVENT_SHE_MEN_BEI_DU:
+                sheMenBeiDu -= 1;
+                break;
+            case EventCode.EVENT_CHUAN_QIU_CHENG_GONG:
+                chuanQiuChengGong -= 1;
+                break;
+            case EventCode.EVENT_WEI_XIE_QIU:
+                weiXieQiu -= 1;
+                break;
+            case EventCode.EVENT_CHUAN_QIU_SHI_BAI:
+                chuanQiuShiBai -= 1;
+                break;
+            case EventCode.EVENT_FENG_DU_SHE_MEN:
+                fengDuSheMen -= 1;
+                break;
+            case EventCode.EVENT_LAN_JIE:
+                lanJie -= 1;
+                break;
+            case EventCode.EVENT_QIANG_DUAN:
+                qiangDuan -= 1;
+                break;
+            case EventCode.EVENT_JIE_WEI:
+                jieWei -= 1;
+                break;
+            case EventCode.EVENT_BU_JIU_SHE_MEN:
+                puJiuSheMen -= 1;
+                break;
+            case EventCode.EVENT_BU_JIU_DAN_DAO:
+                danDao -= 1;
+                break;
+            case EventCode.EVENT_SHOU_PAO_QIU:
+                shouPaoQiu -= 1;
+                break;
+            case EventCode.EVENT_QIU_MEN_QIU:
+                qiuMenQiu -= 1;
+                break;
+            case EventCode.EVENT_HUANG_PAI:
+                huangPai -= 1;
+                break;
+            case EventCode.EVENT_HONG_PAI:
+                hongPai -= 1;
+                break;
+            case EventCode.EVENT_FAN_GUI:
+                fanGui -= 1;
+                break;
+            case EventCode.EVENT_WU_LONG_QIU:
+                wuLongQiu -= 1;
+                break;
+            case EventCode.EVENT_HUAN_REN:
+                huanRen -= 1;
+                break;
+        }
+        save();
+    }
 
     @Override
     public String toString() {

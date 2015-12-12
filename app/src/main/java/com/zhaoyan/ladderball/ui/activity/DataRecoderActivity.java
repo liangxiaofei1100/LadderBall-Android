@@ -76,7 +76,7 @@ public class DataRecoderActivity extends BaseActivity {
 
     private ProgressDialog mProgressDialog;
 
-    private List<PlayerEvent> mOnPitchPlayerEventList;
+//    private List<PlayerEvent> mOnPitchPlayerEventList;//改用hashmap
 
     private HashMap<Long, PlayerEvent> mPlayerEventMap;
 
@@ -146,7 +146,8 @@ public class DataRecoderActivity extends BaseActivity {
         mPlayerNumberAdapter = new RecordPlayerNumberAdapter(getApplicationContext(), mOnPitchPlayerList);
         mPlayerNumberRecyclerView.setAdapter(mPlayerNumberAdapter);
 
-        mOnPitchPlayerEventList = new ArrayList<>();
+//        mOnPitchPlayerEventList = new ArrayList<>();
+        initRecentList();
         initEvents(allPlayerList);
 
         mDataObserverable = RxBus.get().register(RxBusTag.DATA_RECORD_ACTIVITY, RxBusTag.DataRecord.class);
@@ -167,6 +168,33 @@ public class DataRecoderActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    /**
+     * 初始化事件历史纪录，这种情况一般会在程序异常崩溃等一节比赛还未提交的时候，再次进来恢复上一次的数据记录
+     */
+    private void initRecentList() {
+        Observable.create(new Observable.OnSubscribe<List<EventItem>>() {
+            @Override
+            public void call(Subscriber<? super List<EventItem>> subscriber) {
+                //读取当前比赛第一个球员
+                List<EventItem> eventItemList = new Select().from(EventItem.class)
+                        .where("matchId=? and teamId=?", mMatchId, mTeamId).execute();
+                subscriber.onNext(eventItemList);
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<EventItem>>() {
+                    @Override
+                    public void call(List<EventItem> result) {
+                        if (result != null && result.size() > 0 && mRecentAdapter != null) {
+                            mRecentAdapter.setDataList(result);
+                            mRecentAdapter.notifyDataSetChanged();
+                        }
+                        Log.d("init recent list over");
+                    }
+                });
     }
 
     private void initEvents(final List<Player> allPlayerList) {
@@ -190,7 +218,7 @@ public class DataRecoderActivity extends BaseActivity {
                     playerEvent.partNumber = mPartNumber;
                     playerEvent.save();
 
-                    mOnPitchPlayerEventList.add(playerEvent);
+//                    mOnPitchPlayerEventList.add(playerEvent);
 
                     if (firsPlayerEvent == null) {
                         firsPlayerEvent = playerEvent;
@@ -250,9 +278,6 @@ public class DataRecoderActivity extends BaseActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         mMatchStartTime = System.currentTimeMillis();
-                                        if (mRecordAdapter != null) {
-                                            mRecordAdapter.setStartTime(mMatchStartTime);
-                                        }
                                     }
                                 })
                                 .setNegativeButton("还没开始", new DialogInterface.OnClickListener() {
@@ -304,7 +329,28 @@ public class DataRecoderActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 从历史记录中移除一个事件
+     * @param position
+     */
     private void onRecentItemRemove(int position) {
+        EventItem eventItem = mRecentAdapter.getItem(position);
+        //首先从EventItem数据表中删除这条数据
+        eventItem.delete();
+
+        //然后总表也要删除数据
+        PlayerEvent playerEvent = mPlayerEventMap.get(eventItem.playerId);
+        Log.d("playerevent:" + playerEvent.toString());
+        playerEvent.rollback(eventItem.eventCode);
+
+        if (mPlayerNumberAdapter != null &&
+                mPlayerNumberAdapter.getSelectItemId() == eventItem.playerId) {
+            if (mRecordAdapter != null) {
+                mRecordAdapter.setDataList(playerEvent);
+                mRecordAdapter.notifyDataSetChanged();
+            }
+        }
+
         if (mRecentAdapter != null) {
             mRecentAdapter.removeItem(position);
         }
@@ -802,6 +848,14 @@ public class DataRecoderActivity extends BaseActivity {
                         doCommitEventData();
                     }
                 })
+                //test
+                .setNeutralButton("强行退出", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DataRecoderActivity.this.finish();
+                    }
+                })
+                //test
                 .setNegativeButton("取消", null)
                 .create().show();
     }
