@@ -66,6 +66,7 @@
             android:name=".ui.activity.DataRecoderActivity"
             android:label="@string/title_activity_data_recoder"
             android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity

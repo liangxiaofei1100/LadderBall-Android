@@ -98,6 +98,8 @@ public class PlayerHorizontalAdapter extends RecyclerView.Adapter<PlayerHorizont
             super(itemView);
 
             ButterKnife.bind(this, itemView);
+
+            removeView.setVisibility(View.GONE);
         }
 
         @OnClick(R.id.iv_player_item_remove)

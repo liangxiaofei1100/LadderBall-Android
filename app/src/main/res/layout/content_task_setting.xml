@@ -165,7 +165,7 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:paddingTop="2dp"
-                    android:text="调整首发"
+                    android:text="新增球员"
                     />
             </RelativeLayout>
 

@@ -132,15 +132,17 @@ public class DataRecoderActivity extends BaseActivity {
 
         mOnPitchPlayerList = new ArrayList<>();
         mUnOnPitchPlayerList = new ArrayList<>();
+        Log.d("=============");
         for (Player player : allPlayerList) {
 //            Log.d(player.toString());
+            Log.d("isFirst:" + player.isFirst + ",isOnPitch:" + player.isOnPitch);
             if (player.isOnPitch) {
                 mOnPitchPlayerList.add(player);
             } else {
                 mUnOnPitchPlayerList.add(player);
             }
         }
-
+        Log.d("=============");
         int itemHeight = getItemHeight(getApplicationContext(), mOnPitchPlayerList.size());
         int px = DensityUtil.dip2px(getApplicationContext(), 1);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(itemHeight * 2, ViewGroup.LayoutParams.MATCH_PARENT);
