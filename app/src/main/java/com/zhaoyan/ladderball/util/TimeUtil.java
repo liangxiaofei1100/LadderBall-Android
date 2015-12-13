@@ -38,7 +38,7 @@ public class TimeUtil {
         }
 
         if (hour == 0) {
-            return min + "'  " + sec.trim().substring(0, 2) + "'";
+            return min + "'  " + sec.trim().substring(0, 2) + "''";
         } else {
             String hours = "";
             if (hour < 10) {
@@ -46,7 +46,7 @@ public class TimeUtil {
             } else {
                 hours = hours + "";
             }
-            return hours + "' " + min + "' " + sec.trim().substring(0, 2) + "'";
+            return hours + "' " + min + "' " + sec.trim().substring(0, 2) + "''";
         }
     }
 }

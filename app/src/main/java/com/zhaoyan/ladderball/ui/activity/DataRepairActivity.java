@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
+import com.zhaoyan.ladderball.http.EventCode;
 import com.zhaoyan.ladderball.http.request.EventPartListRequest;
 import com.zhaoyan.ladderball.http.response.EventPartListResponse;
 import com.zhaoyan.ladderball.ui.adapter.DataRepairAdapter;
@@ -36,6 +37,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class DataRepairActivity extends BaseActivity implements OnItemClickListener {
@@ -121,8 +123,29 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<EventPartListResponse, List<EventPartListResponse.HttpEvent>>() {
+                    @Override
+                    public List<EventPartListResponse.HttpEvent> call(EventPartListResponse eventPartListResponse) {
+                        List<EventPartListResponse.HttpEvent> events = new ArrayList<>();
+                        if (eventPartListResponse.header.resultCode == 0) {
+                            if (eventPartListResponse.events == null) {
+                                return events;
+                            }
+                            EventPartListResponse.HttpEvent httpEvent;
+                            for (int i = 0; i < eventPartListResponse.events.size(); i++) {
+                                httpEvent = eventPartListResponse.events.get(i);
+                                if (httpEvent.eventCode != EventCode.EVENT_PART_OVER) {
+                                    events.add(httpEvent);
+                                }
+                            }
+                            return events;
+                        }
+                        mFaiLResultString = eventPartListResponse.header.resultText;
+                        return null;
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<EventPartListResponse>() {
+                .subscribe(new Observer<List<EventPartListResponse.HttpEvent>>() {
                     @Override
                     public void onCompleted() {
                         Log.d();
@@ -139,21 +162,22 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
                     }
 
                     @Override
-                    public void onNext(EventPartListResponse response) {
+                    public void onNext(List<EventPartListResponse.HttpEvent> result) {
                         progressDialog.cancel();
-                        if (response.header.resultCode == 0) {
+                        if (result != null) {
                             mRetryButton.setVisibility(View.GONE);
-
-                            mAdapter.setDataList(response.events);
+                            mAdapter.setDataList(result);
                             mAdapter.notifyDataSetChanged();
 
                         } else {
-                            ToastUtil.showToast(getApplicationContext(), response.header.resultText);
+                            ToastUtil.showToast(getApplicationContext(), mFaiLResultString);
                             mRetryButton.setVisibility(View.VISIBLE);
                         }
                     }
                 });
     }
+
+    private String mFaiLResultString;
 
     @OnClick(R.id.btn_data_repair_retry)
     public void doRetry() {
@@ -214,7 +238,9 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
     }
 
     private void doEditItem(int position) {
+        EventPartListResponse.HttpEvent httpEvent = mAdapter.getItem(position);
         DataRepairDialog repairDialog = new DataRepairDialog(this, DataRepairDialog.TYPE_EDIT);
+        repairDialog.setEvent(httpEvent);
         repairDialog.setDialogTitle("编辑数据");
         repairDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
                     @Override

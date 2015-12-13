@@ -2,6 +2,7 @@ package com.zhaoyan.ladderball.ui.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,9 @@ import com.zhaoyan.ladderball.http.EventCode;
 import com.zhaoyan.ladderball.http.response.EventPartListResponse;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.TimeUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -58,8 +62,31 @@ public class DataRepairAdapter extends RecyclerView.Adapter<DataRepairAdapter.Re
         EventPartListResponse.HttpEvent httpEvent = mDataList.get(position);
 
         holder.timeView.setText(TimeUtil.timeFormat(httpEvent.timeSecond));
-        holder.numberView.setText(httpEvent.partNumber);
-        holder.evetNameView.setText(getEventName(httpEvent.eventCode));
+        holder.numberView.setText(httpEvent.playerNumber + "");
+        if (httpEvent.eventCode == EventCode.EVENT_HUAN_REN) {
+            int playerNumber = getReplacePlayerNumber(httpEvent.additionalData);
+            if (playerNumber == -1) {
+                holder.evetNameView.setText(getEventName(httpEvent.eventCode));
+            } else {
+                holder.evetNameView.setText(getEventName(httpEvent.eventCode) + "(" + playerNumber + ")");
+            }
+        } else {
+            holder.evetNameView.setText(getEventName(httpEvent.eventCode));
+        }
+    }
+
+    private int getReplacePlayerNumber(String additionalData) {
+        int playerNumber = -1;
+        if (TextUtils.isEmpty(additionalData)) {
+            return -1;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(additionalData);
+            playerNumber = jsonObject.getInt("playerNumber");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return playerNumber;
     }
 
     @Override
@@ -110,7 +137,7 @@ public class DataRepairAdapter extends RecyclerView.Adapter<DataRepairAdapter.Re
     }
 
     private String getEventName(int eventCode) {
-        Log.d("eventCode:" + eventCode);
+//        Log.d("eventCode:" + eventCode);
         String eventName = "";
         switch (eventCode) {
             case EventCode.EVENT_JIN_QIU:
