@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.zhaoyan.ladderball.ui.activity.TaskMainActivity"
     tools:showIn="@layout/activity_task_main">
@@ -15,7 +14,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/fl_task_main_check_data"
+        android:paddingTop="8dp"
         android:layout_alignParentTop="true"
+        android:visibility="gone"
         >
 
         <LinearLayout
@@ -71,50 +72,14 @@
             </RelativeLayout>
 
             <LinearLayout
-                android:id="@+id/ll_task_main_record"
+                android:id="@+id/ll_task_main_part"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:background="@android:color/white"
                 android:orientation="vertical"
-                android:paddingBottom="8dp"
-                android:paddingTop="8dp"
+                android:layout_marginTop="8dp"
                 >
-
-                <TextView
-                    android:id="@+id/tv_task_main_record_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="16dp"
-                    android:text="比赛记录(3节*30分钟)"
-                    />
-
-                <!--<com.zhaoyan.ladderball.ui.view.SettingItemView-->
-                    <!--android:id="@+id/stv_task_main_first"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="48dp"-->
-                    <!--app:itemRightArrow="true"-->
-                    <!--app:itemSummary="第一节"-->
-                    <!--app:itemTitle="未开始"-->
-                    <!--/>-->
-
-                <!--<com.zhaoyan.ladderball.ui.view.SettingItemView-->
-                    <!--android:id="@+id/stv_task_main_second"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="48dp"-->
-                    <!--app:itemRightArrow="true"-->
-                    <!--app:itemSummary="第二节"-->
-                    <!--app:itemTitle="未开始"-->
-                    <!--/>-->
-
-                <!--<com.zhaoyan.ladderball.ui.view.SettingItemView-->
-                    <!--android:id="@+id/stv_task_main_third"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="48dp"-->
-                    <!--app:itemRightArrow="true"-->
-                    <!--app:itemSummary="第三节"-->
-                    <!--app:itemTitle="未开始"-->
-                    <!--/>-->
+                <!-- 这里根据实际情况显示每一小节的状态  -->
             </LinearLayout>
 
         </LinearLayout>
@@ -140,6 +105,7 @@
             android:background="@drawable/btn_bg_selector"
             android:text="预览数据"
             android:textColor="@android:color/white"
+            android:enabled="false"
             />
     </FrameLayout>
 
@@ -149,6 +115,15 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         style="@android:style/Widget.Holo.ProgressBar.Large"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/tv_task_main_load_fail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="点击重试"
         android:visibility="gone"
         />
 

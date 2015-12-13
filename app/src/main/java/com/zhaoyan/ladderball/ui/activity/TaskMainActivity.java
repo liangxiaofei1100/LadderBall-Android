@@ -10,8 +10,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
@@ -50,13 +52,6 @@ public class TaskMainActivity extends BaseActivity {
     @Bind(R.id.task_main_recyclerview)
     RecyclerView mRecyclerView;
 
-//    @Bind(R.id.stv_task_main_first)
-//    SettingItemView mSectionOneView;
-//    @Bind(R.id.stv_task_main_second)
-//    SettingItemView mSectionTwoView;
-//    @Bind(R.id.stv_task_main_third)
-//    SettingItemView mSectionThreeView;
-
     //最上面的队伍对阵情况
     @Bind(R.id.tv_task_item_home_team_name_color)
     TextView mTeamHomeName;
@@ -78,14 +73,18 @@ public class TaskMainActivity extends BaseActivity {
     @Bind(R.id.tv_player_title)
     TextView mStartingLineupView;//首发阵容标题
 
-    @Bind(R.id.tv_task_main_record_title)
-    TextView mRecordTitleView;//比赛记录标题
-
     @Bind(R.id.bar_loading)
     ProgressBar mLoadingBar;
 
-    @Bind(R.id.ll_task_main_record)
-    LinearLayout mRecordLayout;
+    @Bind(R.id.ll_task_main_part)
+    LinearLayout mPartLayout;
+
+    @Bind(R.id.task_main_scrollview)
+    ScrollView mScrollView;
+    @Bind(R.id.tv_task_main_load_fail)
+    TextView mLoadFailView;
+    @Bind(R.id.btn_task_main_check_data)
+    Button mCheckDataBtn;
 
     LinearLayoutManager mLinearLayoutManager;
 
@@ -267,15 +266,25 @@ public class TaskMainActivity extends BaseActivity {
                         Log.e(e);
                         mLoadingBar.setVisibility(View.GONE);
                         ToastUtil.showToast(getApplicationContext(), "获取失败，请重试");
-                        TaskMainActivity.this.finish();
+
+                        mLoadFailView.setVisibility(View.VISIBLE);
+
                     }
 
                     @Override
                     public void onNext(Match match) {
                         Log.d("match:" + match.matchId);
+                        mCheckDataBtn.setEnabled(true);
+                        mScrollView.setVisibility(View.VISIBLE);
                         showData(match);
                     }
                 });
+    }
+
+    @OnClick(R.id.tv_task_main_load_fail)
+    void reload() {
+        mLoadFailView.setVisibility(View.GONE);
+        getMatchDetail();
     }
 
     private void showData(Match match) {
@@ -302,9 +311,6 @@ public class TaskMainActivity extends BaseActivity {
             }
             mAdapter.notifyDataSetChanged();
         }
-        //显示比赛记录
-        mRecordTitleView.setText(getString(R.string.record_title, match.totalPart, match.partMinutes));
-
         SettingItemView itemView;
         View view;
         String[] matchParts = getResources().getStringArray(R.array.match_parts);
@@ -315,7 +321,15 @@ public class TaskMainActivity extends BaseActivity {
 
         PartItemClickListener itemClickListener = new PartItemClickListener();
 
-        mRecordLayout.removeAllViews();
+        mPartLayout.removeAllViews();
+
+        //title
+        itemView = new SettingItemView(this);
+        itemView.setLayoutParams(params);
+        itemView.setTitleText(getString(R.string.record_title, match.totalPart, match.partMinutes));
+        itemView.setRightArrowVisiblily(View.GONE);
+        mPartLayout.addView(itemView);
+
         for (PartData pardData : match.partDatas) {
             if (pardData.partNumber > matchParts.length) {
                 //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
@@ -324,26 +338,12 @@ public class TaskMainActivity extends BaseActivity {
             itemView = new SettingItemView(this);
             itemView.setLayoutParams(params);
             itemView.setId(pardData.partNumber);
-            itemView.setTitleText(matchParts[pardData.partNumber - 1]);
+            //itemView.setTitleText(matchParts[pardData.partNumber - 1]);
+            itemView.setTitleText("第" + pardData.partNumber + "节");
             itemView.setSummaryText(pardData.isComplete ? "已完成录入" : "未开始");
             itemView.setOnClickListener(itemClickListener);
-            mRecordLayout.addView(itemView);
+            mPartLayout.addView(itemView);
         }
-
-//        for (int i = 0; i < match.partDatas.size(); i++) {
-//            PartData partData = match.partDatas.get(i);
-//            if (partData.partNumber > matchParts.length) {
-//                //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
-//                break;
-//            }
-//            itemView = new SettingItemView(this);
-//            itemView.setLayoutParams(params);
-//            itemView.setId(i);
-//            itemView.setTitleText(matchParts[partData.partNumber - 1]);
-//            itemView.setSummaryText(partData.isComplete ? "已完成录入" : "未开始");
-//            itemView.setOnClickListener(itemClickListener);
-//            mRecordLayout.addView(itemView);
-//        }
     }
 
     private class PartItemClickListener implements View.OnClickListener {

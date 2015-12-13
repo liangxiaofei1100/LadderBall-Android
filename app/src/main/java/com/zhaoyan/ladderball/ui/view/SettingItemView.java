@@ -34,6 +34,7 @@ public class SettingItemView extends FrameLayout {
     private View mRedDotView;
     private TextView mSummaryView;
     private TextView mTitleView;
+    private View mIndicatorView;
 
 //    private SlideButton mSlideButton;
 
@@ -80,7 +81,7 @@ public class SettingItemView extends FrameLayout {
         mTitleView = (TextView) rootView.findViewById(R.id.tv_setting_title);
         mSummaryView = (TextView) rootView.findViewById(R.id.tv_setting_summary);
         View underLineView = rootView.findViewById(R.id.underLineView);
-        View indicatorView = rootView.findViewById(R.id.indicator);
+        mIndicatorView = rootView.findViewById(R.id.indicator);
         if (mIconResId == -1) {
             mRedDotView = rootView.findViewById(R.id.iv_icon_new);
             iconFrameView.setVisibility(View.GONE);
@@ -96,7 +97,7 @@ public class SettingItemView extends FrameLayout {
         mSummaryView.setText(mSummary);
         mSummaryView.setTextColor(mSummaryColor);
         underLineView.setVisibility(mHasUnderLine ? VISIBLE : INVISIBLE);
-        indicatorView.setVisibility(mHasRightArrow ? VISIBLE : GONE);
+        mIndicatorView.setVisibility(mHasRightArrow ? VISIBLE : GONE);
         addView(rootView);
 
         setBackgroundResource(R.drawable.setting_item_bg);
@@ -147,6 +148,12 @@ public class SettingItemView extends FrameLayout {
     public void setSummaryText(String text) {
         if (mSummaryView != null) {
             mSummaryView.setText(text);
+        }
+    }
+
+    public void setRightArrowVisiblily(int visiblily) {
+        if (mIndicatorView != null) {
+            mIndicatorView.setVisibility(visiblily);
         }
     }
 

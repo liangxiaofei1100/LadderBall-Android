@@ -16,6 +16,7 @@ import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.model.User;
 import com.zhaoyan.ladderball.ui.activity.LoginActivity;
 import com.zhaoyan.ladderball.ui.activity.ModifyPasswordActivity;
+import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.CommonUtil;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.SharedPreferencesManager;
@@ -30,14 +31,15 @@ import rx.functions.Action1;
 
 public class UserCenterFragment extends Fragment {
 
-    @Bind(R.id.tv_user_name)
-    TextView mUserNameView;
-    @Bind(R.id.tv_user_phone)
-    TextView mUserPhoneView;
-    @Bind(R.id.tv_user_address)
-    TextView mUserAddressView;
-    @Bind(R.id.tv_user_gender)
-    TextView mUserGenderView;
+    @Bind(R.id.siv_username)
+    SettingItemView mUserNameView;
+    @Bind(R.id.siv_phone)
+    SettingItemView mUserPhoneView;
+    @Bind(R.id.siv_address)
+    SettingItemView mUserAddressView;
+    @Bind(R.id.siv_gender)
+    SettingItemView mUserGenderView;
+
 
 
 
@@ -74,13 +76,13 @@ public class UserCenterFragment extends Fragment {
                     @Override
                     public void call(User user) {
                         if (user != null) {
-                            mUserNameView.setText(user.mUserName);
-                            mUserPhoneView.setText(user.mPhone);
-                            mUserAddressView.setText(user.mAddress);
+                            mUserNameView.setSummaryText(user.mUserName);
+                            mUserPhoneView.setSummaryText(user.mPhone);
+                            mUserAddressView.setSummaryText(user.mAddress);
                             if (user.mGender == BallConstants.MEN) {
-                                mUserGenderView.setText("男");
+                                mUserGenderView.setSummaryText("男");
                             } else {
-                                mUserGenderView.setText("女");
+                                mUserGenderView.setSummaryText("女");
                             }
                         }
                     }
@@ -99,7 +101,7 @@ public class UserCenterFragment extends Fragment {
         });
     }
 
-    @OnClick(R.id.rl_user_modify_passwd)
+    @OnClick(R.id.siv_modify_pw)
     public void doModifyPasswd() {
         Intent intent = new Intent();
         intent.setClass(getActivity(), ModifyPasswordActivity.class);
