@@ -18,7 +18,6 @@
         android:id="@+id/rl_item"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         >
 
         <TextView
@@ -26,9 +25,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="1"
+            android:text="22"
             android:textColor="@color/textPrimary"
             android:textStyle="bold"
+            android:background="@drawable/player_number_item_transpanert_bg"
             />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

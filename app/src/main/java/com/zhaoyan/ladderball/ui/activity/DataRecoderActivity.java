@@ -143,9 +143,9 @@ public class DataRecoderActivity extends BaseActivity {
             }
         }
         Log.d("=============");
-        int itemHeight = getItemHeight(getApplicationContext(), mOnPitchPlayerList.size());
-        int px = DensityUtil.dip2px(getApplicationContext(), 1);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(itemHeight * 2, ViewGroup.LayoutParams.MATCH_PARENT);
+        int width = getRecyclerViewWidth(getApplicationContext(), mOnPitchPlayerList.size());
+        Log.d("width:" + width);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT);
         mPlayerNumberRecyclerView.setLayoutParams(params);
 
         mPlayerNumberAdapter = new RecordPlayerNumberAdapter(getApplicationContext(), mOnPitchPlayerList);
@@ -733,8 +733,6 @@ public class DataRecoderActivity extends BaseActivity {
             public void onAddNew(Dialog dialog) {
                 Log.d();
 
-
-
             }
         });
         replaceDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
@@ -895,7 +893,7 @@ public class DataRecoderActivity extends BaseActivity {
                 .create().show();
     }
 
-    public static int getItemHeight(Context context, int itemCount) {
+    public int getRecyclerViewWidth(Context context, int itemCount) {
         float height = DensityUtil.getHeightInPx(context);
         Log.d("Screenheight:" + height);
 
@@ -910,10 +908,14 @@ public class DataRecoderActivity extends BaseActivity {
             column = (int) Math.ceil(size);
         }
 
+
+
+        Log.d("column:" + column);
         int itemHeight = (int) ((height - statusBarHeight) / column);
         int px = DensityUtil.dip2px(context, 1);
-        Log.d("itemHeight:" + itemHeight + ",column:" + column + ",px:" + px);
-        return itemHeight;
+//        itemHeight = itemHeight - column * 2 * 1;
+        Log.d("itemHeight:" + itemHeight + ",column:" + column + ",px:" + px + ",msize:" + mOnPitchPlayerList.size());
+        return itemHeight * 2;
     }
 
     @Override

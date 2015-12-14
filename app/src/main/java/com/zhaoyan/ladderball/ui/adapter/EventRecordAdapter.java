@@ -53,7 +53,7 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
             return;
         }
 
-        Log.d("position:" + position);
+//        Log.d("position:" + position);
         holder.eventNameView.setText(mEventsName[position]);
         String eventNum = "";
         switch (position) {
@@ -71,7 +71,7 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
                 break;
             case 4:
                 eventNum = mPlayerEvent.sheZheng + "/" + mPlayerEvent.shePian + "/" + mPlayerEvent.sheMenBeiDu;
-                Log.d("shezheng:eventNum:" + eventNum);
+//                Log.d("shezheng:eventNum:" + eventNum);
                 break;
             case 5:
                 eventNum = mPlayerEvent.chuanQiuChengGong + "";
@@ -106,13 +106,13 @@ public class EventRecordAdapter extends RecyclerView.Adapter<EventRecordAdapter.
                 break;
             case 15:
                 //功能按钮没有数字
-                Log.d(">>>>>>>>>>>>");
+//                Log.d(">>>>>>>>>>>>");
                 break;
             default:
                 Log.d("default");
                 break;
         }
-        Log.d("eventNum:" + eventNum);
+//        Log.d("eventNum:" + eventNum);
         holder.eventCountView.setText(eventNum);
     }
 

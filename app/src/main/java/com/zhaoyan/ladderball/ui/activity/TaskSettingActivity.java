@@ -84,6 +84,18 @@ public class TaskSettingActivity extends BaseActivity {
     private List<Player> mAllPlayerList = new ArrayList<>();
     private List<Player> mFirstPlayerList = new ArrayList<>();
 
+    /**
+     * 将当次操作所新增的球员id记录下来，如果退出的时候，记录员选择不保存，那么要讲这些球员的首发属性设置为false，否则会出问题
+     */
+    private List<Long> mNewAddPlayerIdList = new ArrayList<>();
+    /**
+     * 涉及到修改球员首发属性的球员id列表
+     */
+    private List<Long> mModifyPlayerIdList = new ArrayList<>();
+    /**
+     * 将档次操作的球员的id记录下来
+     */
+
     private Observable<Integer> mItemObservable;
 
     private Match mDetailMatch;
@@ -182,7 +194,7 @@ public class TaskSettingActivity extends BaseActivity {
                 Log.d("isMain:" + (Looper.myLooper() == Looper.getMainLooper()));
                 final Player player1 = mAdapter.getItem(integer);
                 new AlertDialog.Builder(TaskSettingActivity.this)
-                        .setMessage("确定移除" + player1.number + "号")
+                        .setMessage("确定取消" + player1.number + "号首发位置")
                         .setNegativeButton("取消", null)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
@@ -228,6 +240,8 @@ public class TaskSettingActivity extends BaseActivity {
 
         mAdapter.removeItem(poition);
 
+        mModifyPlayerIdList.add(player.playerId);
+
         mHasChanged = true;
 
         mStartingUpTitle.setText("设置首发（" + mAdapter.getItemCount() + "/" + mDetailMatch.playerNumber + "）");
@@ -264,6 +278,7 @@ public class TaskSettingActivity extends BaseActivity {
         if (mDetailMatch == null) {
             return;
         }
+
         MatchModifyRequest request = new MatchModifyRequest(getApplicationContext());
         request.matchId = mDetailMatch.matchId;
         request.partMinutes = mDetailMatch.partMinutes;
@@ -310,6 +325,8 @@ public class TaskSettingActivity extends BaseActivity {
                     @Override
                     public BaseResponse call(BaseResponse baseResponse) {
                         //保存数据库
+                        Log.d("save detail match");
+                        doSaveModifyPlayerData();
                         mDetailMatch.save();
                         return baseResponse;
                     }
@@ -340,7 +357,6 @@ public class TaskSettingActivity extends BaseActivity {
                             setResult(RESULT_OK);
 
                             RxBus.get().post(RxBusTag.TASK_ITEM_CLICK, TaskFragment.REGET_DATA);
-
                             TaskSettingActivity.this.finish();
                         } else {
                             ToastUtil.showToast(getApplicationContext(), baseResponse.header.resultText);
@@ -455,6 +471,7 @@ public class TaskSettingActivity extends BaseActivity {
                     player.isFirst = true;
                     player.isOnPitch = true;
 //                    player.save();
+                    mModifyPlayerIdList.add(player.playerId);
 
                     mAdapter.addItem(player);
                     mAdapter.notifyDataSetChanged();
@@ -487,10 +504,6 @@ public class TaskSettingActivity extends BaseActivity {
         return -2;//没有该球员
     }
 
-    /**
-     * 将当次操作所新增的球员id记录下来，如果退出的时候，记录员选择不保存，那么要讲这些球员的首发属性设置为false，否则会出问题
-     */
-    private List<Long> mNewAddPlayerIdList = new ArrayList<>();
     private String mAddFailString;
     private void doAdd(int playerNumber, String name) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -535,7 +548,8 @@ public class TaskSettingActivity extends BaseActivity {
                             }
 
                             Log.d("new add playerid:" + player.playerId);
-                            mNewAddPlayerIdList.add(player.playerId);
+                            mNewAddPlayerIdList.add(player.playerId);//这个主要是用于用户按返回键选择不保存的时候重置首发属性的
+                            mModifyPlayerIdList.add(player.playerId);//
 //                            mDetailMatch.save();
 
                             mHasChanged = true;
@@ -666,7 +680,6 @@ public class TaskSettingActivity extends BaseActivity {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
                 //将新增球员的首发属性去除
-                boolean hasChange = false;
                 if (mTeamType == BallConstants.TEAM_HOME) {
                     for (Player player: mDetailMatch.teamHome.players) {
                         for (long id: mNewAddPlayerIdList) {
@@ -674,9 +687,7 @@ public class TaskSettingActivity extends BaseActivity {
                             if (player.playerId == id) {
                                 player.isFirst = false;
                                 player.isOnPitch = false;
-
                                 player.save();
-                                hasChange = true;
                             }
                         }
                     }
@@ -686,15 +697,11 @@ public class TaskSettingActivity extends BaseActivity {
                             if (player.playerId == id) {
                                 player.isFirst = false;
                                 player.isOnPitch = false;
-
                                 player.save();
-
-                                hasChange = true;
                             }
                         }
                     }
                 }
-
                 subscriber.onNext(true);
                 subscriber.onCompleted();
             }
@@ -707,6 +714,31 @@ public class TaskSettingActivity extends BaseActivity {
                         TaskSettingActivity.this.finish();
                     }
                 });
+    }
+
+
+    /**
+     * 保存当前设置修改过球员首发属性的球员信息到数据库
+     * 主要是针对移除首发位置和添加已存在球员列表的人为首发的
+     */
+    private void doSaveModifyPlayerData() {
+        if (mTeamType == BallConstants.TEAM_HOME) {
+            for (Player player: mDetailMatch.teamHome.players) {
+                for (long id: mModifyPlayerIdList) {
+                    if (player.playerId == id) {
+                        player.save();
+                    }
+                }
+            }
+        } else {
+            for (Player player: mDetailMatch.teamVisitor.players) {
+                for (long id: mModifyPlayerIdList) {
+                    if (player.playerId == id) {
+                        player.save();
+                    }
+                }
+            }
+        }
     }
 
     @Override

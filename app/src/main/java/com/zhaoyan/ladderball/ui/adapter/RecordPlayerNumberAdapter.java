@@ -78,7 +78,7 @@ public class RecordPlayerNumberAdapter extends RecyclerView.Adapter<RecordPlayer
 
         int dividerHeight = DensityUtil.dip2px(context, 1);
 
-        mItemHeight = mItemHeight - dividerHeight * 8;
+//        mItemHeight = mItemHeight - 1 * 2 * column;
         Log.d("itemHeight:" + mItemHeight + ",column:" + column);
 
     }
@@ -119,7 +119,7 @@ public class RecordPlayerNumberAdapter extends RecyclerView.Adapter<RecordPlayer
     public void onBindViewHolder(SingleChooseViewHolder holder, int position) {
 
         Player player = mDataList.get(position);
-        Log.d(">>" + player.number + ",isFirst:" + player.isFirst);
+//        Log.d(">>" + player.number + ",isFirst:" + player.isFirst + ",isOnPitch:" + player.isOnPitch);
         holder.numberView.setText(player.number + "");
 
         if (mSelectPosition == position) {
