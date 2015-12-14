@@ -1,6 +1,9 @@
 package com.zhaoyan.ladderball.ui.activity;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,18 +21,23 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
+import com.zhaoyan.ladderball.http.request.CommitTaskRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
+import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.MatchDetailResponse;
 import com.zhaoyan.ladderball.model.Match;
 import com.zhaoyan.ladderball.model.PartData;
 import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.model.Team;
 import com.zhaoyan.ladderball.ui.adapter.PlayerHorizontalAdapter;
+import com.zhaoyan.ladderball.ui.fragments.TaskFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.DensityUtil;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.TimeUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
+import com.zhaoyan.ladderball.util.rx.RxBus;
+import com.zhaoyan.ladderball.util.rx.RxBusTag;
 
 import java.util.ArrayList;
 
@@ -37,6 +45,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
@@ -46,6 +55,7 @@ import rx.schedulers.Schedulers;
 public class TaskMainActivity extends BaseActivity {
 
     public static final String EXTRA_MATCH_ID = "match_id";
+    public static final String EXTRA_IS_COMPLETE = "is_complete";
     private static final int REQUEST_CODE_SETTING = 0;
     private static final int REQUEST_CODE_DATA_RECORD = 1;
 
@@ -83,6 +93,10 @@ public class TaskMainActivity extends BaseActivity {
     ScrollView mScrollView;
     @Bind(R.id.tv_task_main_load_fail)
     TextView mLoadFailView;
+
+    @Bind(R.id.tv_task_main_setting)
+    TextView mSettingView;
+
     @Bind(R.id.btn_task_main_check_data)
     Button mCheckDataBtn;
 
@@ -93,12 +107,15 @@ public class TaskMainActivity extends BaseActivity {
     private long mMatchId;
     private long mTeamId;
 
+    private boolean mIsComplete;
+
 //    private List<PartData> mPartDataList = new ArrayList<>();
 
-    public static Intent getStartIntent(Context context, long matchId) {
+    public static Intent getStartIntent(Context context, long matchId, boolean isComplete) {
         Intent intent = new Intent();
         intent.setClass(context, TaskMainActivity.class);
         intent.putExtra(EXTRA_MATCH_ID, matchId);
+        intent.putExtra(EXTRA_IS_COMPLETE, isComplete);
         return intent;
     }
 
@@ -109,6 +126,7 @@ public class TaskMainActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         mMatchId = getIntent().getLongExtra(EXTRA_MATCH_ID, -1);
+        mIsComplete = getIntent().getBooleanExtra(EXTRA_IS_COMPLETE, false);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -118,6 +136,11 @@ public class TaskMainActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mAdapter = new PlayerHorizontalAdapter(this, new ArrayList<Player>());
         mRecyclerView.setAdapter(mAdapter);
+
+        if (mIsComplete) {
+            mSettingView.setEnabled(false);
+            mCheckDataBtn.setText("查看数据结果");
+        }
 
         getMatchDetail();
         //判断任务是否设置,是个问题，怎么判断
@@ -351,6 +374,12 @@ public class TaskMainActivity extends BaseActivity {
         public void onClick(View v) {
             int id = v.getId();
             Log.d("partNumber:" + id);
+
+            if (mIsComplete) {
+                ToastUtil.showToast(getApplicationContext(), "任务已提交不能进行数据修复了");
+                return;
+            }
+
             PartData partData = new Select().from(PartData.class).where("matchId=? and partNumber=?",
                     mMatchId, id).executeSingle();
             if (partData == null) {
@@ -368,6 +397,11 @@ public class TaskMainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_commit_task).setVisible(!mIsComplete);
+        return super.onPrepareOptionsMenu(menu);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -383,7 +417,31 @@ public class TaskMainActivity extends BaseActivity {
             finish();
             return true;
         } else if (item.getItemId() == R.id.action_commit_task) {
+            new AlertDialog.Builder(this)
+                    .setMessage("是否确认数据无误并提交该场比赛？")
+                    .setPositiveButton("提交", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Match match = new Select().from(Match.class).where("matchId=?", mMatchId).executeSingle();
+                            if (match != null) {
+                                boolean hasFinished = true;
+                                for (PartData partData : match.partDatas) {
+                                    if (!partData.isComplete) {
+                                        hasFinished = false;
+                                    }
+                                }
 
+                                if (!hasFinished) {
+                                    ToastUtil.showToast(getApplicationContext(), "请确认所有小节比赛已完成");
+                                } else {
+                                    doCommitTask();
+                                }
+                            }
+
+                        }
+                    })
+                    .setNegativeButton("取消", null)
+                    .create().show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -392,6 +450,60 @@ public class TaskMainActivity extends BaseActivity {
     @OnClick(R.id.tv_task_main_setting)
     void doTaskSetting() {
         startActivityForResult(TaskSettingActivity.getStartIntent(this, mMatchId), REQUEST_CODE_SETTING);
+    }
+
+    private void doCommitTask() {
+        CommitTaskRequest request = new CommitTaskRequest(getApplicationContext());
+        request.matchId = mMatchId;
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("提交任务中...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+
+        mLadderBallApi.doCommitTask(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        progressDialog.cancel();
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        ToastUtil.showToast(getApplicationContext(), "网络连接失败，请重试");
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        progressDialog.cancel();
+                        if (baseResponse.header.resultCode == 0) {
+                            mIsComplete = true;
+                            ToastUtil.showToast(getApplicationContext(), "任务提交成功");
+
+                            invalidateOptionsMenu();
+
+                            mSettingView.setEnabled(false);
+                            mCheckDataBtn.setText("查看数据结果");
+
+                            RxBus.get().post(RxBusTag.TASK_ITEM_CLICK, TaskFragment.REGET_DATA);
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), baseResponse.header.resultText);
+                        }
+                    }
+                });
+
     }
 
     @Override

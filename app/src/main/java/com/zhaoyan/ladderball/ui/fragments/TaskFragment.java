@@ -94,7 +94,8 @@ public class TaskFragment extends BaseFragment {
                         }
                         Task task = mAdapter.getItem(position);
 
-                        startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));
+                        startActivity(TaskMainActivity.getStartIntent(getActivity(),
+                                task.mMatchId, mTaskType == TYPE_COMPLETEED));
                     }
                 });
     }
@@ -252,6 +253,8 @@ public class TaskFragment extends BaseFragment {
                         e.printStackTrace();
                         Log.d(e.toString());
                         ToastUtil.showToast(getActivity(), "网络连接失败，请重试");
+
+
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
 
