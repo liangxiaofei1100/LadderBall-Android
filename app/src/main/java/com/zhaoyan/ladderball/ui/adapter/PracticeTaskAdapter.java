@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.zhaoyan.ladderball.R;
-import com.zhaoyan.ladderball.model.PracticeTask;
+import com.zhaoyan.ladderball.model.TmpTask;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.TimeUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
@@ -30,24 +30,24 @@ public class PracticeTaskAdapter extends RecyclerView.Adapter<PracticeTaskAdapte
     private Context mContext;
     private LayoutInflater mInflater;
 
-    private List<PracticeTask> mDataList;
+    private List<TmpTask> mDataList;
 
-    public PracticeTaskAdapter(Context context, List<PracticeTask> list) {
+    public PracticeTaskAdapter(Context context, List<TmpTask> list) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mDataList = list;
     }
 
-    public void setDataList(List<PracticeTask> list) {
+    public void setDataList(List<TmpTask> list) {
         Log.d(list.size() + "");
         mDataList = list;
     }
 
-    public List<PracticeTask> getDataList() {
+    public List<TmpTask> getDataList() {
         return mDataList;
     }
 
-    public void addDataToList(PracticeTask item) {
+    public void addDataToList(TmpTask item) {
         mDataList.add(0, item);
         notifyDataSetChanged();
     }
@@ -61,7 +61,7 @@ public class PracticeTaskAdapter extends RecyclerView.Adapter<PracticeTaskAdapte
     @Override
     public void onBindViewHolder(PracticeTaskAdapter.TaskViewHoder holder, final int position) {
 
-        PracticeTask task = getItem(position);
+        TmpTask task = getItem(position);
 
         if (TextUtils.isEmpty(task.mTeamHomeColor)) {
             holder.homeTeamNameColor.setText(task.mTeamHomeName);
@@ -109,7 +109,7 @@ public class PracticeTaskAdapter extends RecyclerView.Adapter<PracticeTaskAdapte
         });
     }
 
-    public PracticeTask getItem(int position) {
+    public TmpTask getItem(int position) {
         return  mDataList.get(position);
     }
 

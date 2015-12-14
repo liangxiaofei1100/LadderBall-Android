@@ -22,7 +22,7 @@ import com.zhaoyan.ladderball.http.request.BaseRequest;
 import com.zhaoyan.ladderball.http.request.ReceivePracticeRequest;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
-import com.zhaoyan.ladderball.model.PracticeTask;
+import com.zhaoyan.ladderball.model.TmpTask;
 import com.zhaoyan.ladderball.ui.activity.MainActivity;
 import com.zhaoyan.ladderball.ui.adapter.PracticeTaskAdapter;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
@@ -75,8 +75,8 @@ public class PracticeFragment extends BaseFragment {
     public static final int TYPE_ASSIGNED = 1;
     private int mTaskType = TYPE_ASSIGNED;
 
-    private List<PracticeTask> mUnAssignedTaskList = new ArrayList<>();
-    private List<PracticeTask> mAssignedTaskList = new ArrayList<>();
+    private List<TmpTask> mUnAssignedTaskList = new ArrayList<>();
+    private List<TmpTask> mAssignedTaskList = new ArrayList<>();
 
     private boolean mUnAssignedPracticeHasGet = false;
     private boolean mAssignedPracticeHasGet = true;
@@ -117,7 +117,7 @@ public class PracticeFragment extends BaseFragment {
                             doGetTasks();
                             return;
                         }
-                        final PracticeTask task = mAdapter.getItem(position);
+                        final TmpTask task = mAdapter.getItem(position);
 
                         if (mTaskType == TYPE_UNASSIGNED) {
                             //点击领取练习赛
@@ -136,8 +136,8 @@ public class PracticeFragment extends BaseFragment {
                             receiveDialog.show();
                         } else {
                             ToastUtil.showToast(getActivity(), "努力开发中...");
+//                            startActivity(PracticeMainActivity.getStartIntent(getActivity(), task.mMatchId, false));
                         }
-//                        startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));
                     }
                 });
     }
@@ -199,7 +199,7 @@ public class PracticeFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new PracticeTaskAdapter(getActivity(), new ArrayList<PracticeTask>());
+        mAdapter = new PracticeTaskAdapter(getActivity(), new ArrayList<TmpTask>());
         mRecyclerView.setAdapter(mAdapter);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -239,13 +239,13 @@ public class PracticeFragment extends BaseFragment {
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<TaskListResponse.HttpMatch, PracticeTask>() {
+                .map(new Func1<TaskListResponse.HttpMatch, TmpTask>() {
                     @Override
-                    public PracticeTask call(TaskListResponse.HttpMatch httpMatch) {
+                    public TmpTask call(TaskListResponse.HttpMatch httpMatch) {
                         Log.d("mattchid:" + httpMatch.id + ",address:" + httpMatch.address);
-                        PracticeTask task = new Select().from(PracticeTask.class).where("matchId=?", httpMatch.id).executeSingle();
+                        TmpTask task = new Select().from(TmpTask.class).where("matchId=?", httpMatch.id).executeSingle();
                         if (task == null) {
-                            task = new PracticeTask();
+                            task = new TmpTask();
                         }
                         task.mMatchId = httpMatch.id;
 
@@ -276,7 +276,7 @@ public class PracticeFragment extends BaseFragment {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<PracticeTask>() {
+                .subscribe(new Subscriber<TmpTask>() {
                     @Override
                     public void onStart() {
                         super.onStart();
@@ -312,7 +312,7 @@ public class PracticeFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onNext(PracticeTask task) {
+                    public void onNext(TmpTask task) {
                         Log.d(task.toString());
                         if (task.mIsAssigned) {
                             mAssignedTaskList.add(task);

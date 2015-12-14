@@ -5,10 +5,11 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
 /**
+ * 练习赛任务列表
  * Created by Yuri on 2015/12/12.
  */
-@Table(name = "practice_task")
-public class PracticeTask extends Model {
+@Table(name = "tmp_task")
+public class TmpTask extends Model {
 
     //一场比赛有唯一的id
     @Column(name = "matchId")

@@ -29,7 +29,9 @@
                          com.zhaoyan.ladderball.model.Match,com.zhaoyan.ladderball.model.Team,
                          com.zhaoyan.ladderball.model.Player,com.zhaoyan.ladderball.model.PartData,
                          com.zhaoyan.ladderball.model.EventItem,com.zhaoyan.ladderball.model.PlayerEvent,
-                         com.zhaoyan.ladderball.model.PracticeTask"/>
+                         com.zhaoyan.ladderball.model.TmpTask,com.zhaoyan.ladderball.model.TmpMatch,
+                         com.zhaoyan.ladderball.model.TmpTeam,com.zhaoyan.ladderball.model.TmpPlayer,
+                         com.zhaoyan.ladderball.model.TmpPartData"/>
 
         <activity
             android:name=".ui.activity.LoginActivity"
@@ -84,6 +86,19 @@
         <activity
             android:name=".ui.activity.CreatePracticeActivity"
             android:label="@string/title_activity_create_practice"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+        android:name=".ui.activity.PracticeMainActivity"
+        android:label="任务主页"
+        android:screenOrientation="portrait"
+        android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+            android:name=".ui.activity.PracticeSettingActivity"
+            android:label="任务设置"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

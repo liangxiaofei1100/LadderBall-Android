@@ -10,6 +10,8 @@ import com.zhaoyan.ladderball.http.request.LoginRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
 import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
 import com.zhaoyan.ladderball.http.request.ModifyPasswordRequest;
+import com.zhaoyan.ladderball.http.request.PracticeDetailRequest;
+import com.zhaoyan.ladderball.http.request.PracticeModifyRequest;
 import com.zhaoyan.ladderball.http.request.ReceivePracticeRequest;
 import com.zhaoyan.ladderball.http.request.TaskListRequest;
 import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
@@ -18,6 +20,7 @@ import com.zhaoyan.ladderball.http.response.EventPartListResponse;
 import com.zhaoyan.ladderball.http.response.LoginResponse;
 import com.zhaoyan.ladderball.http.response.MatchDetailResponse;
 import com.zhaoyan.ladderball.http.response.ModifyPasswordResponse;
+import com.zhaoyan.ladderball.http.response.PracticeDetailResponse;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
 
 import retrofit.http.Body;
@@ -82,5 +85,12 @@ public interface LadderBallApi {
     @POST("tmpmatch/asignvisitor")
     Observable<BaseResponse> doReceivePracticeMatch(@Body ReceivePracticeRequest request);
 
+    /**练习赛获取任务详细信息请求*/
+    @POST("tmpmatch/detail")
+    Observable<PracticeDetailResponse> doGetPracticeDetail(@Body PracticeDetailRequest request);
+
+    /**练习赛修改比赛设置请求*/
+    @POST("tmpmatch/modify")
+    Observable<BaseResponse> doModifyMatch(@Body PracticeModifyRequest request);
 
 }
