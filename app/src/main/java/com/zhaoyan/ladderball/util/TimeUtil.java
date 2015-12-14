@@ -49,4 +49,35 @@ public class TimeUtil {
             return hours + "' " + min + "' " + sec.trim().substring(0, 2) + "''";
         }
     }
+
+    /**
+     * 格式化时间
+     * @param time audio/video time like 12323312
+     * @return the format time string like 2'12'
+     */
+    public static String[] getMinuteSecond(long time) {
+        String[] result = new String[2];
+        long hour = time / (60 * 60 * 1000);
+        String min = time % (60 * 60 * 1000) / (60 * 1000) + "";
+        String sec = time % (60 * 60 * 1000) % (60 * 1000) + "";
+        if (min.length() < 2) {
+            min = "0" + time / (1000 * 60) + "";
+        }
+
+        result[0] = min;
+
+        if (sec.length() == 4) {
+            sec = "0" + sec;
+        } else if (sec.length() == 3) {
+            sec = "00" + sec;
+        } else if (sec.length() == 2) {
+            sec = "000" + sec;
+        } else if (sec.length() == 1) {
+            sec = "0000" + sec;
+        }
+
+        result[1] = sec.trim().substring(0, 2);
+
+        return result;
+    }
 }

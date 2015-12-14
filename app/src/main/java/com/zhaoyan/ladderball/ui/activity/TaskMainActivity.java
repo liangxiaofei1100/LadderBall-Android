@@ -106,6 +106,7 @@ public class TaskMainActivity extends BaseActivity {
 
     private long mMatchId;
     private long mTeamId;
+    private int mPartMinutes;
 
     private boolean mIsComplete;
 
@@ -173,6 +174,8 @@ public class TaskMainActivity extends BaseActivity {
                         match.address = response.address;
                         match.totalPart = response.totalPart;
                         match.partMinutes = response.partMinutes;
+
+                        mPartMinutes = response.partMinutes;
 
                         Team teamHome = new Select().from(Team.class).where("matchId=? and teamId=?",
                                 response.id, response.teamHome.id).executeSingle();
@@ -392,7 +395,7 @@ public class TaskMainActivity extends BaseActivity {
                 startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id, false));
             } else {
                 startActivityForResult(DataRecoderActivity.getStartIntent(TaskMainActivity.this,
-                        mMatchId, mTeamId, id), REQUEST_CODE_DATA_RECORD);
+                        mMatchId, mTeamId, id, mPartMinutes), REQUEST_CODE_DATA_RECORD);
             }
         }
     }

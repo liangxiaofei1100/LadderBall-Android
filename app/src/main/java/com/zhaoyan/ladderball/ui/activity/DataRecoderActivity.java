@@ -56,6 +56,7 @@ public class DataRecoderActivity extends BaseActivity {
     public static final String EXTRA_MATCH_ID = "matchId";
     public static final String EXTRA_TEAM_ID = "teamId";
     public static final String EXTRA_PART_NUMBER = "partNumber";
+    public static final String EXTRA_PART_MINUTES = "partMinutes";
 
     @Bind(R.id.recent_event_recyclerview)
     RecyclerView mRecentRecyclerView;
@@ -73,6 +74,7 @@ public class DataRecoderActivity extends BaseActivity {
     private long mMatchId;
     private long mTeamId;
     private int mPartNumber;
+    private int mPartMinutes;
 
     private List<Player> mOnPitchPlayerList;//场上球员
     private List<Player> mUnOnPitchPlayerList;//场下球员
@@ -87,12 +89,13 @@ public class DataRecoderActivity extends BaseActivity {
 
     private long mMatchStartTime;
 
-    public static Intent getStartIntent(Context context, long matchId, long teamId, int partNumber) {
+    public static Intent getStartIntent(Context context, long matchId, long teamId, int partNumber, int partMinutes) {
         Intent intent = new Intent();
         intent.setClass(context, DataRecoderActivity.class);
         intent.putExtra(EXTRA_MATCH_ID, matchId);
         intent.putExtra(EXTRA_TEAM_ID, teamId);
         intent.putExtra(EXTRA_PART_NUMBER, partNumber);
+        intent.putExtra(EXTRA_PART_MINUTES, partMinutes);
         return intent;
     }
 
@@ -121,6 +124,7 @@ public class DataRecoderActivity extends BaseActivity {
         mMatchId = intent.getLongExtra(EXTRA_MATCH_ID, -1);
         mTeamId = intent.getLongExtra(EXTRA_TEAM_ID, -1);
         mPartNumber = intent.getIntExtra(EXTRA_PART_NUMBER, -1);
+        mPartMinutes = intent.getIntExtra(EXTRA_PART_MINUTES, -1);
         Log.d("matchId:" + mMatchId + ",teamId:" + mTeamId + ",partNumber:" + mPartNumber);
 
         mProgressDialog = new ProgressDialog(this);
@@ -599,6 +603,16 @@ public class DataRecoderActivity extends BaseActivity {
     }
 
     private void doCommitEventData() {
+        //暂时不做这个限制，否则没法测试了
+//        long time = System.currentTimeMillis() - mMatchStartTime;
+//        long totalTime = mPartMinutes * 60 * 1000;
+//        if (time < totalTime * 0.8) {
+//            String[] times = TimeUtil.getMinuteSecond(time);
+//            String timeStr = " 当前已进行" + times[0] + "分" + times[1] + "秒";
+//            ToastUtil.showToast(getApplicationContext(), "时间太短，不允许提交\n" + timeStr);
+//            return;
+//        }
+
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交数据...");
         progressDialog.setCancelable(false);
@@ -878,6 +892,8 @@ public class DataRecoderActivity extends BaseActivity {
                 .setPositiveButton("提交数据", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+
 
                         doCommitEventData();
                     }
