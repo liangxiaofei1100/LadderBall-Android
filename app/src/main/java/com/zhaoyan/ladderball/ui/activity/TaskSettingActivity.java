@@ -279,6 +279,18 @@ public class TaskSettingActivity extends BaseActivity {
             return;
         }
 
+        if (mTeamType == BallConstants.TEAM_HOME) {
+            Log.d("firstsize:" + mAdapter.getItemCount());
+        } else {
+            Log.d("firstsize:" +  mAdapter.getItemCount());
+        }
+
+        if (mAdapter.getItemCount() < mDetailMatch.playerNumber) {
+            //如果当前首发人员小于赛制人数，则不能提交，提示用户
+            ToastUtil.showToast(getApplicationContext(), "首发人员不足" + mDetailMatch.playerNumber + "人，请添加");
+            return;
+        }
+
         MatchModifyRequest request = new MatchModifyRequest(getApplicationContext());
         request.matchId = mDetailMatch.matchId;
         request.partMinutes = mDetailMatch.partMinutes;
@@ -401,9 +413,16 @@ public class TaskSettingActivity extends BaseActivity {
                         return;
                     }
 
+                    if (num < mAdapter.getItemCount()) {
+                        ToastUtil.showToast(getApplicationContext(), "首发人员超过" + num + "人，请调整");
+                        return;
+                    }
+
                     mRuleItemView.setSummaryText(num + "人制");
 
                     mDetailMatch.playerNumber = num;
+
+                    mStartingUpTitle.setText("设置首发（" + mAdapter.getItemCount() + "/" + mDetailMatch.playerNumber + "）");
                 } else if (type == 1) {
                     /*if (num < 1 || num > 6) {
                         editText.setError("请输入1到6的整数");

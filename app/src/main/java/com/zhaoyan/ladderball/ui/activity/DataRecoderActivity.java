@@ -878,6 +878,7 @@ public class DataRecoderActivity extends BaseActivity {
                 .setPositiveButton("提交数据", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
                         doCommitEventData();
                     }
                 })

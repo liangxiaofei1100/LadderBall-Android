@@ -50,12 +50,12 @@
         <item>传球成功</item>
         <item>威胁球</item>
         <item>传球失败</item>
-        <item>封堵球门</item>
+        <item>封堵射门</item>
         <item>拦截</item>
         <item>抢断</item>
         <item>解围</item>
         <item>扑救射门</item>
-        <item>单刀</item>
+        <item>扑救单刀</item>
         <item>手抛球</item>
         <item>球门球</item>
         <item>黄牌</item>
@@ -94,7 +94,7 @@
 
     <string-array name="event_pujiushemen">
         <item>扑救射门</item>
-        <item>单刀</item>
+        <item>扑救单刀</item>
     </string-array>
 
     <string-array name="event_shoupaoqiu">

@@ -140,11 +140,11 @@ public class EventRecentAdapter extends RecyclerView.Adapter<EventRecentAdapter.
             case EventCode.EVENT_GUO_REN_SHI_BAI:
                 eventName = "过人失败";
                 break;
-            case EventCode.EVENT_SHE_ZHENG:
-                eventName = "射正";
-                break;
-            case EventCode.EVENT_SHE_PIAN:
-                eventName = "射偏";
+                case EventCode.EVENT_SHE_ZHENG:
+                    eventName = "射正";
+                    break;
+                case EventCode.EVENT_SHE_PIAN:
+                    eventName = "射偏";
                 break;
             case EventCode.EVENT_SHE_MEN_BEI_DU:
                 eventName = "射门被封堵";
@@ -174,7 +174,7 @@ public class EventRecentAdapter extends RecyclerView.Adapter<EventRecentAdapter.
                 eventName = "扑救射门";
                 break;
             case EventCode.EVENT_BU_JIU_DAN_DAO:
-                eventName = "单刀";
+                eventName = "扑救单刀";
                 break;
             case EventCode.EVENT_SHOU_PAO_QIU:
                 eventName = "手抛球";
