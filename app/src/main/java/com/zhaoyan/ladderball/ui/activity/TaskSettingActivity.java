@@ -18,13 +18,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+import com.zhaoyan.ladderball.BallConstants;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.request.AddPlayerRequest;
 import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
 import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.MatchDetailResponse;
-import com.zhaoyan.ladderball.http.response.ResponseHeader;
 import com.zhaoyan.ladderball.model.Match;
 import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.ui.adapter.TaskSettingAdapter;
@@ -89,6 +89,8 @@ public class TaskSettingActivity extends BaseActivity {
 
     private boolean mHasChanged = false;
 
+    private int mTeamType;
+
     public static Intent getStartIntent(Context context,long matchId) {
         Intent intent = new Intent();
         intent.setClass(context, TaskSettingActivity.class);
@@ -122,8 +124,9 @@ public class TaskSettingActivity extends BaseActivity {
         Log.d("teamHome:" + mDetailMatch.teamHome.toString());
         Log.d("teamVisitor:" + mDetailMatch.teamVisitor.toString());
         if (mDetailMatch.teamHome.isAssiged) {
-            mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  " + mDetailMatch.teamHome.color);
+            mTeamType = BallConstants.TEAM_HOME;
 
+            mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  " + mDetailMatch.teamHome.color);
             //查询该场比赛，该只队伍的人员
             mAllPlayerList = new Select().from(Player.class).where("matchId=? and teamId=?"
                     , mDetailMatch.matchId, mDetailMatch.teamHome.teamId).execute();
@@ -134,10 +137,11 @@ public class TaskSettingActivity extends BaseActivity {
             Log.d("teamHome.size:" + mDetailMatch.teamHome.players.size());
             for (Player player: mDetailMatch.teamHome.players) {
                 if (player.isFirst) {
-                    mFirstPlayerList.add(player);
+                    mFirstPlayerList.add(player);//获取首发球员列表
                 }
             }
         } else if (mDetailMatch.teamVisitor.isAssiged) {
+            mTeamType = BallConstants.TEAM_VISITOR;
             mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  " + mDetailMatch.teamVisitor.color);
 
             //查询该场比赛，该只队伍的人员
@@ -147,7 +151,6 @@ public class TaskSettingActivity extends BaseActivity {
                 mAllPlayerList = new ArrayList<>();
             }
             mDetailMatch.teamVisitor.players = mAllPlayerList;
-
             Log.d("teamVisitor.size:" + mDetailMatch.teamVisitor.players.size());
             for (Player player: mDetailMatch.teamVisitor.players) {
                 if (player.isFirst) {
@@ -169,7 +172,6 @@ public class TaskSettingActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
         mAdapter = new TaskSettingAdapter(this, mFirstPlayerList);
-//        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         mRecyclerView.setAdapter(mAdapter);
 
         mItemObservable = RxBus.get().register(RxBusTag.PlAYER_ITEM_REMOVE, Integer.class);
@@ -184,7 +186,7 @@ public class TaskSettingActivity extends BaseActivity {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                setPlayerFisrt(false, player1, integer);
+                                setPlayerNonFirst(player1, integer);
                             }
                         })
                         .create().show();
@@ -200,7 +202,8 @@ public class TaskSettingActivity extends BaseActivity {
             ToastUtil.showToast(getApplicationContext(), "首发位置已满，请先移除一个首发人员");
             return;
         }
-            showAddNewPlayerDialog();
+
+        showAddNewPlayerDialog();
 //        if (mDetailMatch == null)
 //            return;
 //
@@ -217,11 +220,14 @@ public class TaskSettingActivity extends BaseActivity {
 //                teamId, mDetailMatch.playerNumber, teamName), REQUEST_CODE_PLAYER_CHOOSE);
     }
 
-    private void setPlayerFisrt(boolean isFirst, Player player, int poition) {
-        player.isFirst = isFirst;
-        player.isOnPitch = isFirst;
-        player.save();
+    private void setPlayerNonFirst(Player player, int poition) {
+        player.isFirst = false;
+        player.isOnPitch = false;
+//        player.save();//不保存，待记录员点击提交按钮后  再保存，否则该次修改无效
+
         mAdapter.removeItem(poition);
+
+        mHasChanged = true;
 
         mStartingUpTitle.setText("设置首发（" + mAdapter.getItemCount() + "/" + mDetailMatch.playerNumber + "）");
     }
@@ -263,8 +269,9 @@ public class TaskSettingActivity extends BaseActivity {
         request.totalPart = mDetailMatch.totalPart;
         request.playerNumber = mDetailMatch.playerNumber;
         MatchDetailResponse.HttpPlayer httpPlayer;
-        if (mDetailMatch.teamHome.isAssiged) {
-            for (Player player: mDetailMatch.teamHome.players) {
+
+        if (mTeamType == BallConstants.TEAM_HOME) {
+            for (Player player : mDetailMatch.teamHome.players) {
                 httpPlayer = new MatchDetailResponse.HttpPlayer();
                 httpPlayer.id = player.playerId;
                 httpPlayer.name = player.name;
@@ -272,7 +279,7 @@ public class TaskSettingActivity extends BaseActivity {
                 httpPlayer.isFirst = player.isFirst;
                 request.players.add(httpPlayer);
             }
-        } else if (mDetailMatch.teamVisitor.isAssiged) {
+        } else {
             for (Player player: mDetailMatch.teamVisitor.players) {
                 httpPlayer = new MatchDetailResponse.HttpPlayer();
                 httpPlayer.id = player.playerId;
@@ -298,6 +305,15 @@ public class TaskSettingActivity extends BaseActivity {
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<BaseResponse, BaseResponse>() {
+                    @Override
+                    public BaseResponse call(BaseResponse baseResponse) {
+                        //保存数据库
+                        mDetailMatch.save();
+                        return baseResponse;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BaseResponse>() {
                     @Override
@@ -380,17 +396,17 @@ public class TaskSettingActivity extends BaseActivity {
                     }*/
 
                     mJieItemView.setSummaryText(num + "节");
-                    mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
                     mDetailMatch.totalPart = num;
+                    mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
                 } else if (type == 2) {
                     mJieTimeItemView.setSummaryText(num + "分钟");
-                    mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
                     mDetailMatch.partMinutes = num;
+                    mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
                 }
 
                 mHasChanged = true;
 
-                mDetailMatch.save();
+//                mDetailMatch.save();
 
                 dialog.dismiss();
             }
@@ -430,14 +446,14 @@ public class TaskSettingActivity extends BaseActivity {
                 if (result == -2) {
                     //没有该球员可以新增了
                     doAdd(num, nameText);
-
+                    mHasChanged = true;
                     dialog.dismiss();
                 } else {
                     //有该球员但不是首发，将他调到首发位置上来
                     Player player = mAllPlayerList.get(result);
                     player.isFirst = true;
                     player.isOnPitch = true;
-                    player.save();
+//                    player.save();
 
                     mAdapter.addItem(player);
                     mAdapter.notifyDataSetChanged();
@@ -445,6 +461,7 @@ public class TaskSettingActivity extends BaseActivity {
 
                     mStartingUpTitle.setText("设置首发（" + mAdapter.getItemCount() + "/" + mDetailMatch.playerNumber + "）");
 
+                    mHasChanged = true;
                     dialog.dismiss();
                     return;
                 }
@@ -469,6 +486,10 @@ public class TaskSettingActivity extends BaseActivity {
         return -2;//没有该球员
     }
 
+    /**
+     * 将当次操作所新增的球员id记录下来，如果退出的时候，记录员选择不保存，那么要讲这些球员的首发属性设置为false，否则会出问题
+     */
+    private List<Long> mNewAddPlayerIdList = new ArrayList<>();
     private String mAddFailString;
     private void doAdd(int playerNumber, String name) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -487,7 +508,7 @@ public class TaskSettingActivity extends BaseActivity {
         request.teamId = teamId;
 
         final AddPlayerRequest.HttpPlayer httpPlayer = new AddPlayerRequest.HttpPlayer();
-        httpPlayer.isFirst = true;//默认不首发
+        httpPlayer.isFirst = false;//默认不首发
         httpPlayer.name = name;
         httpPlayer.number = Integer.valueOf(playerNumber);
         request.player = httpPlayer;
@@ -503,15 +524,20 @@ public class TaskSettingActivity extends BaseActivity {
                             player.playerId = response.player.id;
                             player.number = response.player.number;
                             player.name = response.player.name;
-                            player.isFirst = response.player.isFirst;
+                            player.isFirst = true;
+                            player.isOnPitch = true;
 
-                            if (mDetailMatch.teamHome.isAssiged) {
+                            if (mTeamType == BallConstants.TEAM_HOME) {
                                 mDetailMatch.teamHome.players.add(player);
                             } else {
                                 mDetailMatch.teamVisitor.players.add(player);
                             }
-                            mDetailMatch.save();
 
+                            Log.d("new add playerid:" + player.playerId);
+                            mNewAddPlayerIdList.add(player.playerId);
+//                            mDetailMatch.save();
+
+                            mHasChanged = true;
                             return player;
                         }
                         mAddFailString = response.header.resultText;
@@ -620,13 +646,66 @@ public class TaskSettingActivity extends BaseActivity {
                     .setNegativeButton("不保存", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            TaskSettingActivity.this.finish();
+                            handleNewAddPlayer();
                         }
                     })
                     .create().show();
             return;
         }
         super.onBackPressed();
+    }
+
+    private void handleNewAddPlayer() {
+        if (mNewAddPlayerIdList.size() == 0) {
+            TaskSettingActivity.this.finish();
+            return;
+        }
+
+        Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                //将新增球员的首发属性去除
+                boolean hasChange = false;
+                if (mTeamType == BallConstants.TEAM_HOME) {
+                    for (Player player: mDetailMatch.teamHome.players) {
+                        for (long id: mNewAddPlayerIdList) {
+//                            Log.d("has player?" + player.playerId + ",id:" + id);
+                            if (player.playerId == id) {
+                                player.isFirst = false;
+                                player.isOnPitch = false;
+
+                                player.save();
+                                hasChange = true;
+                            }
+                        }
+                    }
+                } else {
+                    for (Player player: mDetailMatch.teamVisitor.players) {
+                        for (long id: mNewAddPlayerIdList) {
+                            if (player.playerId == id) {
+                                player.isFirst = false;
+                                player.isOnPitch = false;
+
+                                player.save();
+
+                                hasChange = true;
+                            }
+                        }
+                    }
+                }
+
+                subscriber.onNext(true);
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+
+                        TaskSettingActivity.this.finish();
+                    }
+                });
     }
 
     @Override

@@ -111,7 +111,7 @@ public class PracticeFragment extends BaseFragment {
                         }
                         PracticeTask task = mAdapter.getItem(position);
 
-                        ToastUtil.showToast(getActivity(), "正在努力开发中...");
+                        ToastUtil.showToast(getActivity(), "努力开发中...");
 //                        startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));
                     }
                 });

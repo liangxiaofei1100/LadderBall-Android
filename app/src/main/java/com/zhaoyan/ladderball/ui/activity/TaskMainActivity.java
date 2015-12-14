@@ -300,8 +300,6 @@ public class TaskMainActivity extends BaseActivity {
         mTeamRuleView.setVisibility(View.GONE);
         mAddressView.setText(match.address);
         mDateView.setText(TimeUtil.getFormatterDate(match.startTime));
-        //显示首发阵容情况
-        mStartingLineupView.setText(getString(R.string.starting_lineup, match.playerNumber));
         if (mAdapter != null) {
             mAdapter.clear();
             if (match.teamHome.isAssiged) {
@@ -310,6 +308,8 @@ public class TaskMainActivity extends BaseActivity {
                 mAdapter.setDataList(match.teamVisitor.players);
             }
             mAdapter.notifyDataSetChanged();
+            //显示首发阵容情况
+            mStartingLineupView.setText(getString(R.string.starting_lineup, mAdapter.getItemCount()));
         }
         SettingItemView itemView;
         View view;

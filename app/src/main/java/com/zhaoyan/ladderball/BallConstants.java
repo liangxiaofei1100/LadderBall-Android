@@ -11,4 +11,7 @@ public class BallConstants{
 
     public static final int MEN = 1;//男性
     public static final int FEMALE = 2; //女性
+
+    public static final int TEAM_HOME = 0;
+    public static final int TEAM_VISITOR = 1;
 }
