@@ -31,6 +31,7 @@ import com.zhaoyan.ladderball.ui.adapter.TaskSettingAdapter;
 import com.zhaoyan.ladderball.ui.fragments.TaskFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.MatchUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
 import com.zhaoyan.ladderball.util.rx.RxBusTag;
@@ -369,6 +370,9 @@ public class TaskSettingActivity extends BaseActivity {
                             setResult(RESULT_OK);
 
                             RxBus.get().post(RxBusTag.TASK_ITEM_CLICK, TaskFragment.REGET_DATA);
+
+                            MatchUtil.setHadSetTask(getApplicationContext(), mDetailMatch.matchId);
+
                             TaskSettingActivity.this.finish();
                         } else {
                             ToastUtil.showToast(getApplicationContext(), baseResponse.header.resultText);

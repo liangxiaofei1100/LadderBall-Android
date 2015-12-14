@@ -34,6 +34,7 @@ import com.zhaoyan.ladderball.ui.fragments.TaskFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.DensityUtil;
 import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.MatchUtil;
 import com.zhaoyan.ladderball.util.TimeUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
@@ -143,6 +144,9 @@ public class TaskMainActivity extends BaseActivity {
             mCheckDataBtn.setText("查看数据结果");
         }
 
+        if (!MatchUtil.hasSetTask(getApplicationContext(), mMatchId)) {
+            doTaskSetting();
+        }
         getMatchDetail();
         //判断任务是否设置,是个问题，怎么判断
     }
