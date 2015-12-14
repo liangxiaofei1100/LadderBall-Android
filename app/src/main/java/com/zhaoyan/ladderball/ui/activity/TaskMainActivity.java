@@ -354,10 +354,10 @@ public class TaskMainActivity extends BaseActivity {
         mPartLayout.addView(itemView);
 
         for (PartData pardData : match.partDatas) {
-            if (pardData.partNumber > matchParts.length) {
-                //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
-                break;
-            }
+//            if (pardData.partNumber > matchParts.length) {
+//                //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
+//                break;
+//            }
             itemView = new SettingItemView(this);
             itemView.setLayoutParams(params);
             itemView.setId(pardData.partNumber);
