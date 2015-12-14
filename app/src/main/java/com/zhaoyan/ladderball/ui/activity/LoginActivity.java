@@ -28,6 +28,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -50,7 +51,8 @@ public class LoginActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         if (CommonUtil.isLogin(getApplicationContext())) {
-            goToMain();
+            //执行自动登陆
+            doAutoLogin();
         }
 
         //支持用户点击虚拟键盘的回车键直接登录
@@ -70,6 +72,28 @@ public class LoginActivity extends BaseActivity {
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.setCancelable(false);
 
+    }
+
+    private void doAutoLogin() {
+        Log.d();
+        LoginRequest request = new LoginRequest(getApplicationContext());
+        request.loginType = 0;
+        request.userName = CommonUtil.getUserPhone(getApplicationContext());
+        request.password = "";
+        mLadderBallApi.doLogin(request)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Action1<LoginResponse>() {
+                    @Override
+                    public void call(LoginResponse response) {
+                        if (response.header.resultCode == 0) {
+                            CommonUtil.setUserHttpHeaderToken(getApplicationContext(), response.userToken);
+                            SharedPreferencesManager.put(getApplicationContext(), CommonUtil.KEY_USER_PHONE, response.phone);
+                            UserManager.saveOrUpdateUser(response);
+                        }
+                    }
+                });
+
+        goToMain();
     }
 
 
