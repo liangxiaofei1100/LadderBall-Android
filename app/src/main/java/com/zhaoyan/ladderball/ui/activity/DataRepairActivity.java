@@ -44,10 +44,12 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
     private static final String EXTRA_MATCH_ID = "matchId";
     private static final String EXTRA_TEAM_ID = "teamId";
     private static final String EXTRA_PART_NUMBER = "part_number";
+    private static final String EXTRA_IS_COMPLETE = "is_complete";
 
     private long mMatchId;
     private long mTeamId;
     private int mPartNumber;
+    private boolean mIsComplete;
 
     @Bind(R.id.data_repair_recyclerview)
     RecyclerView mRecyclerView;
@@ -61,12 +63,13 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
     private List<String> mMenuList = new ArrayList<>();
 
-    public static Intent getStartIntent(Context context, long matchId, long teamId, int partNumber) {
+    public static Intent getStartIntent(Context context, long matchId, long teamId, int partNumber, boolean isComplete) {
         Intent intent=  new Intent();
         intent.setClass(context, DataRepairActivity.class);
         intent.putExtra(EXTRA_MATCH_ID, matchId);
         intent.putExtra(EXTRA_TEAM_ID, teamId);
         intent.putExtra(EXTRA_PART_NUMBER, partNumber);
+        intent.putExtra(EXTRA_IS_COMPLETE, isComplete);
         return  intent;
     }
 
@@ -84,6 +87,17 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
         mMatchId = intent.getLongExtra(EXTRA_MATCH_ID, -1);
         mTeamId = intent.getLongExtra(EXTRA_TEAM_ID, -1);
         mPartNumber = intent.getIntExtra(EXTRA_PART_NUMBER, -1);
+        mIsComplete = intent.getBooleanExtra(EXTRA_IS_COMPLETE, false);
+
+        Log.d("isComplete:" + mIsComplete);
+        if (mIsComplete) {
+            toolbar.setTitle("数据记录");
+            setTitle("数据记录");
+        } else {
+            toolbar.setTitle("数据修复");
+            setTitle("数据修复");
+        }
+        toolbar.setSubtitle("第" + mPartNumber + "节");
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -92,7 +106,10 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
         mAdapter = new DataRepairAdapter(getApplicationContext(), new ArrayList<EventPartListResponse.HttpEvent>());
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(this);
+
+        if (!mIsComplete) {
+            mAdapter.setOnItemClickListener(this);
+        }
 
         mMenuList.add("编辑");
         mMenuList.add("删除");
@@ -185,6 +202,12 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(0).setVisible(!mIsComplete);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0,0,0,"+")
                 .setIcon(R.mipmap.ic_add_white)
@@ -206,6 +229,9 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
     @Override
     public void onItemClick(final int position) {
+        if (mIsComplete) {
+            return;
+        }
         new MenuDialog(this, mMenuList)
                 .setOnItemClickListener(new OnItemClickListener() {
                     @Override

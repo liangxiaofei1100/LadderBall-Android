@@ -376,7 +376,7 @@ public class TaskMainActivity extends BaseActivity {
             Log.d("partNumber:" + id);
 
             if (mIsComplete) {
-                ToastUtil.showToast(getApplicationContext(), "任务已提交不能进行数据修复了");
+                startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id, true));
                 return;
             }
 
@@ -389,7 +389,7 @@ public class TaskMainActivity extends BaseActivity {
 
             Log.d("isPardComplete:" + partData.isComplete);
             if (partData.isComplete) {
-                startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id));
+                startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id, false));
             } else {
                 startActivityForResult(DataRecoderActivity.getStartIntent(TaskMainActivity.this,
                         mMatchId, mTeamId, id), REQUEST_CODE_DATA_RECORD);
