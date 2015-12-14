@@ -1,6 +1,8 @@
 package com.zhaoyan.ladderball.ui.fragments;
 
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Looper;
@@ -17,10 +19,13 @@ import android.widget.TextView;
 import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
+import com.zhaoyan.ladderball.http.request.ReceivePracticeRequest;
+import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
 import com.zhaoyan.ladderball.model.PracticeTask;
 import com.zhaoyan.ladderball.ui.activity.MainActivity;
 import com.zhaoyan.ladderball.ui.adapter.PracticeTaskAdapter;
+import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.view.SegmentControl;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.ToastUtil;
@@ -33,8 +38,10 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -72,6 +79,7 @@ public class PracticeFragment extends BaseFragment {
     private List<PracticeTask> mAssignedTaskList = new ArrayList<>();
 
     private boolean mUnAssignedPracticeHasGet = false;
+    private boolean mAssignedPracticeHasGet = true;
 
     public PracticeFragment() {
         // Required empty public constructor
@@ -109,9 +117,26 @@ public class PracticeFragment extends BaseFragment {
                             doGetTasks();
                             return;
                         }
-                        PracticeTask task = mAdapter.getItem(position);
+                        final PracticeTask task = mAdapter.getItem(position);
 
-                        ToastUtil.showToast(getActivity(), "努力开发中...");
+                        if (mTaskType == TYPE_UNASSIGNED) {
+                            //点击领取练习赛
+                            String teamStr = task.mTeamHomeName + " VS " + task.mTeamVisitorName;
+                            BaseDialog receiveDialog = new BaseDialog(getActivity());
+                            receiveDialog.setDialogMessage("是否确定领取该练习赛？" + "\n" + teamStr);
+                            receiveDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
+                                @Override
+                                public void onClick(Dialog dialog) {
+                                    doReceivePractice(task.mMatchId);
+
+                                    dialog.dismiss();
+                                }
+                            });
+                            receiveDialog.setNegativeButton("取消", null);
+                            receiveDialog.show();
+                        } else {
+                            ToastUtil.showToast(getActivity(), "努力开发中...");
+                        }
 //                        startActivity(TaskMainActivity.getStartIntent(getActivity(), task.mMatchId));
                     }
                 });
@@ -137,7 +162,18 @@ public class PracticeFragment extends BaseFragment {
                 Log.d("index:" + index);
                 if (index == 0) {
                     mTaskType = TYPE_ASSIGNED;
-                    showData();
+
+                    if (mAssignedPracticeHasGet) {
+                        showData();
+                    } else {
+                        mSwipeRefreshLayout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSwipeRefreshLayout.setRefreshing(true);
+                            }
+                        });
+                        doGetTasks();
+                    }
                 } else {
                     mTaskType = TYPE_UNASSIGNED;
                     if (mUnAssignedPracticeHasGet) {
@@ -309,6 +345,57 @@ public class PracticeFragment extends BaseFragment {
 
     private boolean isAssigned() {
         return mTaskType == TYPE_ASSIGNED;
+    }
+
+    private void doReceivePractice(long matchId) {
+        ReceivePracticeRequest request = new ReceivePracticeRequest(getActivity());
+        request.matchId = matchId;
+
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("领取练习赛中...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+
+        mLadderBallApi.doReceivePracticeMatch(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        progressDialog.cancel();
+                        e.printStackTrace();
+                        Log.e(e.toString());
+
+                        ToastUtil.showToast(getActivity(), "网络连接失败，请重试");
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        progressDialog.cancel();
+
+                        if (baseResponse.header.resultCode == 0) {
+                            mAssignedPracticeHasGet = false;
+
+                            ToastUtil.showToast(getActivity(), "领取成功");
+
+                            doGetTasks();
+                        } else {
+                            ToastUtil.showToast(getActivity(), baseResponse.header.resultText);
+                        }
+                    }
+                });
     }
 
     private boolean isMainLooper() {

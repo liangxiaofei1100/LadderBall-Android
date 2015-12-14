@@ -10,6 +10,7 @@ import com.zhaoyan.ladderball.http.request.LoginRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
 import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
 import com.zhaoyan.ladderball.http.request.ModifyPasswordRequest;
+import com.zhaoyan.ladderball.http.request.ReceivePracticeRequest;
 import com.zhaoyan.ladderball.http.request.TaskListRequest;
 import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
@@ -76,4 +77,10 @@ public interface LadderBallApi {
     /**创建练习赛*/
     @POST("tmpmatch/add")
     Observable<BaseResponse> doCreatePracticeTask(@Body CreatePracticeRequest request);
+
+    /**领取练习赛，只能领取客队的任务*/
+    @POST("tmpmatch/asignvisitor")
+    Observable<BaseResponse> doReceivePracticeMatch(@Body ReceivePracticeRequest request);
+
+
 }

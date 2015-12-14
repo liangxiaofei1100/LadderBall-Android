@@ -28,6 +28,7 @@ import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.dialog.ReplaceDialog;
 import com.zhaoyan.ladderball.util.DensityUtil;
 import com.zhaoyan.ladderball.util.Log;
+import com.zhaoyan.ladderball.util.TimeUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
 import com.zhaoyan.ladderball.util.rx.RxBusTag;
@@ -604,14 +605,14 @@ public class DataRecoderActivity extends BaseActivity {
 
     private void doCommitEventData() {
         //暂时不做这个限制，否则没法测试了
-//        long time = System.currentTimeMillis() - mMatchStartTime;
-//        long totalTime = mPartMinutes * 60 * 1000;
-//        if (time < totalTime * 0.8) {
-//            String[] times = TimeUtil.getMinuteSecond(time);
-//            String timeStr = " 当前已进行" + times[0] + "分" + times[1] + "秒";
-//            ToastUtil.showToast(getApplicationContext(), "时间太短，不允许提交\n" + timeStr);
-//            return;
-//        }
+        long time = System.currentTimeMillis() - mMatchStartTime;
+        long totalTime = mPartMinutes * 60 * 1000;
+        if (time < totalTime * 0.8) {
+            String[] times = TimeUtil.getMinuteSecond(time);
+            String timeStr = " 当前已进行" + times[0] + "分" + times[1] + "秒";
+            ToastUtil.showToast(getApplicationContext(), "时间太短，不允许提交\n" + timeStr);
+            return;
+        }
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交数据...");

@@ -356,11 +356,16 @@ public class TaskMainActivity extends BaseActivity {
         itemView.setRightArrowVisiblily(View.GONE);
         mPartLayout.addView(itemView);
 
+        boolean hasPartComplete = false;
         for (PartData pardData : match.partDatas) {
 //            if (pardData.partNumber > matchParts.length) {
 //                //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
 //                break;
 //            }
+            if (pardData.isComplete) {
+                hasPartComplete = true;
+            }
+
             itemView = new SettingItemView(this);
             itemView.setLayoutParams(params);
             itemView.setId(pardData.partNumber);
@@ -370,6 +375,13 @@ public class TaskMainActivity extends BaseActivity {
             itemView.setOnClickListener(itemClickListener);
             mPartLayout.addView(itemView);
         }
+
+        //但是为了能测试，这个功能暂时不开启
+        //TODO
+        //只要有一个小节比赛已提交，就不能再去修改任务设置了
+//        if (hasPartComplete) {
+//            mSettingView.setEnabled(false);
+//        }
     }
 
     private class PartItemClickListener implements View.OnClickListener {
