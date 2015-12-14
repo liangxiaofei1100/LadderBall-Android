@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
-import com.zhaoyan.ladderball.http.request.BaseRequest;
+import com.zhaoyan.ladderball.http.request.TaskListRequest;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
 import com.zhaoyan.ladderball.model.Task;
 import com.zhaoyan.ladderball.ui.activity.TaskMainActivity;
@@ -60,12 +60,15 @@ public class TaskFragment extends BaseFragment {
     public static final int REGET_DATA = -2;
     private Observable<Integer> mItemObservable;
 
-    public static final int TYPE_UNCOMPLETEED = 0;
+    public static final int TYPE_ALL = 0;
     public static final int TYPE_COMPLETEED = 1;
+    public static final int TYPE_UNCOMPLETEED = 2;
     private int mTaskType = TYPE_UNCOMPLETEED;
 
     private List<Task> mUnCompleteTaskList = new ArrayList<>();
     private List<Task> mCompleteTaskList = new ArrayList<>();
+
+    private boolean mCompleteTaskHasGet = false;
 
     public TaskFragment() {
         // Required empty public constructor
@@ -120,10 +123,21 @@ public class TaskFragment extends BaseFragment {
                 Log.d("index:" + index);
                 if (index == 0) {
                     mTaskType = TYPE_UNCOMPLETEED;
+                    showData();
                 } else {
                     mTaskType = TYPE_COMPLETEED;
+                    if (mCompleteTaskHasGet) {
+                        showData();
+                    } else {
+                        mSwipeRefreshLayout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSwipeRefreshLayout.setRefreshing(true);
+                            }
+                        });
+                        doGetTasks();
+                    }
                 }
-                showData();
             }
         });
 
@@ -158,7 +172,10 @@ public class TaskFragment extends BaseFragment {
      * do get task from server
      */
     private void doGetTasks() {
-        Observable<TaskListResponse> responseObservable = mLadderBallApi.doGetTaskList(new BaseRequest(getActivity()));
+        TaskListRequest request = new TaskListRequest(getActivity());
+        request.completeType = mTaskType;
+
+        Observable<TaskListResponse> responseObservable = mLadderBallApi.doGetTaskList(request);
         responseObservable
                 .subscribeOn(Schedulers.io())
                 .flatMap(new Func1<TaskListResponse, Observable<TaskListResponse.HttpMatch>>() {
@@ -196,36 +213,7 @@ public class TaskFragment extends BaseFragment {
                         task.mStartTime = httpMatch.startTime;
 
                         task.save();
-
-                        //本来想分表保存的，但是team这个字段，服务端没有返回id，有点不好处理
-//                        Match match = new Match();
-//                        match.matchId = httpMatch.id;
-//                        match.address = httpMatch.address;
-//                        match.startTime = httpMatch.startTime;
-//                        match.playerNumber = httpMatch.playerNumber;
-//
-//                        Team teamHome = new Team();
-//                        teamHome.matchId = httpMatch.id;
-//                        teamHome.color = httpMatch.teamHome.color;
-//                        teamHome.score = httpMatch.teamHome.score;
-//                        teamHome.isAssiged = httpMatch.teamHome.isAsigned;
-//                        teamHome.logoUrl = httpMatch.teamHome.logoURL;
-//                        teamHome.save();
-//
-//                        Team teamVisitor = new Team();
-//                        teamVisitor.matchId = httpMatch.id;
-//                        teamVisitor.color = httpMatch.teamVisitor.color;
-//                        teamVisitor.score = httpMatch.teamVisitor.score;
-//                        teamVisitor.isAssiged = httpMatch.teamVisitor.isAsigned;
-//                        teamVisitor.logoUrl = httpMatch.teamVisitor.logoURL;
-//                        teamVisitor.save();
-//
-//                        match.teamHome = teamHome;
-//                        match.teamVisitor = teamVisitor;
-//
-//                        match.save();
                         Log.d("finish saved");
-
                         return task;
                     }
                 })
@@ -236,8 +224,14 @@ public class TaskFragment extends BaseFragment {
                     public void onStart() {
                         super.onStart();
                         Log.d();
-                        mUnCompleteTaskList.clear();
-                        mCompleteTaskList.clear();
+                        if (mTaskType == TYPE_COMPLETEED) {
+                            mCompleteTaskList.clear();
+                        } else if (mTaskType == TYPE_UNCOMPLETEED) {
+                            mUnCompleteTaskList.clear();
+                        } else {
+                            mCompleteTaskList.clear();
+                            mUnCompleteTaskList.clear();
+                        }
                     }
 
                     @Override
@@ -245,6 +239,11 @@ public class TaskFragment extends BaseFragment {
                         Log.d();
 //                        ToastUtil.showToast(getActivity(), "获取任务完成");
                         mSwipeRefreshLayout.setRefreshing(false);
+
+                        if (mTaskType == TYPE_COMPLETEED) {
+                            mCompleteTaskHasGet = true;
+                        }
+
                         showData();
                     }
 
@@ -261,6 +260,7 @@ public class TaskFragment extends BaseFragment {
                     @Override
                     public void onNext(Task task) {
                         Log.d(task.toString());
+
                         if (task.mIsComplete) {
                             mCompleteTaskList.add(task);
                         } else {
@@ -287,7 +287,6 @@ public class TaskFragment extends BaseFragment {
         } else {
             mEmptyView.setVisibility(View.GONE);
         }
-
         mAdapter.notifyDataSetChanged();
     }
 

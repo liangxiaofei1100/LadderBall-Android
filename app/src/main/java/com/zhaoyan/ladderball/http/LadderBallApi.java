@@ -10,6 +10,7 @@ import com.zhaoyan.ladderball.http.request.LoginRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
 import com.zhaoyan.ladderball.http.request.MatchModifyRequest;
 import com.zhaoyan.ladderball.http.request.ModifyPasswordRequest;
+import com.zhaoyan.ladderball.http.request.TaskListRequest;
 import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.EventPartListResponse;
@@ -38,7 +39,7 @@ public interface LadderBallApi {
 
     /**获取任务列表请求*/
     @POST("match/list")
-    Observable<TaskListResponse> doGetTaskList(@Body BaseRequest request);
+    Observable<TaskListResponse> doGetTaskList(@Body TaskListRequest request);
 
     /**获取任务详细信息请求*/
     @POST("match/detail")
