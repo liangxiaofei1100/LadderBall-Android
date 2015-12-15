@@ -29,7 +29,7 @@ public class BaseDialog extends Dialog implements View.OnClickListener {
     private Button mMiddleButton;
     private Button mRightButton;
 
-    private Button mMenuView;
+    private TextView mMenuView;
 
     private String mTitle;
     private String mMessage;
@@ -105,7 +105,7 @@ public class BaseDialog extends Dialog implements View.OnClickListener {
                 .findViewById(R.id.tv_custom_dialog_message);
         messageView.setGravity(mTextGravity);
 
-        mMenuView = (Button) mDialogView.findViewById(R.id.btn_dialog_menu);
+        mMenuView = (TextView) mDialogView.findViewById(R.id.btn_dialog_menu);
 
         if (mCustomView != null) {
             frameLayoutCustomView.setVisibility(View.VISIBLE);

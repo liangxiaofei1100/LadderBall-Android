@@ -16,7 +16,9 @@ import android.widget.FrameLayout;
 import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.EventCode;
+import com.zhaoyan.ladderball.http.request.AddPlayerRequest;
 import com.zhaoyan.ladderball.http.request.EventCollectionRequest;
+import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.model.EventItem;
 import com.zhaoyan.ladderball.model.Player;
@@ -24,6 +26,7 @@ import com.zhaoyan.ladderball.model.PlayerEvent;
 import com.zhaoyan.ladderball.ui.adapter.EventRecentAdapter;
 import com.zhaoyan.ladderball.ui.adapter.EventRecordAdapter;
 import com.zhaoyan.ladderball.ui.adapter.RecordPlayerNumberAdapter;
+import com.zhaoyan.ladderball.ui.dialog.AddPlayerDialog;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.dialog.ReplaceDialog;
 import com.zhaoyan.ladderball.util.DensityUtil;
@@ -189,7 +192,7 @@ public class DataRecoderActivity extends BaseActivity {
             public void call(Subscriber<? super List<EventItem>> subscriber) {
                 //读取当前比赛第一个球员
                 List<EventItem> eventItemList = new Select().from(EventItem.class)
-                        .where("matchId=? and teamId=?", mMatchId, mTeamId).execute();
+                        .where("matchId=? and teamId=? and partNumber=?", mMatchId, mTeamId, mPartNumber).execute();
                 subscriber.onNext(eventItemList);
                 subscriber.onCompleted();
             }
@@ -208,6 +211,7 @@ public class DataRecoderActivity extends BaseActivity {
     }
 
     private void initEvents(final List<Player> allPlayerList) {
+        Log.d("mPartNumber:" + mPartNumber);
         mPlayerEventMap = new HashMap<>();
         Observable<PlayerEvent> observable = Observable.create(new Observable.OnSubscribe<PlayerEvent>() {
             @Override
@@ -216,8 +220,9 @@ public class DataRecoderActivity extends BaseActivity {
                 PlayerEvent playerEvent = null;
                 PlayerEvent firsPlayerEvent = null;
                 for (Player player : allPlayerList) {
-                    playerEvent = new Select().from(PlayerEvent.class).where("matchId=? and teamId=? and playerId=?",
-                            mMatchId, mTeamId, player.playerId).executeSingle();
+                    playerEvent = new Select().from(PlayerEvent.class).where("matchId=? and teamId=?" +
+                            " and playerId=? and partNumber=?",
+                            mMatchId, mTeamId, player.playerId, mPartNumber).executeSingle();
                     if (playerEvent == null) {
                         playerEvent = new PlayerEvent();
                     }
@@ -747,7 +752,8 @@ public class DataRecoderActivity extends BaseActivity {
             @Override
             public void onAddNew(Dialog dialog) {
                 Log.d();
-
+                showAddNewDialog(position, downPlayerEvent);
+                dialog.dismiss();
             }
         });
         replaceDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
@@ -809,83 +815,132 @@ public class DataRecoderActivity extends BaseActivity {
         replaceDialog.show();
     }
 
-//    private void showAddNewDialog()
+    private void showAddNewDialog(final int position, final PlayerEvent downPlayerEvent) {
+        final AddPlayerDialog addDialog = new AddPlayerDialog(this);
+        addDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
+            @Override
+            public void onClick(Dialog dialog) {
+                String playerNumber = addDialog.getPlayerNumber();
+                if (playerNumber.isEmpty()) {
+                    addDialog.setNumberErrStr("必须输入一个号码");
+                    return;
+                }
 
-//    private void doAdd(String playerNumber, String name) {
-//        final ProgressDialog progressDialog = new ProgressDialog(this);
-//        progressDialog.setMessage("正在新增球员...");
-//        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//        progressDialog.setCancelable(false);
-//
-//        AddPlayerRequest request = new AddPlayerRequest(getApplicationContext());
-//        request.matchId = mMatchId;
-//        request.teamId = mTeamId;
-//
-//        final AddPlayerRequest.HttpPlayer httpPlayer = new AddPlayerRequest.HttpPlayer();
-//        httpPlayer.isFirst = false;//默认不首发
-//        httpPlayer.name = name;
-//        httpPlayer.number = Integer.valueOf(playerNumber);
-//        request.player = httpPlayer;
-//
-//        mLadderBallApi.doAddPlayer(request)
-//                .map(new Func1<AddPlayerResponse, ResponseHeader>() {
-//                    @Override
-//                    public ResponseHeader call(AddPlayerResponse response) {
-//                        if (response.header.resultCode == 0) {
-//                            Player player = new Player();
-//                            player.matchId = mMatchId;
-//                            player.teamId = mTeamId;
-//                            player.playerId = response.player.id;
-//                            player.number = response.player.number;
-//                            player.name = response.player.name;
-//                            player.isFirst = response.player.isFirst;
-//
-//                            if (mMatch.teamHome.isAssiged) {
-//                                mMatch.teamHome.players.add(player);
-//                            } else {
-//                                mMatch.teamVisitor.players.add(player);
-//                            }
-//                            mMatch.save();
-//                        }
-//                        return response.header;
-//                    }
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .doOnSubscribe(new Action0() {
-//                    @Override
-//                    public void call() {
-//                        progressDialog.show();
-//                    }
-//                })
-//                .subscribeOn(AndroidSchedulers.mainThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Observer<ResponseHeader>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        Log.d();
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        e.printStackTrace();
-//                        Log.e(e.toString());
-//                        progressDialog.cancel();
-//                        ToastUtil.showToast(getApplicationContext(), "网络连接超时，请重试");
-//                    }
-//
-//                    @Override
-//                    public void onNext(ResponseHeader responseHeader) {
-//                        progressDialog.cancel();
-//                        if (responseHeader.resultCode == 0) {
-//                            ToastUtil.showToast(getApplicationContext(), "添加球员成功");
-//                            //添加成功，重新加载界面
-//                            initData(true);
-//                        } else {
-//                            ToastUtil.showToast(getApplicationContext(), responseHeader.resultText);
-//                        }
-//                    }
-//                });
-//    }
+                String name = addDialog.getPlayerName();
+
+                doAdd(position, downPlayerEvent, playerNumber, name);
+
+                dialog.dismiss();
+            }
+        });
+        addDialog.setNegativeButton("取消", null);
+        addDialog.show();
+    }
+
+    private String mAddNewPlayerFailString;
+    private void doAdd(int position, final PlayerEvent downPlayerEvent, String playerNumber, String name) {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("正在新增球员...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+
+        AddPlayerRequest request = new AddPlayerRequest(getApplicationContext());
+        request.matchId = mMatchId;
+        request.teamId = mTeamId;
+
+        final AddPlayerRequest.HttpPlayer httpPlayer = new AddPlayerRequest.HttpPlayer();
+        httpPlayer.isFirst = false;//默认不首发
+        httpPlayer.name = name;
+        httpPlayer.number = Integer.valueOf(playerNumber);
+        request.player = httpPlayer;
+
+        mLadderBallApi.doAddPlayer(request)
+                .map(new Func1<AddPlayerResponse, Player>() {
+                    @Override
+                    public Player call(AddPlayerResponse response) {
+                        if (response.header.resultCode == 0) {
+                            Player upPlayer = new Player();
+                            upPlayer.matchId = mMatchId;
+                            upPlayer.teamId = mTeamId;
+                            upPlayer.playerId = response.player.id;
+                            upPlayer.number = response.player.number;
+                            upPlayer.name = response.player.name;
+                            upPlayer.isFirst = response.player.isFirst;
+                            upPlayer.isOnPitch = true;
+
+                            upPlayer.save();
+
+                            //这个是将要下场的球员
+                            int currentPlayerPosition = mPlayerNumberAdapter.getSelectPosition();
+                            Player downPlayer = mOnPitchPlayerList.get(currentPlayerPosition);
+                            Log.d("downPlayer:" + downPlayer.number);
+                            downPlayer.isOnPitch = false;
+                            downPlayer.save();//保存换人状态，这样其他节比赛能够保持换人后的球员列表
+
+                            mUnOnPitchPlayerList.add(downPlayer);
+
+                            return upPlayer;
+                        }
+
+                        mAddNewPlayerFailString = response.header.resultText;
+                        return null;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Player>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        progressDialog.cancel();
+                        ToastUtil.showNetworkFailToast(getApplicationContext());
+                    }
+
+                    @Override
+                    public void onNext(Player upPlayer) {
+                        progressDialog.cancel();
+                        if (upPlayer != null) {
+                            ToastUtil.showToast(getApplicationContext(), "添加球员成功");
+                            //添加成功，重新加载界面
+
+                            //将换下的人员从界面上拿走
+                            int currentPlayerPosition = mPlayerNumberAdapter.getSelectPosition();
+                            mPlayerNumberAdapter.changeItem(currentPlayerPosition, upPlayer);
+
+                            PlayerEvent upPlayerEvent = new PlayerEvent();
+                            upPlayerEvent.matchId = mMatchId;
+                            upPlayerEvent.teamId = mTeamId;
+                            upPlayerEvent.playerId = upPlayer.playerId;
+                            upPlayerEvent.playerNumber = upPlayer.number;
+                            upPlayerEvent.partNumber = mPartNumber;
+                            upPlayerEvent.save();
+
+                            mPlayerEventMap.put(upPlayer.playerId, upPlayerEvent);
+
+                            mRecordAdapter.setDataList(upPlayerEvent);
+                            mRecordAdapter.notifyDataSetChanged();
+
+                            createHuanRenEventRecord(downPlayerEvent, upPlayerEvent);//添加一条换人记录
+
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), mAddNewPlayerFailString);
+                        }
+                    }
+                });
+    }
 
     private void gameOver() {
         new AlertDialog.Builder(this)

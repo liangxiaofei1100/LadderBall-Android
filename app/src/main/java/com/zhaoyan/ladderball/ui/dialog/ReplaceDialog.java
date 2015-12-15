@@ -44,8 +44,7 @@ public class ReplaceDialog extends BaseDialog implements BaseDialog.OnMenuClickL
         mRecyclerView = (RecyclerView) view.findViewById(R.id.replace_recyclerview);
         mEmptyView= (TextView) view.findViewById(tv_replace_dialog_empty);
         setDialogTitle("换人");
-        //换人界面暂时不做新增球员动作，太复杂了
-//        setRightMenu("新增球员");
+        setRightMenu("新增球员");
 
         mPlayerList = playerList;
 
