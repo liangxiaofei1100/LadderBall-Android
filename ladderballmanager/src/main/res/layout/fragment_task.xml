@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+    >
+
+    <com.zhaoyan.ladderballmanager.ui.view.SegmentControl
+        android:id="@+id/segmentControl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp"
+        app:colors="@color/colorPrimary"
+        app:cornerRadius="2dp"
+        app:direction="horizontal"
+        app:horizonGap="8dp"
+        app:texts="未完成|已完成"
+        app:verticalGap="12dp"
+        />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/task_swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/segmentControl"
+        >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/task_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/tv_task_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/segmentControl"
+        android:layout_centerHorizontal="true"
+        android:text="暂无任务信息"
+        android:visibility="gone"
+        />
+
+</RelativeLayout>

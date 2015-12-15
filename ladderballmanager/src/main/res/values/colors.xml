@@ -3,4 +3,17 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="itemPressed">#E7E7E7</color>
+
+    <color name="main_bg">#EEEEEE</color>
+
+    <color name="btn_red">#EB4444</color>
+    <color name="btn_red_pressed">#d72d2d</color> <!-- 被按下红色的色值 -->
+    <color name="btn_disabled">#cdcdcd</color>
+
+    <color name="text">#FFFFFF</color>
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#727272</color>
+    <color name="divider">#B6B6B6</color>
 </resources>

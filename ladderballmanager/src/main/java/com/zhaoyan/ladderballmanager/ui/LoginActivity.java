@@ -75,7 +75,7 @@ public class LoginActivity extends BaseActivity{
      * errors are presented and no actual login attempt is made.
      */
     @OnClick(R.id.phone_sign_in_button)
-    private void attemptLogin() {
+    void attemptLogin() {
         // Reset errors.
         mPhoneView.setError(null);
         mPasswordView.setError(null);
