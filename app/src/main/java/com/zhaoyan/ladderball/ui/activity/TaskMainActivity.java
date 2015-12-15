@@ -144,11 +144,7 @@ public class TaskMainActivity extends BaseActivity {
             mCheckDataBtn.setText("查看数据结果");
         }
 
-        if (!MatchUtil.hasSetTask(getApplicationContext(), mMatchId)) {
-            doTaskSetting();
-        }
         getMatchDetail();
-        //判断任务是否设置,是个问题，怎么判断
     }
 
     private void getMatchDetail() {
@@ -289,6 +285,9 @@ public class TaskMainActivity extends BaseActivity {
                         Log.d();
                         mLoadingBar.setVisibility(View.GONE);
 
+                        if (!MatchUtil.hasSetTask(getApplicationContext(), mMatchId)) {
+                            doTaskSetting();
+                        }
                     }
 
                     @Override
