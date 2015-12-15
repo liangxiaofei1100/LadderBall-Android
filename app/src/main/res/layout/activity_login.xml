@@ -33,27 +33,30 @@
                     android:maxLines="1"
                     android:singleLine="true"
                     android:drawableLeft="@mipmap/ic_phone"
-                    android:drawablePadding="4dp"
+                    android:drawablePadding="8dp"
                     android:background="@drawable/edit_bg"
                     />
 
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:hint="@string/prompt_password"
                     android:imeActionLabel="@string/action_sign_in"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:singleLine="true"/>
+                    android:singleLine="true"
+                    android:drawableLeft="@mipmap/ic_password"
+                    android:drawablePadding="8dp"
+                    android:background="@drawable/edit_bg"
+                    />
 
-            </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/sign_in_button"
@@ -62,6 +65,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
+                android:background="@drawable/green_btn_bg_selector"
+                android:textColor="@color/text"
                 android:textStyle="bold"/>
 
         </LinearLayout>
