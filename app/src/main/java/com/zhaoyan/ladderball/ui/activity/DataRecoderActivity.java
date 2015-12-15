@@ -140,17 +140,15 @@ public class DataRecoderActivity extends BaseActivity {
 
         mOnPitchPlayerList = new ArrayList<>();
         mUnOnPitchPlayerList = new ArrayList<>();
-        Log.d("=============");
         for (Player player : allPlayerList) {
 //            Log.d(player.toString());
-            Log.d("isFirst:" + player.isFirst + ",isOnPitch:" + player.isOnPitch);
+//            Log.d("isFirst:" + player.isFirst + ",isOnPitch:" + player.isOnPitch);
             if (player.isOnPitch) {
                 mOnPitchPlayerList.add(player);
             } else {
                 mUnOnPitchPlayerList.add(player);
             }
         }
-        Log.d("=============");
         int width = getRecyclerViewWidth(getApplicationContext(), mOnPitchPlayerList.size());
         Log.d("width:" + width);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -372,11 +370,13 @@ public class DataRecoderActivity extends BaseActivity {
     }
 
     private void onPlayerItemClick(int position) {
+        Log.d(System.currentTimeMillis() + ">>>>");
         Player player = mOnPitchPlayerList.get(position);
         PlayerEvent playerEvent = mPlayerEventMap.get(player.playerId);
         Log.d("matchId:" + playerEvent.matchId + ",teamId:" + playerEvent.teamId + ",playerId:" + playerEvent.playerId);
         mRecordAdapter.setDataList(playerEvent);
         mRecordAdapter.notifyDataSetChanged();
+        Log.d(System.currentTimeMillis() + "<<<<");
     }
 
     private String[] getItemMenu(int position) {

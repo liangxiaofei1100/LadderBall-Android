@@ -1,5 +1,6 @@
 package com.zhaoyan.ladderball.ui.activity;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,6 +31,8 @@ import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.model.TmpMatch;
 import com.zhaoyan.ladderball.model.TmpPlayer;
 import com.zhaoyan.ladderball.ui.adapter.PracticeSettingAdapter;
+import com.zhaoyan.ladderball.ui.dialog.AddPlayerDialog;
+import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.fragments.PracticeFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.Log;
@@ -145,7 +148,7 @@ public class PracticeSettingActivity extends BaseActivity {
         if (mDetailMatch.teamHome.isAssiged) {
             mTeamType = BallConstants.TEAM_HOME;
 
-            mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  " + mDetailMatch.teamHome.color);
+            mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  ");
             //查询该场比赛，该只队伍的人员
             mAllPlayerList = new Select().from(Player.class).where("matchId=? and teamId=?"
                     , mDetailMatch.matchId, mDetailMatch.teamHome.teamId).execute();
@@ -161,7 +164,7 @@ public class PracticeSettingActivity extends BaseActivity {
             }
         } else if (mDetailMatch.teamVisitor.isAssiged) {
             mTeamType = BallConstants.TEAM_VISITOR;
-            mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  " + mDetailMatch.teamVisitor.color);
+            mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  ");
 
             //查询该场比赛，该只队伍的人员
             mAllPlayerList = new Select().from(Player.class).where("matchId=? and teamId=?"
@@ -274,6 +277,21 @@ public class PracticeSettingActivity extends BaseActivity {
             Log.d("firstsize:" + mAdapter.getItemCount());
         } else {
             Log.d("firstsize:" +  mAdapter.getItemCount());
+        }
+
+        if (mDetailMatch.playerNumber == 0) {
+            ToastUtil.showToast(getApplicationContext(), "请设置赛制人数");
+            return;
+        }
+
+        if (mDetailMatch.totalPart == 0) {
+            ToastUtil.showToast(getApplicationContext(), "请设置比赛节数");
+            return;
+        }
+
+        if (mDetailMatch.partMinutes == 0) {
+            ToastUtil.showToast(getApplicationContext(), "请设置每节时长");
+            return;
         }
 
         if (mAdapter.getItemCount() < mDetailMatch.playerNumber) {
@@ -445,25 +463,19 @@ public class PracticeSettingActivity extends BaseActivity {
     }
 
     private void showAddNewPlayerDialog() {
-        View view = getLayoutInflater().inflate(R.layout.dialog_add_new_player, null);
-        final EditText numEditText = (EditText) view.findViewById(R.id.et_add_new_player_number);
-        final EditText nameEditText = (EditText) view.findViewById(R.id.et_add_new_player_name);
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("新增球员");
-        dialog.setView(view);
-        dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        final AddPlayerDialog addDialog = new AddPlayerDialog(this);
+        addDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String text = numEditText.getText().toString();
-                Log.d("text：" + text);
-                if (text.isEmpty()) {
-                    ToastUtil.showToast(getApplicationContext(), "球员号码不能为空");
-                    setDialogDismiss(dialog, false);
+            public void onClick(Dialog dialog) {
+                String playerNumber = addDialog.getPlayerNumber();
+                if (playerNumber.isEmpty()) {
+                    addDialog.setNumberErrStr("球员号码不能为空");
                     return;
                 }
 
-                String nameText = nameEditText.getText().toString().trim();
-                int num = Integer.valueOf(text);
+                String name = addDialog.getPlayerName();
+
+                int num = Integer.valueOf(playerNumber);
                 //首先去当前数据库查一下是否有这个号码的球员了，如果有了直接将这个球员设置为首发，如果他已经是首发的话，提示用户
                 int result = checkPlayer(num);
                 if (result == -1) {
@@ -474,9 +486,8 @@ public class PracticeSettingActivity extends BaseActivity {
 
                 if (result == -2) {
                     //没有该球员可以新增了
-                    doAdd(num, nameText);
+                    doAdd(num, name);
                     mHasChanged = true;
-                    dialog.dismiss();
                 } else {
                     //有该球员但不是首发，将他调到首发位置上来
                     TmpPlayer player = mAllPlayerList.get(result);
@@ -492,13 +503,12 @@ public class PracticeSettingActivity extends BaseActivity {
                     mStartingUpTitle.setText("设置首发（" + mAdapter.getItemCount() + "/" + mDetailMatch.playerNumber + "）");
 
                     mHasChanged = true;
-                    dialog.dismiss();
-                    return;
                 }
+                dialog.dismiss();
             }
         });
-        dialog.setNegativeButton("取消", null);
-        dialog.create().show();
+        addDialog.setNegativeButton("取消", null);
+        addDialog.show();
     }
 
     private int checkPlayer(int playerNumber) {
