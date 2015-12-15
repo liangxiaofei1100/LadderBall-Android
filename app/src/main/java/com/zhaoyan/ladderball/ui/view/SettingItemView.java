@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
-import com.zhaoyan.ladderball.util.DensityUtil;
 
 /**
  * 将我的界面所有设置相关的item，封装成一个自定义控件
@@ -85,10 +84,10 @@ public class SettingItemView extends FrameLayout {
         if (mIconResId == -1) {
             mRedDotView = rootView.findViewById(R.id.iv_icon_new);
             iconFrameView.setVisibility(View.GONE);
-            rootView.setPadding(rootView.getPaddingLeft() + DensityUtil.dip2px(context, 5),
-                    rootView.getPaddingTop(),
-                    rootView.getPaddingRight(),
-                    rootView.getPaddingBottom());
+//            rootView.setPadding(rootView.getPaddingLeft() + DensityUtil.dip2px(context, 5),
+//                    rootView.getPaddingTop(),
+//                    rootView.getPaddingRight(),
+//                    rootView.getPaddingBottom());
         } else {
             mRedDotView = rootView.findViewById(R.id.iv_icon_dot);
             iconView.setImageResource(mIconResId);

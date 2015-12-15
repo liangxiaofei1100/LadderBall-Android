@@ -55,7 +55,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="8dp"
                 android:background="@android:color/white">
                 <com.zhaoyan.ladderball.ui.view.SettingItemView
                     android:id="@+id/siv_modify_pw"
@@ -70,7 +70,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="退出登录" />
+                android:background="@drawable/red_btn_bg_selector"
+                android:text="退出登录"
+                android:textColor="@color/text"
+                />
         </LinearLayout>
     </ScrollView>
 

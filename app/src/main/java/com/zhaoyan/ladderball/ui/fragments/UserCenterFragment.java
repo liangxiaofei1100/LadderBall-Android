@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.BallConstants;
@@ -39,8 +38,6 @@ public class UserCenterFragment extends Fragment {
     SettingItemView mUserAddressView;
     @Bind(R.id.siv_gender)
     SettingItemView mUserGenderView;
-
-
 
 
     public UserCenterFragment() {
