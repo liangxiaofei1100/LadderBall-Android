@@ -287,7 +287,7 @@ public class TaskMainActivity extends BaseActivity {
                         Log.d();
                         mLoadingBar.setVisibility(View.GONE);
 
-                        if (!MatchUtil.hasSetTask(getApplicationContext(), mMatchId)) {
+                        if (!mIsComplete && !MatchUtil.hasSetTask(getApplicationContext(), mMatchId)) {
                             doTaskSetting();
                         }
                     }
@@ -437,27 +437,28 @@ public class TaskMainActivity extends BaseActivity {
             finish();
             return true;
         } else if (item.getItemId() == R.id.action_commit_task) {
+            Match match = new Select().from(Match.class).where("matchId=?", mMatchId).executeSingle();
+            if (match != null) {
+                boolean hasFinished = true;
+                for (PartData partData : match.partDatas) {
+                    Log.d("number:" + partData.partNumber + ",iscomplete:" + partData.isComplete);
+                    if (!partData.isComplete) {
+                        hasFinished = false;
+                    }
+                }
+
+                if (!hasFinished) {
+                    ToastUtil.showToast(getApplicationContext(), "请确认所有小节比赛已完成");
+                    return true;
+                }
+            }
+
             new AlertDialog.Builder(this)
                     .setMessage("是否确认数据无误并提交该场比赛？")
                     .setPositiveButton("提交", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Match match = new Select().from(Match.class).where("matchId=?", mMatchId).executeSingle();
-                            if (match != null) {
-                                boolean hasFinished = true;
-                                for (PartData partData : match.partDatas) {
-                                    if (!partData.isComplete) {
-                                        hasFinished = false;
-                                    }
-                                }
-
-                                if (!hasFinished) {
-                                    ToastUtil.showToast(getApplicationContext(), "请确认所有小节比赛已完成");
-                                } else {
-                                    doCommitTask();
-                                }
-                            }
-
+                            doCommitTask();
                         }
                     })
                     .setNegativeButton("取消", null)

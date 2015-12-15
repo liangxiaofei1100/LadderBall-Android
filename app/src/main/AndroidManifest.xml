@@ -36,7 +36,6 @@
 
         <activity
             android:name=".ui.activity.LoginActivity"
-            android:label="登录"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             >

@@ -278,7 +278,7 @@ public class PracticeMainActivity extends BaseActivity {
                         Log.d();
                         mLoadingBar.setVisibility(View.GONE);
 
-                        if (!MatchUtil.hasSetPractice(getApplicationContext(), mMatchId)) {
+                        if (!mIsComplete && !MatchUtil.hasSetPractice(getApplicationContext(), mMatchId)) {
                             doTaskSetting();
                         }
                     }
