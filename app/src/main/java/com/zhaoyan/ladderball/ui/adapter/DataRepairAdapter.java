@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.EventCode;
 import com.zhaoyan.ladderball.http.response.EventPartListResponse;
-import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.TimeUtil;
 
 import org.json.JSONException;
@@ -101,6 +100,10 @@ public class DataRepairAdapter extends RecyclerView.Adapter<DataRepairAdapter.Re
     public void removeItem(int position) {
         mDataList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void changeItem(int position) {
+        notifyItemChanged(position);
     }
 
     public class RepairViewHolder extends RecyclerView.ViewHolder {

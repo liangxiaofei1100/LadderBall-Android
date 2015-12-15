@@ -57,12 +57,12 @@
         android:text="号码"
         />
 
-    <EditText
-        android:id="@+id/et_dialog_data_repair_number"
+    <Spinner
+        android:id="@+id/spinner_dialog_repair_number1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        />
+        >
+    </Spinner>
 
     <TextView
         android:layout_width="wrap_content"
@@ -80,7 +80,7 @@
         >
 
         <Spinner
-            android:id="@+id/spinner_dialog_data_repair"
+            android:id="@+id/spinner_dialog_repair_event"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -93,12 +93,12 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             >
-            <EditText
-                android:id="@+id/et_dialog_data_repair_number_new"
+            <Spinner
+                android:id="@+id/spinner_dialog_repair_number2"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
-                android:inputType="number"
-                />
+                >
+            </Spinner>
 
             <TextView
                 android:layout_width="wrap_content"

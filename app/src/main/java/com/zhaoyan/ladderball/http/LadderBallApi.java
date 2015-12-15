@@ -4,8 +4,9 @@ import com.zhaoyan.ladderball.http.request.AddPlayerRequest;
 import com.zhaoyan.ladderball.http.request.BaseRequest;
 import com.zhaoyan.ladderball.http.request.CommitTaskRequest;
 import com.zhaoyan.ladderball.http.request.CreatePracticeRequest;
-import com.zhaoyan.ladderball.http.request.DeleteEventRequest;
+import com.zhaoyan.ladderball.http.request.EventDeleteRequest;
 import com.zhaoyan.ladderball.http.request.EventCollectionRequest;
+import com.zhaoyan.ladderball.http.request.EventModifyRequest;
 import com.zhaoyan.ladderball.http.request.EventPartListRequest;
 import com.zhaoyan.ladderball.http.request.LoginRequest;
 import com.zhaoyan.ladderball.http.request.MatchDetailRequest;
@@ -71,8 +72,12 @@ public interface LadderBallApi {
     Observable<BaseResponse> doCommitTask(@Body CommitTaskRequest request);
 
     /**删除一条数据记录*/
-    @POST("match/delete")
-    Observable<BaseResponse> doDeleteEvent(@Body DeleteEventRequest request);
+    @POST("match/event/delete")
+    Observable<BaseResponse> doDeleteEvent(@Body EventDeleteRequest request);
+
+    /**修改一条数据记录*/
+    @POST("match/event/modify")
+    Observable<BaseResponse> doModifyEvent(@Body EventModifyRequest request);
 
     /**已领取的练习赛列表请求*/
     @POST("tmpmatch/list")

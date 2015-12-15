@@ -79,15 +79,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHoder>
         Picasso.with(mContext)
                 .load(task.mTeamHomeLogoUrl)
                 .resize(96, 96)
-                .placeholder(R.mipmap.ic_launcher)
-                .error(R.mipmap.ic_launcher)
+                .placeholder(R.mipmap.default_team_home_logo)
+                .error(R.mipmap.default_team_home_logo)
                 .into(holder.homeTeamIcon);
 
         Picasso.with(mContext)
                 .load(task.mTeamVisitorLogoUrl)
                 .resize(96, 96)
-                .placeholder(R.mipmap.ic_launcher)
-                .error(R.mipmap.ic_launcher)
+                .placeholder(R.mipmap.default_team_visitor_logo)
+                .error(R.mipmap.default_team_visitor_logo)
                 .into(holder.visitorTeamIcon);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

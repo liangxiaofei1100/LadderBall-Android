@@ -14,12 +14,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.EventCode;
-import com.zhaoyan.ladderball.http.request.DeleteEventRequest;
+import com.zhaoyan.ladderball.http.request.EventCollectionRequest;
+import com.zhaoyan.ladderball.http.request.EventDeleteRequest;
+import com.zhaoyan.ladderball.http.request.EventModifyRequest;
 import com.zhaoyan.ladderball.http.request.EventPartListRequest;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.EventPartListResponse;
+import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.ui.adapter.DataRepairAdapter;
 import com.zhaoyan.ladderball.ui.adapter.OnItemClickListener;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
@@ -29,8 +33,12 @@ import com.zhaoyan.ladderball.ui.view.ItemDivider;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.ToastUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -174,7 +182,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
                     @Override
                     public void onError(Throwable e) {
-                        cancelProgressDialog();
+                        disMissProgressDialog();
 
                         e.printStackTrace();
                         Log.e(e.toString());
@@ -184,7 +192,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
                     @Override
                     public void onNext(List<EventPartListResponse.HttpEvent> result) {
-                        cancelProgressDialog();
+                        disMissProgressDialog();
 
                         if (result != null) {
                             mRetryButton.setVisibility(View.GONE);
@@ -206,9 +214,16 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
         doGetEventList();
     }
 
+    private void disMissProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+    }
+
     private void cancelProgressDialog() {
         if (mProgressDialog != null) {
             mProgressDialog.cancel();
+            mProgressDialog = null;
         }
     }
 
@@ -233,7 +248,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
             DataRepairActivity.this.finish();
         } else if (itemId == 0) {
             //add new record
-            doAddItem();
+            showAddDialog();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -249,7 +264,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
                     public void onItemClick(int menuPosition) {
                         if (menuPosition == 0) {
                             //edit
-                            doEditItem(position);
+                            showEditDialog(position);
                         } else if (menuPosition == 1) {
                             //delete
                             showDeleteDialog(position);
@@ -261,32 +276,243 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
                 .show();
     }
 
-    private void doAddItem() {
-        DataRepairDialog repairDialog = new DataRepairDialog(this, DataRepairDialog.TYPE_ADD);
+    private void showAddDialog() {
+        List<Player> playerList = new Select().from(Player.class).where("matchId=? and teamId=?",
+                mMatchId, mTeamId).execute();
+
+        if (playerList == null) {
+            playerList = new ArrayList<>();
+        }
+
+        final DataRepairDialog repairDialog = new DataRepairDialog(this, DataRepairDialog.TYPE_ADD, playerList);
         repairDialog.setDialogTitle("添加数据");
         repairDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
             @Override
             public void onClick(Dialog dialog) {
 
+                Log.d(repairDialog.getSelectedItem());
+                int eventCode = repairDialog.getSelectedEventCode();
+                long time = repairDialog.getTime();
+
+                if (time == 0) {
+                    ToastUtil.showToast(getApplicationContext(), "请输入时间");
+                    return;
+                }
+
+                long playerId1 = repairDialog.getPlayerId1();
+                int playerNumber1 = repairDialog.getPlayerNumber1();
+
+                long playerId2 = -1;
+                int playerNumber2 = -1;
+                if (eventCode == EventCode.EVENT_HUAN_REN) {
+                    playerId2 = repairDialog.getPlayerId2();
+                    playerNumber2 = repairDialog.getPlayerNumber2();
+                }
+
+                Log.d("eventCode:" + eventCode + ",time:" + time + ",playerId1:" + playerId1
+                        + "playerId2:" + playerId2 + ",playerNumber2:" + playerNumber2);
+
+                EventPartListResponse.HttpEvent httpEvent = new EventPartListResponse.HttpEvent();
+                httpEvent.matchId = mMatchId;
+                httpEvent.teamId = mTeamId;
+                httpEvent.playerId = playerId1;
+                httpEvent.playerNumber = playerNumber1;
+                httpEvent.partNumber = mPartNumber;
+                httpEvent.timeSecond = time;
+                if (eventCode == EventCode.EVENT_HUAN_REN) {
+                    //换人的event需要在additionalData添加被换上场球员的基本信息
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("id", playerId2);
+                        jsonObject.put("playerNumber", playerNumber2);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    httpEvent.additionalData = jsonObject.toString();
+                }
+                httpEvent.uuid = UUID.randomUUID().toString();
+                httpEvent.eventCode = eventCode;
+
+                doAddItem(httpEvent);
+
+                dialog.dismiss();
             }
         });
         repairDialog.setNegativeButton("取消", null);
         repairDialog.show();
     }
 
-    private void doEditItem(int position) {
+    private void doAddItem(final EventPartListResponse.HttpEvent httpEvent) {
+        EventCollectionRequest.HttpEvent httpEvent1 = new EventCollectionRequest.HttpEvent();
+        httpEvent1.matchId = httpEvent.matchId;
+        httpEvent1.teamId = httpEvent.teamId;
+        httpEvent1.playerId = httpEvent.playerId;
+        httpEvent1.partNumber = httpEvent.partNumber;
+        httpEvent1.timeSecond = httpEvent.timeSecond;
+        httpEvent1.additionalData = httpEvent.additionalData;
+        httpEvent1.uuid = httpEvent.uuid;
+        httpEvent1.eventCode = httpEvent.eventCode;
+
+        final EventCollectionRequest request = new EventCollectionRequest(getApplicationContext());
+        request.events.add(httpEvent1);
+
+        mLadderBallApi.doCommitEventData(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        mProgressDialog.setMessage("添加记录中...");
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        disMissProgressDialog();
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        ToastUtil.showNetworkFailToast(getApplicationContext());
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        disMissProgressDialog();
+                        if (baseResponse.header.resultCode == 0) {
+                            ToastUtil.showToast(getApplicationContext(), "添加记录成功");
+
+                            //添加完毕后，必须重新刷一次，否则新添加的记录没有id，如果再对这个数据进行删除或修改就会报错
+                            doGetEventList();
+//                            mAdapter.addItem(httpEvent);
+//                            mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), baseResponse.header.resultText);
+                        }
+                    }
+                });
+
+    }
+
+    private void showEditDialog(final int position) {
+        List<Player> playerList = new Select().from(Player.class).where("matchId=? and teamId=?",
+                mMatchId, mTeamId).execute();
+
+        if (playerList == null) {
+            playerList = new ArrayList<>();
+        }
+
         EventPartListResponse.HttpEvent httpEvent = mAdapter.getItem(position);
-        final DataRepairDialog repairDialog = new DataRepairDialog(this, DataRepairDialog.TYPE_EDIT);
+        final DataRepairDialog repairDialog = new DataRepairDialog(this, DataRepairDialog.TYPE_EDIT, playerList);
         repairDialog.setEvent(httpEvent);
         repairDialog.setDialogTitle("编辑数据");
         repairDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
                     @Override
                     public void onClick(Dialog dialog) {
                         Log.d(repairDialog.getSelectedItem());
+                        int eventCode = repairDialog.getSelectedEventCode();
+                        long time = repairDialog.getTime();
+
+                        if (time == 0) {
+                            ToastUtil.showToast(getApplicationContext(), "请输入时间");
+                            return;
+                        }
+
+                        long playerId1 = repairDialog.getPlayerId1();
+                        int playerNumber1 = repairDialog.getPlayerNumber1();
+
+                        long playerId2 = -1;
+                        int playerNumber2 = -1;
+                        if (eventCode == EventCode.EVENT_HUAN_REN) {
+                            playerId2 = repairDialog.getPlayerId2();
+                            playerNumber2 = repairDialog.getPlayerNumber2();
+                        }
+
+                        Log.d("eventCode:" + eventCode + ",time:" + time + ",playerId1:" + playerId1
+                        + "playerId2:" + playerId2 + ",playerNumber2:" + playerNumber2);
+                        doModify(position, eventCode, time, playerId1, playerNumber1, playerId2, playerNumber2);
+
+                        dialog.dismiss();
                     }
                 });
         repairDialog.setNegativeButton("取消", null);
         repairDialog.show();
+    }
+
+    private void doModify(final int position, int eventCode, long time, long playerId1, int playerNumber1, long playerId2, int playerNumber2) {
+        EventPartListResponse.HttpEvent httpEvent = mAdapter.getItem(position);
+
+        final EventModifyRequest request = new EventModifyRequest(getApplicationContext());
+        request.id = httpEvent.id;
+        request.matchId = httpEvent.matchId;
+        request.teamId = httpEvent.teamId;
+        request.playerId = playerId1;
+        httpEvent.playerId = playerId1;
+        httpEvent.playerNumber = playerNumber1;
+        if (eventCode == -1) {
+            request.eventCode = httpEvent.eventCode;
+        } else {
+            httpEvent.eventCode = eventCode;
+            request.eventCode = eventCode;
+        }
+        request.partNumber = httpEvent.partNumber;
+        request.timeSecond = time;
+        httpEvent.timeSecond = time;
+        request.uuid = UUID.randomUUID().toString();
+
+        if (eventCode == EventCode.EVENT_HUAN_REN) {
+            //换人的event需要在additionalData添加被换上场球员的基本信息
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("id", playerId2);
+                jsonObject.put("playerNumber", playerNumber2);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            request.additionalData = jsonObject.toString();
+            httpEvent.additionalData = jsonObject.toString();
+        }
+
+        mLadderBallApi.doModifyEvent(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        Log.d("modify event id:" + request.id);
+                        mProgressDialog.setMessage("修改数据中...");
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        disMissProgressDialog();
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        ToastUtil.showNetworkFailToast(getApplicationContext());
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        disMissProgressDialog();
+                        if (baseResponse.header.resultCode == 0) {
+                            ToastUtil.showToast(getApplicationContext(), "修改数据成功");
+                            mAdapter.changeItem(position);
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), baseResponse.header.resultText);
+                        }
+                    }
+                });
     }
 
     private void showDeleteDialog(final int position) {
@@ -306,7 +532,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
     private void doDelete(final int position) {
         EventPartListResponse.HttpEvent httpEvent = mAdapter.getItem(position);
 
-        final DeleteEventRequest request = new DeleteEventRequest(getApplicationContext());
+        final EventDeleteRequest request = new EventDeleteRequest(getApplicationContext());
         request.eventId = httpEvent.id;
 
         mLadderBallApi.doDeleteEvent(request)
@@ -328,7 +554,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
                     @Override
                     public void onError(Throwable e) {
-                        cancelProgressDialog();
+                        disMissProgressDialog();
                         e.printStackTrace();
                         Log.e(e.toString());
                         ToastUtil.showNetworkFailToast(getApplicationContext());
@@ -336,7 +562,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
                     @Override
                     public void onNext(BaseResponse baseResponse) {
-                        cancelProgressDialog();
+                        disMissProgressDialog();
                         if (baseResponse.header.resultCode == 0) {
                             ToastUtil.showToast(getApplicationContext(), "删除数据成功");
                             mAdapter.removeItem(position);
@@ -346,5 +572,12 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
                     }
                 });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        cancelProgressDialog();
     }
 }

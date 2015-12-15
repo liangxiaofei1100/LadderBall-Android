@@ -44,15 +44,19 @@
                         android:id="@+id/iv_task_setting_team_logo"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@mipmap/ic_launcher"
+                        android:src="@mipmap/default_team_home_logo"
                         />
 
                     <TextView
                         android:id="@+id/tv_task_setting_team_status"
-                        android:layout_width="wrap_content"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|center_horizontal"
                         android:text="已领取"
+                        android:textColor="@color/text"
+                        android:gravity="center"
+                        android:textSize="12sp"
+                        android:background="@drawable/receive_task_text_bg"
                         />
                 </FrameLayout>
 
