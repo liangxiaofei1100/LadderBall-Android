@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.EventCode;
+import com.zhaoyan.ladderball.http.request.DeleteEventRequest;
 import com.zhaoyan.ladderball.http.request.EventPartListRequest;
+import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.EventPartListResponse;
 import com.zhaoyan.ladderball.ui.adapter.DataRepairAdapter;
 import com.zhaoyan.ladderball.ui.adapter.OnItemClickListener;
@@ -62,6 +64,8 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
     DataRepairAdapter mAdapter;
 
     private List<String> mMenuList = new ArrayList<>();
+
+    private ProgressDialog mProgressDialog;
 
     public static Intent getStartIntent(Context context, long matchId, long teamId, int partNumber, boolean isComplete) {
         Intent intent=  new Intent();
@@ -115,6 +119,10 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
         mMenuList.add("删除");
         mMenuList.add("取消");
 
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(false);
+
         doGetEventList();
     }
 
@@ -124,11 +132,6 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
         request.teamId = mTeamId;
         request.partNumber = mPartNumber;
 
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("获取数据中...");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setCancelable(false);
-
         Observable<EventPartListResponse> responseObservable
                 = mLadderBallApi.doGetEvetPartList(request).subscribeOn(Schedulers.io());
 
@@ -136,7 +139,8 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
                 .doOnSubscribe(new Action0() {
                     @Override
                     public void call() {
-                        progressDialog.show();
+                        mProgressDialog.setMessage("获取数据中...");
+                        mProgressDialog.show();
                     }
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
@@ -170,7 +174,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
                     @Override
                     public void onError(Throwable e) {
-                        progressDialog.cancel();
+                        cancelProgressDialog();
 
                         e.printStackTrace();
                         Log.e(e.toString());
@@ -180,7 +184,8 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
                     @Override
                     public void onNext(List<EventPartListResponse.HttpEvent> result) {
-                        progressDialog.cancel();
+                        cancelProgressDialog();
+
                         if (result != null) {
                             mRetryButton.setVisibility(View.GONE);
                             mAdapter.setDataList(result);
@@ -201,6 +206,12 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
         doGetEventList();
     }
 
+    private void cancelProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.cancel();
+        }
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.findItem(0).setVisible(!mIsComplete);
@@ -210,7 +221,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0,0,0,"+")
-                .setIcon(R.mipmap.ic_add_white)
+                .setIcon(R.mipmap.ic_action_add)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
@@ -241,7 +252,7 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
                             doEditItem(position);
                         } else if (menuPosition == 1) {
                             //delete
-                            doDeleteItem(position);
+                            showDeleteDialog(position);
                         } else {
                             //cancel
                         }
@@ -265,29 +276,75 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
     private void doEditItem(int position) {
         EventPartListResponse.HttpEvent httpEvent = mAdapter.getItem(position);
-        DataRepairDialog repairDialog = new DataRepairDialog(this, DataRepairDialog.TYPE_EDIT);
+        final DataRepairDialog repairDialog = new DataRepairDialog(this, DataRepairDialog.TYPE_EDIT);
         repairDialog.setEvent(httpEvent);
         repairDialog.setDialogTitle("编辑数据");
         repairDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
                     @Override
                     public void onClick(Dialog dialog) {
-
+                        Log.d(repairDialog.getSelectedItem());
                     }
                 });
         repairDialog.setNegativeButton("取消", null);
         repairDialog.show();
     }
 
-    private void doDeleteItem(int position) {
+    private void showDeleteDialog(final int position) {
         BaseDialog deleteDialog = new BaseDialog(this);
         deleteDialog.setDialogMessage("确定删除这条数据?");
         deleteDialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
             @Override
             public void onClick(Dialog dialog) {
-
+                doDelete(position);
+                dialog.dismiss();
             }
         });
         deleteDialog.setNegativeButton("取消", null);
         deleteDialog.show();
+    }
+
+    private void doDelete(final int position) {
+        EventPartListResponse.HttpEvent httpEvent = mAdapter.getItem(position);
+
+        final DeleteEventRequest request = new DeleteEventRequest(getApplicationContext());
+        request.eventId = httpEvent.id;
+
+        mLadderBallApi.doDeleteEvent(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        Log.d("delete event id:" + request.eventId);
+                        mProgressDialog.setMessage("删除数据中...");
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        cancelProgressDialog();
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        ToastUtil.showNetworkFailToast(getApplicationContext());
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        cancelProgressDialog();
+                        if (baseResponse.header.resultCode == 0) {
+                            ToastUtil.showToast(getApplicationContext(), "删除数据成功");
+                            mAdapter.removeItem(position);
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), baseResponse.header.resultText);
+                        }
+                    }
+                });
+
     }
 }

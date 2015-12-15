@@ -44,4 +44,11 @@ public class ToastUtil {
         }
         showToast(context, context.getResources().getString(resId));
     }
+
+    public static void showNetworkFailToast(Context context) {
+        if (context == null) {
+            return;
+        }
+        showToast(context, "无法连接到服务器，请重试");
+    }
 }

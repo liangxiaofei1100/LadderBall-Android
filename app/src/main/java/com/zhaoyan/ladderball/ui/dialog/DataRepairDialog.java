@@ -21,6 +21,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
+ * 数据修复菜单对话框
+ * 包括数据添加，数据修改以及数据删除
  * Created by Yuri on 2015/12/12.
  */
 public class DataRepairDialog extends BaseDialog implements AdapterView.OnItemSelectedListener {
@@ -56,7 +58,7 @@ public class DataRepairDialog extends BaseDialog implements AdapterView.OnItemSe
         }
 
         String[] events = context.getResources().getStringArray(R.array.all_events);
-        ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item, events);
+        ArrayAdapter adapter = new ArrayAdapter(context, R.layout.spinner_item, events);
         mSpinner.setAdapter(adapter);
 
         mSpinner.setOnItemSelectedListener(this);
@@ -72,10 +74,27 @@ public class DataRepairDialog extends BaseDialog implements AdapterView.OnItemSe
         mSecondET.setText(minSecs[1]);
         mOldNumberET.setText(event.playerNumber + "");
         mSpinner.setSelection(getEventPosition(event.eventCode));
-        mNewNumberET.setText(getReplacePlayerNumber(event.additionalData) + "");
+        int playerNumber = getReplacePlayerNumber(event.additionalData);
+        if (playerNumber == -1) {
+            mNewNumberET.setText("");
+        } else {
+            mNewNumberET.setText(playerNumber + "");
+        }
+
         if (event.eventCode == EventCode.EVENT_HUAN_REN) {
             mEditExtraView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public long getTime() {
+        String minute = mMinuteET.getText().toString().trim();
+        String second = mSecondET.getText().toString().trim();
+        return -1;
+    }
+
+    public String getSelectedItem() {
+        String result = (String) mSpinner.getSelectedItem();
+        return result;
     }
 
     @Override
