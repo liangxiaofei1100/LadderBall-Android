@@ -30,10 +30,10 @@ import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.model.TmpMatch;
 import com.zhaoyan.ladderball.model.TmpPlayer;
 import com.zhaoyan.ladderball.ui.adapter.PracticeSettingAdapter;
-import com.zhaoyan.ladderball.ui.fragments.TaskFragment;
+import com.zhaoyan.ladderball.ui.fragments.PracticeFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.Log;
-import com.zhaoyan.ladderball.util.SharedPreferencesManager;
+import com.zhaoyan.ladderball.util.MatchUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
 import com.zhaoyan.ladderball.util.rx.RxBusTag;
@@ -216,27 +216,12 @@ public class PracticeSettingActivity extends BaseActivity {
 
     @OnClick(R.id.btn_add_player)
     void addPlayer() {
-        int rulePlayerNumber;
         if (mAdapter.getItemCount() >= mDetailMatch.playerNumber) {
             ToastUtil.showToast(getApplicationContext(), "首发位置已满，请先移除一个首发人员");
             return;
         }
 
         showAddNewPlayerDialog();
-//        if (mDetailMatch == null)
-//            return;
-//
-//        long teamId;
-//        String teamName;
-//        if (mDetailMatch.teamHome.isAssiged) {
-//            teamId = mDetailMatch.teamHome.teamId;
-//            teamName = mDetailMatch.teamHome.name;
-//        } else {
-//            teamId = mDetailMatch.teamVisitor.teamId;
-//            teamName = mDetailMatch.teamVisitor.name;
-//        }
-//        startActivityForResult(ChooseStartingUpPlayerActivity.getStartIntent(this, mDetailMatch.matchId,
-//                teamId, mDetailMatch.playerNumber, teamName), REQUEST_CODE_PLAYER_CHOOSE);
     }
 
     private void setPlayerNonFirst(TmpPlayer player, int poition) {
@@ -328,7 +313,7 @@ public class PracticeSettingActivity extends BaseActivity {
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("正在提交，请等待...");
-        Observable<BaseResponse> observable = mLadderBallApi.doModifyMatch(request)
+        Observable<BaseResponse> observable = mLadderBallApi.doModifyPractice(request)
                 .subscribeOn(Schedulers.io());
 
         observable
@@ -361,7 +346,6 @@ public class PracticeSettingActivity extends BaseActivity {
                     public void onError(Throwable e) {
                         Log.d(e.toString());
                         e.printStackTrace();
-                        Log.e(e);
                         progressDialog.cancel();
                         ToastUtil.showToast(getApplicationContext(), "提交失败，请检查网络");
                     }
@@ -374,9 +358,9 @@ public class PracticeSettingActivity extends BaseActivity {
 
                             setResult(RESULT_OK);
 
-                            RxBus.get().post(RxBusTag.TASK_ITEM_CLICK, TaskFragment.REGET_DATA);
+                            RxBus.get().post(RxBusTag.PRACTICE_ITEM_CLICK, PracticeFragment.REGET_DATA);
 
-                            SharedPreferencesManager.put(getApplicationContext(), PracticeMainActivity.EXTRA_HAS_SETTED, true);
+                            MatchUtil.setHadSetPractice(getApplicationContext(), mDetailMatch.matchId);
 
                             PracticeSettingActivity.this.finish();
                         } else {

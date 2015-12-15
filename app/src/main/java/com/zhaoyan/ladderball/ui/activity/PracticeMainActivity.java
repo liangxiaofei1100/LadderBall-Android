@@ -29,7 +29,7 @@ import com.zhaoyan.ladderball.ui.adapter.PracticeMainAdapter;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.DensityUtil;
 import com.zhaoyan.ladderball.util.Log;
-import com.zhaoyan.ladderball.util.SharedPreferencesManager;
+import com.zhaoyan.ladderball.util.MatchUtil;
 import com.zhaoyan.ladderball.util.TimeUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
 
@@ -138,12 +138,7 @@ public class PracticeMainActivity extends BaseActivity {
             mCheckDataBtn.setText("查看数据结果");
         }
 
-        if (!SharedPreferencesManager.get(getApplicationContext(), EXTRA_HAS_SETTED, false)) {
-            doTaskSetting();
-        }
-
         getMatchDetail();
-        //判断任务是否设置,是个问题，怎么判断
     }
 
     private void getMatchDetail() {
@@ -284,6 +279,9 @@ public class PracticeMainActivity extends BaseActivity {
                         Log.d();
                         mLoadingBar.setVisibility(View.GONE);
 
+                        if (!MatchUtil.hasSetPractice(getApplicationContext(), mMatchId)) {
+                            doTaskSetting();
+                        }
                     }
 
                     @Override

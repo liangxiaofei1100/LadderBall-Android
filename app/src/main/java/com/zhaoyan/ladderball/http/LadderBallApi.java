@@ -91,6 +91,6 @@ public interface LadderBallApi {
 
     /**练习赛修改比赛设置请求*/
     @POST("tmpmatch/modify")
-    Observable<BaseResponse> doModifyMatch(@Body PracticeModifyRequest request);
+    Observable<BaseResponse> doModifyPractice(@Body PracticeModifyRequest request);
 
 }
