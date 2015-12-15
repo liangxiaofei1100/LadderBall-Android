@@ -26,8 +26,6 @@ import com.zhaoyan.ladderball.http.request.PracticeModifyRequest;
 import com.zhaoyan.ladderball.http.response.AddPlayerResponse;
 import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.PracticeDetailResponse;
-import com.zhaoyan.ladderball.model.Match;
-import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.model.TmpMatch;
 import com.zhaoyan.ladderball.model.TmpPlayer;
 import com.zhaoyan.ladderball.ui.adapter.PracticeSettingAdapter;
@@ -150,7 +148,7 @@ public class PracticeSettingActivity extends BaseActivity {
 
             mTeamInfo.setText(mDetailMatch.teamHome.name + "(主队)  ");
             //查询该场比赛，该只队伍的人员
-            mAllPlayerList = new Select().from(Player.class).where("matchId=? and teamId=?"
+            mAllPlayerList = new Select().from(TmpPlayer.class).where("matchId=? and teamId=?"
                     , mDetailMatch.matchId, mDetailMatch.teamHome.teamId).execute();
             if (mAllPlayerList == null) {
                 mAllPlayerList = new ArrayList<>();
@@ -167,7 +165,7 @@ public class PracticeSettingActivity extends BaseActivity {
             mTeamInfo.setText(mDetailMatch.teamVisitor.name + "(客队)  ");
 
             //查询该场比赛，该只队伍的人员
-            mAllPlayerList = new Select().from(Player.class).where("matchId=? and teamId=?"
+            mAllPlayerList = new Select().from(TmpPlayer.class).where("matchId=? and teamId=?"
                     , mDetailMatch.matchId, mDetailMatch.teamVisitor.teamId).execute();
             if (mAllPlayerList == null) {
                 mAllPlayerList = new ArrayList<>();
@@ -549,7 +547,7 @@ public class PracticeSettingActivity extends BaseActivity {
         httpPlayer.number = Integer.valueOf(playerNumber);
         request.player = httpPlayer;
 
-        mLadderBallApi.doAddPlayer(request)
+        mLadderBallApi.doAddTmpPlayer(request)
                 .map(new Func1<AddPlayerResponse, TmpPlayer>() {
                     @Override
                     public TmpPlayer call(AddPlayerResponse response) {
@@ -640,7 +638,7 @@ public class PracticeSettingActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE_PLAYER_CHOOSE) {
                 mHasChanged = true;
-                mDetailMatch = new Select().from(Match.class).where("matchId=?", mDetailMatch.matchId).executeSingle();
+                mDetailMatch = new Select().from(TmpMatch.class).where("matchId=?", mDetailMatch.matchId).executeSingle();
 
                 if (mDetailMatch != null) {
                     mAdapter.clear();

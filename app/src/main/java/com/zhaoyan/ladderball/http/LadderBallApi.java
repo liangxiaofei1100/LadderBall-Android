@@ -103,4 +103,23 @@ public interface LadderBallApi {
     @POST("tmpmatch/modify")
     Observable<BaseResponse> doModifyPractice(@Body PracticeModifyRequest request);
 
+    /**练习赛新增球员请求*/
+    @POST("tmpmatch/player/add")
+    Observable<AddPlayerResponse> doAddTmpPlayer(@Body AddPlayerRequest request);
+
+    /**练习赛小节数据采集*/
+    @POST("tmpmatch/eventcollection")
+    Observable<BaseResponse> doCommitTmpEventData(@Body EventCollectionRequest request);
+
+    /**练习赛删除一条数据记录*/
+    @POST("tmpmatch/event/delete")
+    Observable<BaseResponse> doDeleteTmpEvent(@Body EventDeleteRequest request);
+
+    /**练习赛修改一条数据记录*/
+    @POST("tmpmatch/event/modify")
+    Observable<BaseResponse> doModifyTmpEvent(@Body EventModifyRequest request);
+
+    /**练习赛获取一场比赛一小节的数据记录*/
+    @POST("tmpmatch/eventpartlist")
+    Observable<EventPartListResponse> doGetTmpEvetPartList(@Body EventPartListRequest request);
 }

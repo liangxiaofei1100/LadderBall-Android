@@ -13,6 +13,6 @@
     tools:context="com.zhaoyan.ladderballmanager.ui.CreateTaskActivity"
     tools:showIn="@layout/activity_create_task">
 
-    
+
 
 </RelativeLayout>

@@ -31,7 +31,8 @@
                          com.zhaoyan.ladderball.model.EventItem,com.zhaoyan.ladderball.model.PlayerEvent,
                          com.zhaoyan.ladderball.model.TmpTask,com.zhaoyan.ladderball.model.TmpMatch,
                          com.zhaoyan.ladderball.model.TmpTeam,com.zhaoyan.ladderball.model.TmpPlayer,
-                         com.zhaoyan.ladderball.model.TmpPartData"/>
+                         com.zhaoyan.ladderball.model.TmpPartData,com.zhaoyan.ladderball.model.TmpPlayerEvent,
+                         com.zhaoyan.ladderball.model.TmpEventItem"/>
 
         <activity
             android:name=".ui.activity.LoginActivity"
@@ -99,6 +100,21 @@
         <activity
             android:name=".ui.activity.PracticeSettingActivity"
             android:label="任务设置"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+            android:name=".ui.activity.PracticeRecoderActivity"
+            android:label="@string/title_activity_data_recoder"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+            android:name=".ui.activity.PracticeRepairActivity"
+            android:label="@string/title_activity_data_repair"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

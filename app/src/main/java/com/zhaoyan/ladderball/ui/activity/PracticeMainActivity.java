@@ -20,7 +20,6 @@ import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.http.request.PracticeDetailRequest;
 import com.zhaoyan.ladderball.http.response.PracticeDetailResponse;
-import com.zhaoyan.ladderball.model.PartData;
 import com.zhaoyan.ladderball.model.TmpMatch;
 import com.zhaoyan.ladderball.model.TmpPartData;
 import com.zhaoyan.ladderball.model.TmpPlayer;
@@ -398,7 +397,7 @@ public class PracticeMainActivity extends BaseActivity {
                 return;
             }
 
-            PartData partData = new Select().from(PartData.class).where("matchId=? and partNumber=?",
+            TmpPartData partData = new Select().from(TmpPartData.class).where("matchId=? and partNumber=?",
                     mMatchId, id).executeSingle();
             if (partData == null) {
                 Log.e("Can not find this pard data");
@@ -407,9 +406,9 @@ public class PracticeMainActivity extends BaseActivity {
 
             Log.d("isPardComplete:" + partData.isComplete);
             if (partData.isComplete) {
-                startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id, false));
+                startActivity(PracticeRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id, false));
             } else {
-                startActivityForResult(DataRecoderActivity.getStartIntent(PracticeMainActivity.this,
+                startActivityForResult(PracticeRecoderActivity.getStartIntent(PracticeMainActivity.this,
                         mMatchId, mTeamId, id, mPartMinutes), REQUEST_CODE_DATA_RECORD);
             }
         }
