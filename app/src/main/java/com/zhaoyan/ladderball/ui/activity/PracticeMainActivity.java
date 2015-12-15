@@ -90,7 +90,7 @@ public class PracticeMainActivity extends BaseActivity {
     @Bind(R.id.tv_task_main_setting)
     TextView mSettingView;
 
-    @Bind(R.id.btn_task_main_check_data)
+    @Bind(R.id.btn_green_bottom)
     Button mCheckDataBtn;
 
     LinearLayoutManager mLinearLayoutManager;

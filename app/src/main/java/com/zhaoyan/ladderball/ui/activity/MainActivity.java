@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0,0,0,"add").setIcon(R.mipmap.ic_add_white).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0,0,0,"add").setIcon(R.mipmap.ic_action_add).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
 

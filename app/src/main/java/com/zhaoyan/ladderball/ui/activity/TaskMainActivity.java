@@ -98,7 +98,7 @@ public class TaskMainActivity extends BaseActivity {
     @Bind(R.id.tv_task_main_setting)
     TextView mSettingView;
 
-    @Bind(R.id.btn_task_main_check_data)
+    @Bind(R.id.btn_green_bottom)
     Button mCheckDataBtn;
 
     LinearLayoutManager mLinearLayoutManager;
@@ -143,6 +143,8 @@ public class TaskMainActivity extends BaseActivity {
             mSettingView.setEnabled(false);
             mCheckDataBtn.setText("查看数据结果");
         }
+        //默认不能点击
+        mCheckDataBtn.setEnabled(false);
 
         getMatchDetail();
     }

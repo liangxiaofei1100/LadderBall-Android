@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button android:id="@+id/btn_green_bottom"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/green_btn_bg_selector"
+        android:textColor="@color/text"
+    >
+
+</Button>

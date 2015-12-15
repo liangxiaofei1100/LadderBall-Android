@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="16dp"
-        app:colors="@color/colorAccent"
+        app:colors="@color/colorPrimary"
         app:cornerRadius="2dp"
         app:direction="horizontal"
         app:horizonGap="8dp"

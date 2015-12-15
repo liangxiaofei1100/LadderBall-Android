@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/btn_red_pressed"
+    >
+
+    <!--&lt;!&ndash; 不加mask，表示无边际 &ndash;&gt;-->
+    <!--<item android:id="@android:id/mask"-->
+          <!--android:drawable="@android:color/white" />-->
+
+    <!-- 这是第一种方法，这样的话就可以实现红色背景的自定按钮效果，并且zai5.0手机上也能有ripple效果
+     但是这种实现方法有个却笑，如果button disable的情况下并没有突出效果了
+     -->
+    <!--<item android:drawable="@drawable/btn_bg_normal" />-->
+
+    <!-- 所以为了实现，button disable情况下的效果，也可以这样做 -->
+    <item>
+        <selector>
+            <!-- pressed效果要不得，否则ripple效果就没了 -->
+        <!--<item android:drawable="@drawable/btn_bg_pressed" android:state_pressed="true" />-->
+        <item android:drawable="@drawable/btn_bg_disabled" android:state_enabled="false" />
+        <item android:drawable="@drawable/red_btn_bg_normal" />
+        </selector>
+    </item>
+
+</ripple>
