@@ -2,9 +2,9 @@ package com.zhaoyan.ladderball.ui.activity;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
@@ -52,11 +52,6 @@ public class ModifyPasswordActivity extends BaseActivity {
 
     @OnClick(R.id.btn_modify_pw_confirm)
     public void attemptModifyPassword() {
-        // Reset errors.
-        mOldPwEditText.setError(null);
-        mNewPwEditText.setError(null);
-        mNewPwAgainEditText.setError(null);
-        //
         String oldPassword = mOldPwEditText.getText().toString();
         String newPassword = mNewPwEditText.getText().toString();
         String newPasswordAgain = mNewPwAgainEditText.getText().toString();
@@ -65,25 +60,25 @@ public class ModifyPasswordActivity extends BaseActivity {
         View focusView = null;
 
         if (TextUtils.isEmpty(newPasswordAgain)) {
-            mNewPwAgainEditText.setError("请再次输入新密码");
+            ToastUtil.showToast(getApplicationContext(), "请再次输入新密码");
             focusView = mNewPwAgainEditText;
             cancel = true;
         }
 
         if (!newPassword.equals(newPasswordAgain)) {
-            mNewPwAgainEditText.setError("两次输入的新密码不相同");
+            ToastUtil.showToast(getApplicationContext(), "两次输入的新密码不相同");
             focusView = mNewPwAgainEditText;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(newPassword)) {
-            mNewPwEditText.setError("新密码不能为空");
+            ToastUtil.showToast(getApplicationContext(), "新密码不能为空");
             focusView = mNewPwEditText;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(oldPassword)) {
-            mOldPwEditText.setError("旧密码不能为空");
+            ToastUtil.showToast(getApplicationContext(), "旧密码不能为空");
             focusView = mOldPwEditText;
             cancel = true;
         }
@@ -123,8 +118,9 @@ public class ModifyPasswordActivity extends BaseActivity {
                         if (mProgressDialog != null) {
                             mProgressDialog.cancel();
                         }
-                        Snackbar.make(mOldPwEditText, "网络错误，请检查网络连接", Snackbar.LENGTH_SHORT).show();
+                        e.printStackTrace();
                         Log.d(e.toString());
+                        ToastUtil.showNetworkFailToast(getApplicationContext());
                     }
 
                     @Override
@@ -139,10 +135,17 @@ public class ModifyPasswordActivity extends BaseActivity {
 
                             ModifyPasswordActivity.this.finish();
                         } else {
-                            Snackbar.make(mOldPwEditText, response.header.resultText, Snackbar.LENGTH_SHORT).show();
+                            ToastUtil.showToast(getApplicationContext(), response.header.resultText);
                         }
                     }
                 });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

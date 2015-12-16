@@ -19,6 +19,7 @@ import com.zhaoyan.ladderball.http.response.LoginResponse;
 import com.zhaoyan.ladderball.util.CommonUtil;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.SharedPreferencesManager;
+import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.UserManager;
 
 import butterknife.Bind;
@@ -102,10 +103,6 @@ public class LoginActivity extends BaseActivity {
      */
     @OnClick(R.id.sign_in_button)
     public void attemptLogin() {
-        // Reset errors.
-        mPhoneView.setError(null);
-        mPasswordView.setError(null);
-
         // Store values at the time of the login attempt.
         String phone = mPhoneView.getText().toString();
         String password = mPasswordView.getText().toString();
@@ -115,18 +112,18 @@ public class LoginActivity extends BaseActivity {
 
         // Check for a valid password, if the user entered one.
         if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+            ToastUtil.showToast(getApplicationContext(), getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid phone.
         if (TextUtils.isEmpty(phone)) {
-            mPhoneView.setError(getString(R.string.error_phone_field_required));
+            ToastUtil.showToast(getApplicationContext(), getString(R.string.error_phone_field_required));
             focusView = mPhoneView;
             cancel = true;
         } else if (!isPhoneValid(phone)) {
-            mPhoneView.setError(getString(R.string.error_invalid_phone));
+            ToastUtil.showToast(getApplicationContext(), getString(R.string.error_invalid_phone));
             focusView = mPhoneView;
             cancel = true;
         }
@@ -215,8 +212,6 @@ public class LoginActivity extends BaseActivity {
         if (response.header.resultCode != 0) {
             Snackbar.make(mPasswordView, "用户名或密码错误，登录失败", Snackbar.LENGTH_SHORT).show();
         } else {
-            Snackbar.make(mPasswordView, "登录成功", Snackbar.LENGTH_SHORT).show();
-
             CommonUtil.setUserHttpHeaderToken(getApplicationContext(), response.userToken);
 
             SharedPreferencesManager.put(getApplicationContext(), CommonUtil.KEY_USER_PHONE, response.phone);
