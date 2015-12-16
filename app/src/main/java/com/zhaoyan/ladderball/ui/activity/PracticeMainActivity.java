@@ -99,9 +99,10 @@ public class PracticeMainActivity extends BaseActivity {
     private long mMatchId;
     private long mTeamId;
     private int mPartMinutes;
+    private int mPlayerNumber;
 
     private boolean mIsComplete;
-
+    private boolean mHasPartComplete = false;
     public static final String EXTRA_HAS_SETTED = "has_setted";
 
 //    private List<PartData> mPartDataList = new ArrayList<>();
@@ -169,6 +170,7 @@ public class PracticeMainActivity extends BaseActivity {
                         match.partMinutes = response.partMinutes;
 
                         mPartMinutes = response.partMinutes;
+                        mPlayerNumber = response.playerNumber;
 
                         TmpTeam teamHome = new Select().from(TmpTeam.class).where("matchId=? and teamId=?",
                                 response.id, response.teamHome.id).executeSingle();
@@ -263,6 +265,10 @@ public class PracticeMainActivity extends BaseActivity {
                             partData.isComplete = httpPartData.isComplete;
                             partData.save();
 
+                            if (httpPartData.isComplete) {
+                                mHasPartComplete = true;
+                            }
+
                             match.partDatas.add(partData);
                         }
                         match.save();
@@ -278,7 +284,8 @@ public class PracticeMainActivity extends BaseActivity {
                         Log.d();
                         mLoadingBar.setVisibility(View.GONE);
 
-                        if (!mIsComplete && !MatchUtil.hasSetPractice(getApplicationContext(), mMatchId)) {
+                        if (!mHasPartComplete && !mIsComplete &&
+                                !MatchUtil.hasSetPractice(getApplicationContext(), mMatchId)) {
                             doTaskSetting();
                         }
                     }
@@ -362,12 +369,7 @@ public class PracticeMainActivity extends BaseActivity {
         itemView.setRightArrowVisiblily(View.GONE);
         mPartLayout.addView(itemView);
 
-        boolean hasPartComplete = false;
         for (TmpPartData pardData : match.partDatas) {
-            if (pardData.isComplete) {
-                hasPartComplete = true;
-            }
-
             itemView = new SettingItemView(this);
             itemView.setLayoutParams(params);
             itemView.setId(pardData.partNumber);
@@ -381,9 +383,9 @@ public class PracticeMainActivity extends BaseActivity {
         //但是为了能测试，这个功能暂时不开启
         //TODO
         //只要有一个小节比赛已提交，就不能再去修改任务设置了
-//        if (hasPartComplete) {
-//            mSettingView.setEnabled(false);
-//        }
+        if (mHasPartComplete) {
+            mSettingView.setEnabled(false);
+        }
     }
 
     private class PartItemClickListener implements View.OnClickListener {
@@ -394,6 +396,11 @@ public class PracticeMainActivity extends BaseActivity {
 
             if (mIsComplete) {
                 startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id, true));
+                return;
+            }
+
+            if (mAdapter.getItemCount() == 0 || mAdapter.getItemCount() < mPlayerNumber) {
+                ToastUtil.showToast(getApplicationContext(), "首发人员不足，请先设置");
                 return;
             }
 

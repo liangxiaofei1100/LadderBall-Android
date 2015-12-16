@@ -34,4 +34,10 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
+    <style name="Big_Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:textColor">@color/text</item>
+    </style>
+
 </resources>

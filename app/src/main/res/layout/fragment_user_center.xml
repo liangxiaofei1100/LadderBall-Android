@@ -27,14 +27,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     app:itemRightArrow="false"
-                    app:itemTitle="手机号"/>
+                    app:itemTitle="实名姓名"/>
 
                 <com.zhaoyan.ladderball.ui.view.SettingItemView
                     android:id="@+id/siv_phone"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     app:itemRightArrow="false"
-                    app:itemTitle="实名姓名"/>
+                    app:itemTitle="手机号"/>
 
                 <com.zhaoyan.ladderball.ui.view.SettingItemView
                     android:id="@+id/siv_address"
@@ -67,12 +67,10 @@
 
             <Button
                 android:id="@+id/btn_exit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/Big_Button"
                 android:layout_margin="16dp"
                 android:background="@drawable/red_btn_bg_selector"
                 android:text="退出登录"
-                android:textColor="@color/text"
                 />
         </LinearLayout>
     </ScrollView>

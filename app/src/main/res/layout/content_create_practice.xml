@@ -99,12 +99,10 @@
 
         <Button
             android:id="@+id/btn_create_practice_save"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
+            style="@style/Big_Button"
             android:layout_marginTop="64dp"
             android:background="@drawable/green_btn_bg_selector"
             android:text="创建"
-            android:textColor="@android:color/white"
             />
 
     </LinearLayout>

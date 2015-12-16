@@ -48,8 +48,6 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:paddingBottom="8dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
                 android:paddingTop="8dp"
                 >
 
@@ -57,6 +55,7 @@
                     android:id="@+id/tv_player_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
                     android:text="首发阵容(8人)"
                     />
 
@@ -64,6 +63,7 @@
                     android:id="@+id/tv_task_main_setting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/green_btn_bg_selector"
                     android:drawableLeft="@mipmap/ic_setting"
@@ -81,6 +81,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
                     android:layout_below="@+id/tv_player_title"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
                     >
                 </android.support.v7.widget.RecyclerView>
 
@@ -107,8 +109,7 @@
 
     <Button
         android:id="@+id/btn_green_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
+        style="@style/Big_Button"
         android:background="@drawable/green_btn_bg_selector"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="16dp"
@@ -117,7 +118,6 @@
         android:layout_marginBottom="10dp"
         android:enabled="false"
         android:text="预览数据"
-        android:textColor="@android:color/white"
         />
 
     <ProgressBar

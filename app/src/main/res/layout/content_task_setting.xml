@@ -118,7 +118,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:gravity="right"
-                android:padding="8dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingRight="16dp"
                 android:text="比赛共90分钟"
                 />
 
@@ -168,6 +170,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:background="@android:color/white"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
                 >
 
             </android.support.v7.widget.RecyclerView>
@@ -178,8 +182,7 @@
 
     <Button
         android:id="@+id/btn_task_setting_commit"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
+        style="@style/Big_Button"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="16dp"
@@ -187,7 +190,6 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/green_btn_bg_selector"
         android:text="提交"
-        android:textColor="@android:color/white"
         />
 
 </RelativeLayout>

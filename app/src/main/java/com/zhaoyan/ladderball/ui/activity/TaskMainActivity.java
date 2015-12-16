@@ -111,6 +111,7 @@ public class TaskMainActivity extends BaseActivity {
     private int mPlayerNumber;
 
     private boolean mIsComplete;
+    private boolean mHasPartComplete = false;
 
 //    private List<PartData> mPartDataList = new ArrayList<>();
 
@@ -274,6 +275,10 @@ public class TaskMainActivity extends BaseActivity {
                             partData.isComplete = httpPartData.isComplete;
                             partData.save();
 
+                            if (httpPartData.isComplete) {
+                                mHasPartComplete = true;
+                            }
+
                             match.partDatas.add(partData);
                         }
                         match.save();
@@ -289,7 +294,8 @@ public class TaskMainActivity extends BaseActivity {
                         Log.d();
                         mLoadingBar.setVisibility(View.GONE);
 
-                        if (!mIsComplete && !MatchUtil.hasSetTask(getApplicationContext(), mMatchId)) {
+                        if (!mHasPartComplete && !mIsComplete &&
+                                !MatchUtil.hasSetTask(getApplicationContext(), mMatchId)) {
                             doTaskSetting();
                         }
                     }
@@ -363,16 +369,7 @@ public class TaskMainActivity extends BaseActivity {
         itemView.setRightArrowVisiblily(View.GONE);
         mPartLayout.addView(itemView);
 
-        boolean hasPartComplete = false;
         for (PartData pardData : match.partDatas) {
-//            if (pardData.partNumber > matchParts.length) {
-//                //暂时只内置了6个小节的标题文本，一场比赛不会分成这么多小节吧
-//                break;
-//            }
-            if (pardData.isComplete) {
-                hasPartComplete = true;
-            }
-
             itemView = new SettingItemView(this);
             itemView.setLayoutParams(params);
             itemView.setId(pardData.partNumber);
@@ -386,9 +383,9 @@ public class TaskMainActivity extends BaseActivity {
         //但是为了能测试，这个功能暂时不开启
         //TODO
         //只要有一个小节比赛已提交，就不能再去修改任务设置了
-//        if (hasPartComplete) {
-//            mSettingView.setEnabled(false);
-//        }
+        if (mHasPartComplete) {
+            mSettingView.setEnabled(false);
+        }
     }
 
     private class PartItemClickListener implements View.OnClickListener {
