@@ -108,6 +108,7 @@ public class TaskMainActivity extends BaseActivity {
     private long mMatchId;
     private long mTeamId;
     private int mPartMinutes;
+    private int mPlayerNumber;
 
     private boolean mIsComplete;
 
@@ -178,8 +179,9 @@ public class TaskMainActivity extends BaseActivity {
                         match.partMinutes = response.partMinutes;
 
                         mPartMinutes = response.partMinutes;
+                        mPlayerNumber = response.playerNumber;
 
-                        Team teamHome = new Select().from(Team.class).where("matchId=? and teamId=?",
+                                Team teamHome = new Select().from(Team.class).where("matchId=? and teamId=?",
                                 response.id, response.teamHome.id).executeSingle();
                         if (teamHome == null) {
                             teamHome = new Team();
@@ -397,6 +399,11 @@ public class TaskMainActivity extends BaseActivity {
 
             if (mIsComplete) {
                 startActivity(DataRepairActivity.getStartIntent(getApplicationContext(), mMatchId, mTeamId, id, true));
+                return;
+            }
+
+            if (mAdapter.getItemCount() == 0 || mAdapter.getItemCount() < mPlayerNumber) {
+                ToastUtil.showToast(getApplicationContext(), "首发人员不足，请先设置");
                 return;
             }
 
