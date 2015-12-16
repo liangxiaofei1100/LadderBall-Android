@@ -36,11 +36,11 @@ import rx.Observable;
 public interface LadderBallApi {
 
     /**retrofit，登录请求*/
-    @POST("account/recorderlogin")
+    @POST("account/recorder/login")
     Observable<LoginResponse> doLogin(@Body LoginRequest loginRequest);
 
     /**修改密码请求*/
-    @POST("account/recorderSetPassword")
+    @POST("account/recorder/password/set")
     Observable<ModifyPasswordResponse> doModifyPassword(@Body ModifyPasswordRequest request);
 
     /**获取任务列表请求*/
@@ -55,16 +55,16 @@ public interface LadderBallApi {
     @POST("match/modify")
     Observable<BaseResponse> doModifyMatch(@Body MatchModifyRequest request);
 
-    /**比赛时间数据采集*/
-    @POST("match/eventcollection")
+    /**添加比赛比赛时间数据采集*/
+    @POST("match/event/add")
     Observable<BaseResponse> doCommitEventData(@Body EventCollectionRequest request);
 
     /**新增球员请求*/
-    @POST("match/addplayer")
+    @POST("match/player/add")
     Observable<AddPlayerResponse> doAddPlayer(@Body AddPlayerRequest request);
 
     /**获取一场比赛一小节的数据记录*/
-    @POST("match/eventpartlist")
+    @POST("match/event/partlist")
     Observable<EventPartListResponse> doGetEvetPartList(@Body EventPartListRequest request);
 
     /**提交任务请求*/
@@ -108,7 +108,7 @@ public interface LadderBallApi {
     Observable<AddPlayerResponse> doAddTmpPlayer(@Body AddPlayerRequest request);
 
     /**练习赛小节数据采集*/
-    @POST("tmpmatch/eventcollection")
+    @POST("tmpmatch/event/add")
     Observable<BaseResponse> doCommitTmpEventData(@Body EventCollectionRequest request);
 
     /**练习赛删除一条数据记录*/
@@ -120,6 +120,6 @@ public interface LadderBallApi {
     Observable<BaseResponse> doModifyTmpEvent(@Body EventModifyRequest request);
 
     /**练习赛获取一场比赛一小节的数据记录*/
-    @POST("tmpmatch/eventpartlist")
+    @POST("tmpmatch/event/partlist")
     Observable<EventPartListResponse> doGetTmpEvetPartList(@Body EventPartListRequest request);
 }
