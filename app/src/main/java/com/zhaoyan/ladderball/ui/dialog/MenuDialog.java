@@ -13,6 +13,7 @@ import com.zhaoyan.ladderball.R;
 import com.zhaoyan.ladderball.ui.adapter.OnItemClickListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,6 +29,10 @@ public class MenuDialog extends BaseDialog implements AdapterView.OnItemClickLis
         listView.setOnItemClickListener(this);
         listView.setAdapter(new ListDialogAdapter(items));
         setCustomView(view);
+    }
+
+    public MenuDialog(Context context, String[] items) {
+        this(context, Arrays.asList(items));
     }
 
     @Override

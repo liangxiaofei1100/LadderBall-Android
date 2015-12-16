@@ -4,9 +4,6 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 练习赛球员表
  * Created by Yuri on 2015/12/5.
@@ -30,12 +27,9 @@ public class TmpPlayer extends Model{
     @Column(name = "number")
     public int number;
 
-    List<PlayerEvent> eventList = new ArrayList<>();
-
     @Override
     public String toString() {
         return "Player{" +
-                "eventList=" + eventList +
                 ", playerId=" + playerId +
                 ", teamId=" + teamId +
                 ", matchId=" + matchId +

@@ -3,11 +3,9 @@ package com.zhaoyan.ladderball.ui.activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +30,7 @@ import com.zhaoyan.ladderball.ui.dialog.AddPlayerDialog;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.fragments.PracticeFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
+import com.zhaoyan.ladderball.util.CommonUtil;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.MatchUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
@@ -198,16 +197,17 @@ public class PracticeSettingActivity extends BaseActivity {
             public void call(final Integer integer) {
                 Log.d("isMain:" + (Looper.myLooper() == Looper.getMainLooper()));
                 final TmpPlayer player1 = mAdapter.getItem(integer);
-                new AlertDialog.Builder(PracticeSettingActivity.this)
-                        .setMessage("确定取消" + player1.number + "号首发位置")
-                        .setNegativeButton("取消", null)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                new BaseDialog(PracticeSettingActivity.this)
+                        .setDialogMessage("确定取消" + player1.number + "号首发位置")
+                        .setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                            public void onClick(Dialog dialog) {
                                 setPlayerNonFirst(player1, integer);
+                                dialog.dismiss();
                             }
                         })
-                        .create().show();
+                        .setNegativeButton("取消", null)
+                        .show();
             }
         });
         setResult(RESULT_CANCELED);
@@ -491,6 +491,7 @@ public class PracticeSettingActivity extends BaseActivity {
 
                     mHasChanged = true;
                 }
+                CommonUtil.hideSoftKeyborad(getApplicationContext());
                 dialog.dismiss();
             }
         });
@@ -588,7 +589,7 @@ public class PracticeSettingActivity extends BaseActivity {
                         e.printStackTrace();
                         Log.e(e.toString());
                         progressDialog.cancel();
-                        ToastUtil.showToast(getApplicationContext(), "网络连接超时，请重试");
+                        ToastUtil.showNetworkFailToast(getApplicationContext());
                     }
 
                     @Override
@@ -647,22 +648,24 @@ public class PracticeSettingActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (mHasChanged) {
-            new AlertDialog.Builder(this)
-                    .setTitle("提示")
-                    .setMessage("是否保存当前修改？")
-                    .setPositiveButton("保存", new DialogInterface.OnClickListener() {
+            new BaseDialog(this)
+                    .setDialogTitle("提示")
+                    .setDialogMessage("是否保存当前修改？")
+                    .setPositiveButton("保存", new BaseDialog.onMMDialogClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(Dialog dialog) {
                             doModifyMatch();
+                            dialog.dismiss();
                         }
                     })
-                    .setNegativeButton("不保存", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("不保存退出", new BaseDialog.onMMDialogClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(Dialog dialog) {
                             handleNewAddPlayer();
+                            dialog.dismiss();
                         }
                     })
-                    .create().show();
+                    .show();
             return;
         }
         super.onBackPressed();

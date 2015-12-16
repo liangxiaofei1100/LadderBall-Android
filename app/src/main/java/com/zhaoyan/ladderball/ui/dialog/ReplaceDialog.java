@@ -18,7 +18,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.zhaoyan.ladderball.R.id.tv_replace_dialog_empty;
 
@@ -106,7 +105,7 @@ public class ReplaceDialog extends BaseDialog implements BaseDialog.OnMenuClickL
 
         @Override
         public ReplaceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = inflater.inflate(R.layout.layout_replace_dialog_item, null);
+            View view = inflater.inflate(R.layout.layout_replace_dialog_item, parent, false);
             return new ReplaceViewHolder(view);
         }
 
@@ -118,7 +117,7 @@ public class ReplaceDialog extends BaseDialog implements BaseDialog.OnMenuClickL
         public void onBindViewHolder(ReplaceViewHolder holder, int position) {
 
             Player player = mPlayerList.get(position);
-            holder.numberView.setText(player.number + "");
+            holder.numberView.setText(player.number + "号");
             if (mSelectPosition == position) {
                 holder.radioButton.setChecked(true);
             } else {
@@ -141,12 +140,14 @@ public class ReplaceDialog extends BaseDialog implements BaseDialog.OnMenuClickL
             public ReplaceViewHolder(View itemView) {
                 super(itemView);
                 ButterKnife.bind(this, itemView);
-            }
 
-            @OnClick(R.id.rb_replace_dialog)
-            void onRadioButtonClick(View view) {
-                mSelectPosition = getLayoutPosition();
-                notifyDataSetChanged();
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mSelectPosition = getLayoutPosition();
+                        notifyDataSetChanged();
+                    }
+                });
             }
         }
     }

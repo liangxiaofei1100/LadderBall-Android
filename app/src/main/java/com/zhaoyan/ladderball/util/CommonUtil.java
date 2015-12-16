@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
+import android.view.inputmethod.InputMethodManager;
 
 import com.activeandroid.query.Select;
 import com.zhaoyan.ladderball.AppApplication;
@@ -97,6 +98,11 @@ public class CommonUtil {
      */
     public static void setUserHttpHeaderToken(Context context, String userToken){
         getApp(context).setUserToken(userToken);
+    }
+
+    public static void hideSoftKeyborad(Context context) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
 }

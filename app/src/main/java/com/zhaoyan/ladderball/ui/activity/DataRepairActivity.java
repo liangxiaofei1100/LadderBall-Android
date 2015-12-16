@@ -235,8 +235,8 @@ public class DataRepairActivity extends BaseActivity implements OnItemClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0,0,0,"+")
-                .setIcon(R.mipmap.ic_action_add)
+        menu.add(0,0,0,"添加新记录")
+                .setIcon(R.mipmap.ic_add_32)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }

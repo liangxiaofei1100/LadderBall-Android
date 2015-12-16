@@ -30,6 +30,7 @@ import com.zhaoyan.ladderball.ui.dialog.AddPlayerDialog;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.fragments.TaskFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
+import com.zhaoyan.ladderball.util.CommonUtil;
 import com.zhaoyan.ladderball.util.Log;
 import com.zhaoyan.ladderball.util.MatchUtil;
 import com.zhaoyan.ladderball.util.ToastUtil;
@@ -492,6 +493,7 @@ public class TaskSettingActivity extends BaseActivity {
 
                     mHasChanged = true;
                 }
+                CommonUtil.hideSoftKeyborad(getApplicationContext());
                 dialog.dismiss();
             }
         });

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/itemPressed"
+    >
+    <item>
+        <selector>
+            <item>
+                <shape>
+                    <corners
+                        android:bottomLeftRadius="@dimen/radius"
+                        android:bottomRightRadius="@dimen/radius"
+                        android:topLeftRadius="0dp"
+                        android:topRightRadius="0dp"/>
+                    <!-- 这里千万不能使用透明颜色，否则点击没效果 -->
+                    <solid android:color="@android:color/white"/>
+                    <padding
+                        android:bottom="5dp"
+                        android:left="5dp"
+                        android:right="5dp"
+                        android:top="5dp"/>
+                </shape>
+            </item>
+        </selector>
+    </item>
+
+</ripple>

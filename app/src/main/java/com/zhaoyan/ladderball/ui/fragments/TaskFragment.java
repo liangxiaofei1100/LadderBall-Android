@@ -260,7 +260,6 @@ public class TaskFragment extends BaseFragment {
                     @Override
                     public void onNext(Task task) {
                         Log.d(task.toString());
-
                         if (task.mIsComplete) {
                             mCompleteTaskList.add(task);
                         } else {

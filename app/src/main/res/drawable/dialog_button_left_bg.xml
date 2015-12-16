@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:state_pressed="true"><shape>
-            <solid android:color="@color/itemPressed" />
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="@color/itemPressed"/>
 
-        <corners android:bottomLeftRadius="@dimen/radius" android:bottomRightRadius="0dp" android:topLeftRadius="0dp" android:topRightRadius="0dp" />
+            <corners android:bottomLeftRadius="@dimen/radius" android:bottomRightRadius="0dp" android:topLeftRadius="0dp" android:topRightRadius="0dp"/>
 
-            <padding android:bottom="5dp" android:left="5dp" android:right="5dp" android:top="5dp" />
-        </shape></item>
-    <item android:state_focused="true"><shape>
-            <solid android:color="@color/itemPressed" />
+            <padding android:bottom="5dp" android:left="5dp" android:right="5dp" android:top="5dp"/>
+        </shape>
+    </item>
+    <item android:state_focused="true">
+        <shape>
+            <solid android:color="@color/itemPressed"/>
 
-            <corners android:bottomLeftRadius="@dimen/radius" android:bottomRightRadius="0dp" android:topLeftRadius="0dp" android:topRightRadius="0dp" />
+            <corners android:bottomLeftRadius="@dimen/radius" android:bottomRightRadius="0dp" android:topLeftRadius="0dp" android:topRightRadius="0dp"/>
 
-            <padding android:bottom="5dp" android:left="5dp" android:right="5dp" android:top="5dp" />
-        </shape></item>
-    <item><shape>
-            <corners android:bottomLeftRadius="@dimen/radius" android:bottomRightRadius="0dp" android:topLeftRadius="0dp" android:topRightRadius="0dp" />
+            <padding android:bottom="5dp" android:left="5dp" android:right="5dp" android:top="5dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:bottomLeftRadius="@dimen/radius" android:bottomRightRadius="0dp" android:topLeftRadius="0dp" android:topRightRadius="0dp"/>
 
-            <solid android:color="@android:color/transparent" />
+            <solid android:color="@android:color/transparent"/>
 
-            <padding android:bottom="5dp" android:left="5dp" android:right="5dp" android:top="5dp" />
-        </shape></item>
+            <padding android:bottom="5dp" android:left="5dp" android:right="5dp" android:top="5dp"/>
+        </shape>
+    </item>
 
 </selector>

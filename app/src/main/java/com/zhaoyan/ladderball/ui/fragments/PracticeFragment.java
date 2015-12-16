@@ -24,6 +24,7 @@ import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.http.response.TaskListResponse;
 import com.zhaoyan.ladderball.model.TmpTask;
 import com.zhaoyan.ladderball.ui.activity.MainActivity;
+import com.zhaoyan.ladderball.ui.activity.PracticeMainActivity;
 import com.zhaoyan.ladderball.ui.adapter.PracticeTaskAdapter;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.view.SegmentControl;
@@ -135,8 +136,8 @@ public class PracticeFragment extends BaseFragment {
                             receiveDialog.setNegativeButton("取消", null);
                             receiveDialog.show();
                         } else {
-                            ToastUtil.showToast(getActivity(), "努力开发中...");
-//                            startActivity(PracticeMainActivity.getStartIntent(getActivity(), task.mMatchId, false));
+//                            ToastUtil.showToast(getActivity(), "努力开发中...");
+                            startActivity(PracticeMainActivity.getStartIntent(getActivity(), task.mMatchId, false));
                         }
                     }
                 });

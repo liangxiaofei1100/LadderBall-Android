@@ -1,10 +1,8 @@
 package com.zhaoyan.ladderball.ui.activity;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,11 +21,13 @@ import com.zhaoyan.ladderball.http.response.BaseResponse;
 import com.zhaoyan.ladderball.model.TmpEventItem;
 import com.zhaoyan.ladderball.model.TmpPlayer;
 import com.zhaoyan.ladderball.model.TmpPlayerEvent;
+import com.zhaoyan.ladderball.ui.adapter.OnItemClickListener;
 import com.zhaoyan.ladderball.ui.adapter.PracticeEventRecentAdapter;
 import com.zhaoyan.ladderball.ui.adapter.PracticeEventRecordAdapter;
 import com.zhaoyan.ladderball.ui.adapter.PracticeRecordNumberAdapter;
 import com.zhaoyan.ladderball.ui.dialog.AddPlayerDialog;
 import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
+import com.zhaoyan.ladderball.ui.dialog.MenuDialog;
 import com.zhaoyan.ladderball.ui.dialog.PracticeReplaceDialog;
 import com.zhaoyan.ladderball.util.DensityUtil;
 import com.zhaoyan.ladderball.util.Log;
@@ -141,8 +141,7 @@ public class PracticeRecoderActivity extends BaseActivity {
         mOnPitchPlayerList = new ArrayList<>();
         mUnOnPitchPlayerList = new ArrayList<>();
         for (TmpPlayer player : allPlayerList) {
-//            Log.d(player.toString());
-//            Log.d("isFirst:" + player.isFirst + ",isOnPitch:" + player.isOnPitch);
+            Log.d(player.toString());
             if (player.isOnPitch) {
                 mOnPitchPlayerList.add(player);
             } else {
@@ -284,23 +283,24 @@ public class PracticeRecoderActivity extends BaseActivity {
                         mRecordAdapter.setDataList(firstPlayerEvent);
                         mRecordAdapter.notifyDataSetChanged();
 
-                        new AlertDialog.Builder(PracticeRecoderActivity.this)
-                                .setTitle("第" + mPartNumber + "节比赛")
-                                .setMessage("比赛开始？")
-                                .setPositiveButton("比赛开始", new DialogInterface.OnClickListener() {
+                        BaseDialog baseDialog = new BaseDialog(PracticeRecoderActivity.this)
+                                .setDialogTitle("第" + mPartNumber + "节比赛")
+                                .setDialogMessage("比赛开始？")
+                                .setPositiveButton("比赛开始", new BaseDialog.onMMDialogClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(Dialog dialog) {
                                         mMatchStartTime = System.currentTimeMillis();
+                                        dialog.dismiss();
                                     }
                                 })
-                                .setNegativeButton("还没开始", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("还没开始", new BaseDialog.onMMDialogClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(Dialog dialog) {
                                         PracticeRecoderActivity.this.finish();
                                     }
-                                })
-                                .setCancelable(false)
-                                .create().show();
+                                });
+                        baseDialog.setCancelable(false);
+                        baseDialog.show();
                     }
                 });
     }
@@ -318,16 +318,16 @@ public class PracticeRecoderActivity extends BaseActivity {
             case 14:
             case 15:
                 String[] menus = getItemMenu(position);
-                new AlertDialog.Builder(PracticeRecoderActivity.this)
-                        .setItems(menus, new DialogInterface.OnClickListener() {
+                MenuDialog menuDialog = new MenuDialog(PracticeRecoderActivity.this, menus)
+                        .setOnItemClickListener(new OnItemClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                            public void onItemClick(int menuPosition) {
                                 TmpPlayerEvent playerEvent = mRecordAdapter.getItem();
-                                handleEvent(position, which, playerEvent);
+                                handleEvent(position, menuPosition, playerEvent);
                             }
-                        })
-                        .setNegativeButton("取消", null)
-                        .create().show();
+                        });
+                menuDialog.setNegativeButton("取消", null);
+                menuDialog.show();
                 break;
             case 5:
             case 6:
@@ -913,24 +913,23 @@ public class PracticeRecoderActivity extends BaseActivity {
     }
 
     private void gameOver() {
-        new AlertDialog.Builder(this)
-                .setMessage("本节比赛已结束，开始提交数据？")
-                .setPositiveButton("提交数据", new DialogInterface.OnClickListener() {
+        new BaseDialog(this)
+                .setDialogMessage("本节比赛已结束，开始提交数据？")
+                .setPositiveButton("提交数据", new BaseDialog.onMMDialogClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(Dialog dialog) {
                         doCommitEventData();
+                        dialog.dismiss();
                     }
                 })
-                //test
-                .setNeutralButton("强行退出", new DialogInterface.OnClickListener() {
+                .setNeutralButton("强行退出", new BaseDialog.onMMDialogClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(Dialog dialog) {
                         PracticeRecoderActivity.this.finish();
                     }
                 })
-                //test
                 .setNegativeButton("取消", null)
-                .create().show();
+                .show();
     }
 
     public int getRecyclerViewWidth(Context context, int itemCount) {
