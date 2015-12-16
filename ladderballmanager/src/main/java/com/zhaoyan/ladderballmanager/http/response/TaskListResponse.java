@@ -3,29 +3,38 @@ package com.zhaoyan.ladderballmanager.http.response;
 import java.util.List;
 
 /**
- * Created by Yuri on 2015/12/4.
+ * Created by Yuri on 2015/12/16.
  */
 public class TaskListResponse extends BaseResponse {
 
     public List<HttpMatch> matches;
 
-    public class HttpMatch {
+    public static class HttpMatch{
         public long id;
-
-        public HttpTeam teamHome;//主队
-        public HttpTeam teamVisitor;//客队
-        public int playerNumber;//赛制：8人制，11人制
-        public long startTime;//比赛开始日期
-        public String address;//比赛地点
-        public boolean complete;//是否完成
-
+        public HttpTeam teamHome;
+        public HttpTeam teamVisitor;
+        public HttpRecorder recorderHome;
+        public HttpRecorder recorderVisitor;
+        public int playerNumber;
+        public long startTime;
+        public String address;
+        public boolean complete;
     }
 
-    public class HttpTeam{
+    public static class HttpTeam{
+        public long id;
         public String name;
-        public boolean isAsigned;
-        public int score;
         public String color;
+        public int score;
         public String logoURL;
     }
+
+    public static class HttpRecorder{
+        public long id;
+        public String phone;
+        public String name;
+        public String address;
+        public int gender;
+    }
+
 }

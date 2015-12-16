@@ -1,14 +1,13 @@
 package com.zhaoyan.ladderballmanager.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.zhaoyan.ladderballmanager.R;
 
 import butterknife.ButterKnife;
 
-public class CreateTaskActivity extends AppCompatActivity {
+public class CreateTaskActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

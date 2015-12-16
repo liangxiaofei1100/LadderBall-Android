@@ -1,26 +1,32 @@
 package com.zhaoyan.ladderballmanager.ui;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.os.Build;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
 import com.zhaoyan.ladderballmanager.R;
+import com.zhaoyan.ladderballmanager.http.request.LoginRequest;
+import com.zhaoyan.ladderballmanager.http.response.LoginResponse;
+import com.zhaoyan.ladderballmanager.model.User;
 import com.zhaoyan.ladderballmanager.util.CommonUtil;
+import com.zhaoyan.ladderballmanager.util.Log;
+import com.zhaoyan.ladderballmanager.util.ToastUtil;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.schedulers.Schedulers;
 
 /**
  * A login screen that offers login via email/password.
@@ -33,9 +39,6 @@ public class LoginActivity extends BaseActivity{
     AutoCompleteTextView mPhoneView;
     @Bind(R.id.password)
     EditText mPasswordView;
-    @Bind(R.id.login_progress)
-    View mProgressView;
-    View mLoginFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,6 @@ public class LoginActivity extends BaseActivity{
 
         ButterKnife.bind(this);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -56,16 +58,18 @@ public class LoginActivity extends BaseActivity{
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.phone_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+        if (CommonUtil.isLogin(this)) {
+            goToMain();
+        }
+    }
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+    private void goToMain() {
+        Log.d();
+        Intent intent = new Intent();
+        intent.setClass(this, MainActivity.class);
+        startActivity(intent);
+
+        this.finish();
     }
 
 
@@ -99,10 +103,6 @@ public class LoginActivity extends BaseActivity{
             mPhoneView.setError(getString(R.string.error_field_required));
             focusView = mPhoneView;
             cancel = true;
-        } else if (!isPhoneValid(phone)) {
-            mPhoneView.setError(getString(R.string.error_invalid_phone));
-            focusView = mPhoneView;
-            cancel = true;
         }
 
         if (cancel) {
@@ -110,55 +110,66 @@ public class LoginActivity extends BaseActivity{
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
+            doLogin(phone, password);
         }
     }
 
-    private boolean isPhoneValid(String phone) {
-        return CommonUtil.isValidPhoneNumber(phone);
+    private void doLogin(String phone, String password) {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("正在登录...");
+        progressDialog.setCancelable(false);
+
+        LoginRequest request = new LoginRequest(getApplicationContext());
+        request.userName = phone;
+        request.password = password;
+        request.loginType = 1;
+        mLadderBallApi.doLogin(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<LoginResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        progressDialog.cancel();
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        ToastUtil.showNetworkFailToast(getApplicationContext());
+                    }
+
+                    @Override
+                    public void onNext(LoginResponse loginResponse) {
+                        progressDialog.cancel();
+                        if (loginResponse.header.resultCode == 0) {
+                            Log.d("login success");
+                            User user = new Select().from(User.class).where("userToken=?" + loginResponse.userToken).executeSingle();
+                            if (user == null) {
+                                user = new User();
+                                user.mUserToken = loginResponse.userToken;
+                                user.mName = loginResponse.name;
+                                user.save();
+                            }
+
+                            goToMain();
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(), loginResponse.header.resultText);
+                        }
+                    }
+                });
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
     }
 
 

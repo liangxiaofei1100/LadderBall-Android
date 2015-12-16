@@ -63,8 +63,11 @@ public class CommonUtil {
     public static final String KEY_USER_PHONE = "ladderball_phone";
     /**判断当前是否登录状态*/
     public static boolean isLogin(Context context) {
-        String phone = SharedPreferencesManager.get(context, KEY_USER_PHONE, "-1");
-        return !phone.equals("-1");
+        User user = new Select().from(User.class).executeSingle();
+        if (user == null) {
+            return false;
+        }
+        return true;
     }
 
     public static String getUserPhone(Context context) {
@@ -80,7 +83,7 @@ public class CommonUtil {
         String userToken = getApp(context).getUserToken();
         if (TextUtils.isEmpty(userToken)) {
             String phone = getUserPhone(context);
-            User user = new Select().from(User.class).where("phone=?", phone).executeSingle();
+            User user = new Select().from(User.class).executeSingle();
             if (user == null){
                 return null;
             }

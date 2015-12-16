@@ -17,28 +17,7 @@ public class User extends Model{
 
     /**用户昵称，姓名*/
     @Column(name = "name")
-    public String mUserName;
+    public String mName;
 
-    /**手机号，也即用户的登录账号*/
-    @Column(name = "phone")
-    public String mPhone;
 
-    /**用户地址，目前仅保存地区，比如上海市 普陀区*/
-    @Column(name = "address")
-    public String mAddress;
-
-    /**性别，0：女性；1：男性*/
-    @Column(name = "gender")
-    public int mGender;
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "mAddress='" + mAddress + '\'' +
-                ", mUserToken='" + mUserToken + '\'' +
-                ", mUserName='" + mUserName + '\'' +
-                ", mPhone='" + mPhone + '\'' +
-                ", mGender=" + mGender +
-                '}';
-    }
 }

@@ -6,8 +6,5 @@ package com.zhaoyan.ladderballmanager.http.response;
  */
 public class LoginResponse extends BaseResponse{
     public String userToken;
-    public String phone;
     public String name;
-    public String address;
-    public int gender;
 }

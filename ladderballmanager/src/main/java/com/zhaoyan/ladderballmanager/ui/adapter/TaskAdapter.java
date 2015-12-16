@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.zhaoyan.ladderballmanager.R;
-import com.zhaoyan.ladderballmanager.model.Task;
+import com.zhaoyan.ladderballmanager.http.response.TaskListResponse;
 import com.zhaoyan.ladderballmanager.util.Log;
 import com.zhaoyan.ladderballmanager.util.TimeUtil;
 import com.zhaoyan.ladderballmanager.util.rx.RxBus;
@@ -29,24 +29,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHoder>
     private Context mContext;
     private LayoutInflater mInflater;
 
-    private List<Task> mDataList;
+    private List<TaskListResponse.HttpMatch> mDataList;
 
-    public TaskAdapter(Context context, List<Task> list) {
+    public TaskAdapter(Context context, List<TaskListResponse.HttpMatch> list) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mDataList = list;
     }
 
-    public void setDataList(List<Task> list) {
+    public void setDataList(List<TaskListResponse.HttpMatch> list) {
         Log.d(list.size() + "");
         mDataList = list;
     }
 
-    public List<Task> getDataList() {
+    public List<TaskListResponse.HttpMatch> getDataList() {
         return mDataList;
     }
 
-    public void addDataToList(Task item) {
+    public void addDataToList(TaskListResponse.HttpMatch item) {
         mDataList.add(0, item);
         notifyDataSetChanged();
     }
@@ -60,31 +60,28 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHoder>
     @Override
     public void onBindViewHolder(TaskAdapter.TaskViewHoder holder, final int position) {
 
-        Task task = getItem(position);
+        TaskListResponse.HttpMatch match = getItem(position);
 
-        holder.homeTeamNameColor.setText(task.mTeamHomeName + "\n" + "(" + task.mTeamHomeColor + ")");
-        holder.visitorTeamNameColor.setText(task.mTeamVisitorName + "\n" + "(" + task.mTeamVisitorColor + ")");
-        if (task.mIsComplete) {
-            holder.score.setText(task.mTeamHomeScore + ":" + task.mTeamVisitorScore);
+        holder.homeTeamNameColor.setText(match.teamHome.name + "\n" + "(" + match.teamHome.color + ")");
+        holder.visitorTeamNameColor.setText(match.teamVisitor.name  + "\n" + "(" + match.teamVisitor.color + ")");
+        if (match.complete) {
+            holder.score.setText(match.teamHome.score + ":" + match.teamVisitor.score);
         } else {
             holder.score.setText("VS");
         }
-        holder.rule.setText(task.mPlayerNum + "人制");
-        holder.date.setText(TimeUtil.getFormatterDate(task.mStartTime));
-        holder.address.setText(task.mAddress);
-
-        holder.homeTeamStatus.setVisibility(task.mTeamHomeIsAssigned ? View.VISIBLE : View.GONE);
-        holder.visitorTeamStatus.setVisibility(task.mTeamVisitorIsAssigned ? View.VISIBLE : View.GONE);
+        holder.rule.setText(match.playerNumber + "人制");
+        holder.date.setText(TimeUtil.getFormatterDate(match.startTime));
+        holder.address.setText(match.address);
 
         Picasso.with(mContext)
-                .load(task.mTeamHomeLogoUrl)
+                .load(match.teamHome.logoURL)
                 .resize(96, 96)
                 .placeholder(R.mipmap.default_team_home_logo)
                 .error(R.mipmap.default_team_home_logo)
                 .into(holder.homeTeamIcon);
 
         Picasso.with(mContext)
-                .load(task.mTeamVisitorLogoUrl)
+                .load(match.teamVisitor.logoURL)
                 .resize(96, 96)
                 .placeholder(R.mipmap.default_team_visitor_logo)
                 .error(R.mipmap.default_team_visitor_logo)
@@ -93,12 +90,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHoder>
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RxBus.get().post(RxBusTag.TASK_ITEM_CLICK, position);
+                RxBus.get().post(RxBusTag.TASK_FRAGMENT, position);
             }
         });
     }
 
-    public Task getItem(int position) {
+    public TaskListResponse.HttpMatch getItem(int position) {
         return  mDataList.get(position);
     }
 

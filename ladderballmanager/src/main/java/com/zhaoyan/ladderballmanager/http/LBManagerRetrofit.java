@@ -25,7 +25,7 @@ public class LBManagerRetrofit {
         client.interceptors().add(loggingInterceptor);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://zhaoyanladderball.duapp.com/app/")//retroift要求baseurl总是以“/”结尾
+                .baseUrl("http://zhaoyanladderballmanagement.duapp.com/")//retroift要求baseurl总是以“/”结尾
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(client)
