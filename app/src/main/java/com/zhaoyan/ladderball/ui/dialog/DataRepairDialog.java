@@ -93,6 +93,8 @@ public class DataRepairDialog extends BaseDialog implements AdapterView.OnItemSe
         mMinuteET.setText("0");
         mSecondET.setText("0");
 
+        mMinuteET.setSelection(1);
+
         String[] events = context.getResources().getStringArray(R.array.all_events);
         ArrayAdapter adapter = new ArrayAdapter(context, R.layout.spinner_item, events);
         mEventSpinner.setAdapter(adapter);
@@ -126,6 +128,9 @@ public class DataRepairDialog extends BaseDialog implements AdapterView.OnItemSe
         String[] minSecs = getMinSec(event.timeSecond);
         mMinuteET.setText(minSecs[0]);
         mSecondET.setText(minSecs[1]);
+
+        mMinuteET.setSelection(minSecs[0].length());
+
 //        mOldNumberET.setText(event.playerNumber + "");
         mEventSpinner.setSelection(getEventPosition(event.eventCode));
         int playerNumber = getReplacePlayerNumber(event.additionalData);

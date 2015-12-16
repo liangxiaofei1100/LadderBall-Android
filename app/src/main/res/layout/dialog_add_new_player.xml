@@ -14,24 +14,21 @@
         android:paddingBottom="8dp"
         android:text="球员号码(必填)"
         />
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        >
 
         <EditText
             android:id="@+id/et_add_new_player_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:imeActionLabel="下一步"
             android:imeOptions="actionUnspecified"
             android:inputType="number"
             android:maxLines="1"
-            android:singleLine="true"/>
-
-    </android.support.design.widget.TextInputLayout>
+            android:singleLine="true"
+            android:padding="8dp"
+            android:background="@drawable/edittext_bg"
+            />
 
     <TextView
         android:layout_width="wrap_content"
@@ -42,23 +39,21 @@
         android:text="名称/备注(选填)"
         />
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        >
-
         <EditText
             android:id="@+id/et_add_new_player_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="10dp"
             android:imeActionLabel="完成"
             android:imeOptions="actionUnspecified"
             android:inputType="text"
             android:maxLines="1"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:padding="8dp"
+            android:background="@drawable/edittext_bg"
+            />
 
-    </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

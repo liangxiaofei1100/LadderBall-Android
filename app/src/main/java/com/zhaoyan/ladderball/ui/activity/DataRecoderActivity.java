@@ -284,23 +284,23 @@ public class DataRecoderActivity extends BaseActivity {
                         mRecordAdapter.setDataList(firstPlayerEvent);
                         mRecordAdapter.notifyDataSetChanged();
 
-                        new AlertDialog.Builder(DataRecoderActivity.this)
-                                .setTitle("第" + mPartNumber + "节比赛")
-                                .setMessage("比赛开始？")
-                                .setPositiveButton("比赛开始", new DialogInterface.OnClickListener() {
+                        new BaseDialog(DataRecoderActivity.this)
+                                .setDialogTitle("第" + mPartNumber + "节比赛")
+                                .setDialogMessage("比赛开始？")
+                                .setPositiveButton("比赛开始", new BaseDialog.onMMDialogClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(Dialog dialog) {
                                         mMatchStartTime = System.currentTimeMillis();
+                                        dialog.dismiss();
                                     }
                                 })
-                                .setNegativeButton("还没开始", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("还没开始", new BaseDialog.onMMDialogClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    public void onClick(Dialog dialog) {
                                         DataRecoderActivity.this.finish();
                                     }
                                 })
-                                .setCancelable(false)
-                                .create().show();
+                                .show();
                     }
                 });
     }
@@ -943,6 +943,7 @@ public class DataRecoderActivity extends BaseActivity {
     }
 
     private void gameOver() {
+
         new AlertDialog.Builder(this)
                 .setMessage("本节比赛已结束，开始提交数据？")
                 .setPositiveButton("提交数据", new DialogInterface.OnClickListener() {

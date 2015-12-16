@@ -65,7 +65,9 @@
             android:name=".ui.activity.TaskSettingActivity"
             android:label="任务设置"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            >
         </activity>
         <activity
             android:name=".ui.activity.DataRecoderActivity"
@@ -103,7 +105,9 @@
             android:name=".ui.activity.PracticeSettingActivity"
             android:label="任务设置"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            >
         </activity>
 
         <activity

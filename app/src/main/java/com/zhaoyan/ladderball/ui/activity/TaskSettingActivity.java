@@ -3,12 +3,9 @@ package com.zhaoyan.ladderball.ui.activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -39,7 +36,6 @@ import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
 import com.zhaoyan.ladderball.util.rx.RxBusTag;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,7 +104,7 @@ public class TaskSettingActivity extends BaseActivity {
 
     private int mTeamType;
 
-    public static Intent getStartIntent(Context context,long matchId) {
+    public static Intent getStartIntent(Context context, long matchId) {
         Intent intent = new Intent();
         intent.setClass(context, TaskSettingActivity.class);
         intent.putExtra(EXTRA_MATCH_ID, matchId);
@@ -152,7 +148,7 @@ public class TaskSettingActivity extends BaseActivity {
             }
             mDetailMatch.teamHome.players = mAllPlayerList;
             Log.d("teamHome.size:" + mDetailMatch.teamHome.players.size());
-            for (Player player: mDetailMatch.teamHome.players) {
+            for (Player player : mDetailMatch.teamHome.players) {
                 if (player.isFirst) {
                     mFirstPlayerList.add(player);//获取首发球员列表
                 }
@@ -169,7 +165,7 @@ public class TaskSettingActivity extends BaseActivity {
             }
             mDetailMatch.teamVisitor.players = mAllPlayerList;
             Log.d("teamVisitor.size:" + mDetailMatch.teamVisitor.players.size());
-            for (Player player: mDetailMatch.teamVisitor.players) {
+            for (Player player : mDetailMatch.teamVisitor.players) {
                 if (player.isFirst) {
                     mFirstPlayerList.add(player);
                 }
@@ -197,16 +193,17 @@ public class TaskSettingActivity extends BaseActivity {
             public void call(final Integer integer) {
                 Log.d("isMain:" + (Looper.myLooper() == Looper.getMainLooper()));
                 final Player player1 = mAdapter.getItem(integer);
-                new AlertDialog.Builder(TaskSettingActivity.this)
-                        .setMessage("确定取消" + player1.number + "号首发位置")
-                        .setNegativeButton("取消", null)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                new BaseDialog(TaskSettingActivity.this)
+                        .setDialogMessage("确定取消" + player1.number + "号首发位置")
+                        .setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                            public void onClick(Dialog dialog) {
                                 setPlayerNonFirst(player1, integer);
+                                dialog.dismiss();
                             }
                         })
-                        .create().show();
+                        .setNegativeButton("取消", null)
+                        .show();
             }
         });
         setResult(RESULT_CANCELED);
@@ -272,6 +269,7 @@ public class TaskSettingActivity extends BaseActivity {
     void doSetJie() {
         showEditDialog(1);
     }
+
     @OnClick(R.id.stv_jie_time)
     void doSetJieTime() {
         showEditDialog(2);
@@ -286,7 +284,7 @@ public class TaskSettingActivity extends BaseActivity {
         if (mTeamType == BallConstants.TEAM_HOME) {
             Log.d("firstsize:" + mAdapter.getItemCount());
         } else {
-            Log.d("firstsize:" +  mAdapter.getItemCount());
+            Log.d("firstsize:" + mAdapter.getItemCount());
         }
 
         if (mAdapter.getItemCount() < mDetailMatch.playerNumber) {
@@ -312,7 +310,7 @@ public class TaskSettingActivity extends BaseActivity {
                 request.players.add(httpPlayer);
             }
         } else {
-            for (Player player: mDetailMatch.teamVisitor.players) {
+            for (Player player : mDetailMatch.teamVisitor.players) {
                 httpPlayer = new MatchDetailResponse.HttpPlayer();
                 httpPlayer.id = player.playerId;
                 httpPlayer.name = player.name;
@@ -387,27 +385,24 @@ public class TaskSettingActivity extends BaseActivity {
     public void showEditDialog(final int type) {
         View view = getLayoutInflater().inflate(R.layout.dialog_edit, null);
         final EditText editText = (EditText) view.findViewById(R.id.et_dialog);
-        TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.til_dialog);
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        BaseDialog dialog = new BaseDialog(this);
         if (type == 0) {
-            textInputLayout.setHint("请输入1到11的整数");
-            dialog.setTitle("赛制人数设置");
+            editText.setHint("请输入1到11的整数");
+            dialog.setDialogTitle("赛制人数设置");
         } else if (type == 1) {
-            //textInputLayout.setHint("请输入1到6的整数");
-            dialog.setTitle("比赛节数设置");
-        } else if (type == 2){
-            dialog.setTitle("每节时长设置");
+            dialog.setDialogTitle("比赛节数设置");
+        } else if (type == 2) {
+            dialog.setDialogTitle("每节时长设置");
         }
-        dialog.setView(view);
-        dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        dialog.setCustomView(view);
+        dialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(Dialog dialog) {
                 String text = editText.getText().toString();
                 Log.d("text：" + text);
                 if (text.isEmpty()) {
                     editText.setError("不能为空");
-                    ToastUtil.showToast(getApplicationContext(), "不能为空");
-                    setDialogDismiss(dialog, false);
+//                    ToastUtil.showToast(getApplicationContext(), "不能为空");
                     return;
                 }
 
@@ -415,13 +410,13 @@ public class TaskSettingActivity extends BaseActivity {
                 if (type == 0) {
                     if (num < 1 || num > 11) {
                         editText.setError("请输入1到11的整数");
-                        ToastUtil.showToast(getApplicationContext(), "请输入1到11的整数");
-                        setDialogDismiss(dialog, false);
+//                        ToastUtil.showToast(getApplicationContext(), "请输入1到11的整数");
                         return;
                     }
 
                     if (num < mAdapter.getItemCount()) {
-                        ToastUtil.showToast(getApplicationContext(), "首发人员超过" + num + "人，请调整");
+                        editText.setError("首发人员超过" + num + "人，请调整");
+//                        ToastUtil.showToast(getApplicationContext(), "首发人员超过" + num + "人，请调整");
                         return;
                     }
 
@@ -437,7 +432,6 @@ public class TaskSettingActivity extends BaseActivity {
                         setDialogDismiss(dialog, false);
                         return;
                     }*/
-
                     mJieItemView.setSummaryText(num + "节");
                     mDetailMatch.totalPart = num;
                     mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
@@ -448,14 +442,12 @@ public class TaskSettingActivity extends BaseActivity {
                 }
 
                 mHasChanged = true;
-
 //                mDetailMatch.save();
-
                 dialog.dismiss();
             }
         });
         dialog.setNegativeButton("取消", null);
-        dialog.create().show();
+        dialog.show();
     }
 
     private void showAddNewPlayerDialog() {
@@ -509,20 +501,21 @@ public class TaskSettingActivity extends BaseActivity {
 
     private int checkPlayer(int playerNumber) {
         Player player;
-        for (int i=0;i<mAllPlayerList.size();i++) {
+        for (int i = 0; i < mAllPlayerList.size(); i++) {
             player = mAllPlayerList.get(i);
             if (player.number == playerNumber) {
-                    if (player.isFirst) {
-                        return -1;//有该学员且已经在首发位置上了
-                    } else {
-                        return i;//有该学员但是不在首发位置,返回position
-                    }
+                if (player.isFirst) {
+                    return -1;//有该学员且已经在首发位置上了
+                } else {
+                    return i;//有该学员但是不在首发位置,返回position
                 }
+            }
         }
         return -2;//没有该球员
     }
 
     private String mAddFailString;
+
     private void doAdd(int playerNumber, String name) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在新增球员...");
@@ -618,17 +611,6 @@ public class TaskSettingActivity extends BaseActivity {
                 });
     }
 
-    public static void setDialogDismiss(DialogInterface dialog, boolean dismiss){
-        try {
-            Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
-            field.setAccessible(true);
-            field.set(dialog, dismiss);
-            dialog.dismiss();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -642,14 +624,14 @@ public class TaskSettingActivity extends BaseActivity {
                     mAdapter.clear();
                     if (mDetailMatch.teamHome.isAssiged) {
                         Log.d("teamHome.size:" + mDetailMatch.teamHome.players.size());
-                        for (Player player: mDetailMatch.teamHome.players) {
+                        for (Player player : mDetailMatch.teamHome.players) {
                             if (player.isFirst) {
                                 mFirstPlayerList.add(player);
                             }
                         }
                     } else if (mDetailMatch.teamVisitor.isAssiged) {
                         Log.d("teamVisitor.size:" + mDetailMatch.teamVisitor.players.size());
-                        for (Player player: mDetailMatch.teamVisitor.players) {
+                        for (Player player : mDetailMatch.teamVisitor.players) {
                             if (player.isFirst) {
                                 mFirstPlayerList.add(player);
                             }
@@ -667,22 +649,24 @@ public class TaskSettingActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (mHasChanged) {
-            new AlertDialog.Builder(this)
-                    .setTitle("提示")
-                    .setMessage("是否保存当前修改？")
-                    .setPositiveButton("保存", new DialogInterface.OnClickListener() {
+            new BaseDialog(this)
+                    .setDialogTitle("提示")
+                    .setDialogMessage("是否保存当前修改？")
+                    .setPositiveButton("保存", new BaseDialog.onMMDialogClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(Dialog dialog) {
                             doModifyMatch();
+                            dialog.dismiss();
                         }
                     })
-                    .setNegativeButton("不保存", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("不保存退出", new BaseDialog.onMMDialogClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(Dialog dialog) {
                             handleNewAddPlayer();
+                            dialog.dismiss();
                         }
                     })
-                    .create().show();
+                    .show();
             return;
         }
         super.onBackPressed();
@@ -699,8 +683,8 @@ public class TaskSettingActivity extends BaseActivity {
             public void call(Subscriber<? super Boolean> subscriber) {
                 //将新增球员的首发属性去除
                 if (mTeamType == BallConstants.TEAM_HOME) {
-                    for (Player player: mDetailMatch.teamHome.players) {
-                        for (long id: mNewAddPlayerIdList) {
+                    for (Player player : mDetailMatch.teamHome.players) {
+                        for (long id : mNewAddPlayerIdList) {
 //                            Log.d("has player?" + player.playerId + ",id:" + id);
                             if (player.playerId == id) {
                                 player.isFirst = false;
@@ -710,8 +694,8 @@ public class TaskSettingActivity extends BaseActivity {
                         }
                     }
                 } else {
-                    for (Player player: mDetailMatch.teamVisitor.players) {
-                        for (long id: mNewAddPlayerIdList) {
+                    for (Player player : mDetailMatch.teamVisitor.players) {
+                        for (long id : mNewAddPlayerIdList) {
                             if (player.playerId == id) {
                                 player.isFirst = false;
                                 player.isOnPitch = false;
@@ -741,16 +725,16 @@ public class TaskSettingActivity extends BaseActivity {
      */
     private void doSaveModifyPlayerData() {
         if (mTeamType == BallConstants.TEAM_HOME) {
-            for (Player player: mDetailMatch.teamHome.players) {
-                for (long id: mModifyPlayerIdList) {
+            for (Player player : mDetailMatch.teamHome.players) {
+                for (long id : mModifyPlayerIdList) {
                     if (player.playerId == id) {
                         player.save();
                     }
                 }
             }
         } else {
-            for (Player player: mDetailMatch.teamVisitor.players) {
-                for (long id: mModifyPlayerIdList) {
+            for (Player player : mDetailMatch.teamVisitor.players) {
+                for (long id : mModifyPlayerIdList) {
                     if (player.playerId == id) {
                         player.save();
                     }

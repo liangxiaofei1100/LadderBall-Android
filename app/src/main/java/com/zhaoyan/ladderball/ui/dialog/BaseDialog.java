@@ -306,7 +306,7 @@ public class BaseDialog extends Dialog implements View.OnClickListener {
      * @param text 按钮文字
      * @param listener 按钮点击监听事件
      */
-    public void setButton(int whichButton, String text, onMMDialogClickListener listener){
+    public BaseDialog setButton(int whichButton, String text, onMMDialogClickListener listener){
         mButtonArray.put(whichButton, true);
         switch (whichButton) {
             case BUTTON_POSITIVE:
@@ -324,47 +324,49 @@ public class BaseDialog extends Dialog implements View.OnClickListener {
             default:
                 throw new IllegalArgumentException("Button does not exist");
         }
+
+        return this;
     }
 
-    public void setButton(int whichButton, int textId, onMMDialogClickListener listener){
-        setButton(whichButton, mContext.getString(textId), listener);
-    }
-
-    /**
-     * 设定“取消”类型按钮文字和事件
-     */
-    public void setNegativeButton(String text, onMMDialogClickListener listener) {
-        setButton(BUTTON_NEGATIVE, text, listener);
+    public BaseDialog setButton(int whichButton, int textId, onMMDialogClickListener listener){
+        return setButton(whichButton, mContext.getString(textId), listener);
     }
 
     /**
      * 设定“取消”类型按钮文字和事件
      */
-    public void setNegativeButton(int textId, onMMDialogClickListener listener) {
+    public BaseDialog setNegativeButton(String text, onMMDialogClickListener listener) {
+        return setButton(BUTTON_NEGATIVE, text, listener);
+    }
+
+    /**
+     * 设定“取消”类型按钮文字和事件
+     */
+    public BaseDialog setNegativeButton(int textId, onMMDialogClickListener listener) {
         String text = mContext.getString(textId);
-        setNegativeButton(text, listener);
+        return setNegativeButton(text, listener);
     }
 
     /**
      * 设置“确定”类型按钮文字和监听事件
      */
-    public void setPositiveButton(String text, onMMDialogClickListener listener) {
-        setButton(BUTTON_POSITIVE, text, listener);
+    public BaseDialog setPositiveButton(String text, onMMDialogClickListener listener) {
+        return setButton(BUTTON_POSITIVE, text, listener);
     }
 
     /**
      * 设置“确定”类型按钮文字和监听事件
      */
-    public void setPositiveButton(int textId, onMMDialogClickListener listener) {
+    public BaseDialog setPositiveButton(int textId, onMMDialogClickListener listener) {
         String text = mContext.getString(textId);
-        setPositiveButton(text, listener);
+        return setPositiveButton(text, listener);
     }
 
     /**
      * 设定中性属性按钮（确定，取消类型以外的）类型文字和监听事件
      */
-    public void setNeutralButton(String text, onMMDialogClickListener listener) {
-        setButton(BUTTON_NEUTRAL, text, listener);
+    public BaseDialog setNeutralButton(String text, onMMDialogClickListener listener) {
+        return setButton(BUTTON_NEUTRAL, text, listener);
     }
 
     /**
@@ -372,9 +374,9 @@ public class BaseDialog extends Dialog implements View.OnClickListener {
      * @param textId
      * @param listener
      */
-    public void setNeutralButton(int textId, onMMDialogClickListener listener) {
+    public BaseDialog setNeutralButton(int textId, onMMDialogClickListener listener) {
         String text = mContext.getString(textId);
-        setPositiveButton(text, listener);
+        return setPositiveButton(text, listener);
     }
 
     public BaseDialog setCustomView(int resId, Context context) {

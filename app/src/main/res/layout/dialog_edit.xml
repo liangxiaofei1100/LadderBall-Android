@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-        android:layout_margin="16dp"
+              android:layout_margin="16dp"
+              android:orientation="vertical"
     >
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/til_dialog"
+
+    <EditText
+        android:id="@+id/et_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        >
+        android:imeOptions="actionUnspecified"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:inputType="number"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:background="@drawable/edittext_bg"
+        />
 
-        <EditText
-            android:id="@+id/et_dialog"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeActionLabel="@string/action_sign_in"
-            android:imeOptions="actionUnspecified"
-            android:inputType="number"
-            android:maxLines="1"
-            android:singleLine="true"/>
-
-    </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

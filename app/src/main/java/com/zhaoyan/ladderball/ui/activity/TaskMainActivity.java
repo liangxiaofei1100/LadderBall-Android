@@ -1,9 +1,8 @@
 package com.zhaoyan.ladderball.ui.activity;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +29,7 @@ import com.zhaoyan.ladderball.model.PartData;
 import com.zhaoyan.ladderball.model.Player;
 import com.zhaoyan.ladderball.model.Team;
 import com.zhaoyan.ladderball.ui.adapter.PlayerHorizontalAdapter;
+import com.zhaoyan.ladderball.ui.dialog.BaseDialog;
 import com.zhaoyan.ladderball.ui.fragments.TaskFragment;
 import com.zhaoyan.ladderball.ui.view.SettingItemView;
 import com.zhaoyan.ladderball.util.DensityUtil;
@@ -453,16 +453,17 @@ public class TaskMainActivity extends BaseActivity {
                 }
             }
 
-            new AlertDialog.Builder(this)
-                    .setMessage("是否确认数据无误并提交该场比赛？")
-                    .setPositiveButton("提交", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            doCommitTask();
-                        }
-                    })
-                    .setNegativeButton("取消", null)
-                    .create().show();
+            BaseDialog dialog = new BaseDialog(this);
+            dialog.setDialogMessage("是否确认数据无误并提交该场比赛？");
+            dialog.setPositiveButton("提交", new BaseDialog.onMMDialogClickListener() {
+                @Override
+                public void onClick(Dialog dialog) {
+                    doCommitTask();
+                    dialog.dismiss();
+                }
+            });
+            dialog.setNegativeButton("取消", null);
+            dialog.show();
         }
 
         return super.onOptionsItemSelected(item);

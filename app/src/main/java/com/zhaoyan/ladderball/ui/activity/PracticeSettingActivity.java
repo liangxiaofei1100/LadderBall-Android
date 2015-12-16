@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,7 +38,6 @@ import com.zhaoyan.ladderball.util.ToastUtil;
 import com.zhaoyan.ladderball.util.rx.RxBus;
 import com.zhaoyan.ladderball.util.rx.RxBusTag;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -389,36 +387,30 @@ public class PracticeSettingActivity extends BaseActivity {
     public void showEditDialog(final int type) {
         View view = getLayoutInflater().inflate(R.layout.dialog_edit, null);
         final EditText editText = (EditText) view.findViewById(R.id.et_dialog);
-        TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.til_dialog);
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        BaseDialog dialog = new BaseDialog(this);
         if (type == 0) {
-            textInputLayout.setHint("请输入1到11的整数");
-            dialog.setTitle("赛制人数设置");
+            editText.setHint("请输入1到11的整数");
+            dialog.setDialogTitle("赛制人数设置");
         } else if (type == 1) {
-            //textInputLayout.setHint("请输入1到6的整数");
-            dialog.setTitle("比赛节数设置");
-        } else if (type == 2){
-            dialog.setTitle("每节时长设置");
+            dialog.setDialogTitle("比赛节数设置");
+        } else if (type == 2) {
+            dialog.setDialogTitle("每节时长设置");
         }
-        dialog.setView(view);
-        dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        dialog.setCustomView(view);
+        dialog.setPositiveButton("确定", new BaseDialog.onMMDialogClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(Dialog dialog) {
                 String text = editText.getText().toString();
                 Log.d("text：" + text);
                 if (text.isEmpty()) {
-                    editText.setError("不能为空");
                     ToastUtil.showToast(getApplicationContext(), "不能为空");
-                    setDialogDismiss(dialog, false);
                     return;
                 }
 
                 int num = Integer.valueOf(text);
                 if (type == 0) {
                     if (num < 1 || num > 11) {
-                        editText.setError("请输入1到11的整数");
                         ToastUtil.showToast(getApplicationContext(), "请输入1到11的整数");
-                        setDialogDismiss(dialog, false);
                         return;
                     }
 
@@ -439,7 +431,6 @@ public class PracticeSettingActivity extends BaseActivity {
                         setDialogDismiss(dialog, false);
                         return;
                     }*/
-
                     mJieItemView.setSummaryText(num + "节");
                     mDetailMatch.totalPart = num;
                     mTotalTime.setText("比赛共" + mDetailMatch.totalPart * mDetailMatch.partMinutes + "分钟");
@@ -450,14 +441,12 @@ public class PracticeSettingActivity extends BaseActivity {
                 }
 
                 mHasChanged = true;
-
 //                mDetailMatch.save();
-
                 dialog.dismiss();
             }
         });
         dialog.setNegativeButton("取消", null);
-        dialog.create().show();
+        dialog.show();
     }
 
     private void showAddNewPlayerDialog() {
@@ -618,17 +607,6 @@ public class PracticeSettingActivity extends BaseActivity {
                         }
                     }
                 });
-    }
-
-    public static void setDialogDismiss(DialogInterface dialog, boolean dismiss){
-        try {
-            Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
-            field.setAccessible(true);
-            field.set(dialog, dismiss);
-            dialog.dismiss();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
