@@ -19,5 +19,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_create_task">CreateTaskActivity</string>
+    <string name="title_activity_create_task">创建比赛</string>
+    <string name="title_activity_date_time">时间选择</string>
 </resources>

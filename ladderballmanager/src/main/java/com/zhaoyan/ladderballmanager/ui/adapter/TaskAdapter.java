@@ -73,6 +73,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHoder>
         holder.date.setText(TimeUtil.getFormatterDate(match.startTime));
         holder.address.setText(match.address);
 
+        if (match.recorderHome != null) {
+            holder.homeTeamStatus.setVisibility(View.VISIBLE);
+        } else {
+            holder.homeTeamStatus.setVisibility(View.GONE);
+        }
+
+        if (match.recorderVisitor != null) {
+            holder.visitorTeamStatus.setVisibility(View.VISIBLE);
+        } else {
+            holder.visitorTeamStatus.setVisibility(View.GONE);
+        }
+
         Picasso.with(mContext)
                 .load(match.teamHome.logoURL)
                 .resize(96, 96)

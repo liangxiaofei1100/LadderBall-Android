@@ -80,6 +80,8 @@ public class TaskFragment extends BaseFragment {
                             doGetTasks();
                             return;
                         }
+
+                        handleItemClick(position);
                     }
                 });
     }
@@ -178,6 +180,11 @@ public class TaskFragment extends BaseFragment {
             mEmptyView.setVisibility(View.GONE);
         }
         mAdapter.notifyDataSetChanged();
+    }
+
+    private void handleItemClick(int position) {
+        TaskListResponse.HttpMatch match = mAdapter.getItem(position);
+        
     }
 
     private boolean isMainLooper() {
