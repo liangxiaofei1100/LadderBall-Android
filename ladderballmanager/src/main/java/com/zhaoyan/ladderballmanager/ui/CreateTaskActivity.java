@@ -104,13 +104,13 @@ public class CreateTaskActivity extends BaseActivity {
             isCancel = true;
         }
 
-        if (TextUtils.isEmpty(partMinutes)) {
+        if (TextUtils.isEmpty(partMinutes) || !isValidPartMinutes(partMinutes)) {
             mPartMinutesET.setError("请填写每节的时间(分)");
             focusView = mPartMinutesET;
             isCancel = true;
         }
 
-        if (TextUtils.isEmpty(partNumber)) {
+        if (TextUtils.isEmpty(partNumber) || !isValidPartNumber(partNumber)) {
             mPartNumberET.setError("请填写小节数");
             focusView = mPartNumberET;
             isCancel = true;
@@ -154,7 +154,7 @@ public class CreateTaskActivity extends BaseActivity {
         request.teamHomeColor = teamHomeColor;
         request.teamVisitorColor = teamVisitorColor;
         request.playerNumber = Integer.valueOf(playerNumber);
-        request.totalPat = Integer.valueOf(partNumber);
+        request.totalPart = Integer.valueOf(partNumber);
         request.partMinutes = Integer.valueOf(partMinutes);
         request.address = address;
         request.startTime = mStartTime;
@@ -217,6 +217,22 @@ public class CreateTaskActivity extends BaseActivity {
     private boolean isValidPlayerNumber(String number) {
         int playerNumber = Integer.valueOf(number);
         if (playerNumber >= 1 && playerNumber <= 11) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValidPartNumber(String number) {
+        int playerNumber = Integer.valueOf(number);
+        if (playerNumber > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValidPartMinutes(String number) {
+        int playerNumber = Integer.valueOf(number);
+        if (playerNumber > 0) {
             return true;
         }
         return false;

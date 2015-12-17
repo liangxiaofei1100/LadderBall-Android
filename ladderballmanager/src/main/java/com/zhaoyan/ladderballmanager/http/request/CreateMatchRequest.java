@@ -14,7 +14,7 @@ public class CreateMatchRequest extends BaseRequest {
     public int playerNumber;
     public long startTime;
     public String address;
-    public int totalPat;
+    public int totalPart;
     public int partMinutes;
 
     public CreateMatchRequest(Context context) {

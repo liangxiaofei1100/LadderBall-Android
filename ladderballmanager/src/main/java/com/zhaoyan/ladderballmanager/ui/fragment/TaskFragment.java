@@ -1,19 +1,26 @@
 package com.zhaoyan.ladderballmanager.ui.fragment;
 
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.zhaoyan.ladderballmanager.R;
+import com.zhaoyan.ladderballmanager.http.request.AsignTaskRequest;
 import com.zhaoyan.ladderballmanager.http.request.BaseRequest;
+import com.zhaoyan.ladderballmanager.http.response.BaseResponse;
 import com.zhaoyan.ladderballmanager.http.response.TaskListResponse;
 import com.zhaoyan.ladderballmanager.ui.adapter.TaskAdapter;
 import com.zhaoyan.ladderballmanager.util.Log;
@@ -27,8 +34,10 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
@@ -182,9 +191,117 @@ public class TaskFragment extends BaseFragment {
         mAdapter.notifyDataSetChanged();
     }
 
-    private void handleItemClick(int position) {
-        TaskListResponse.HttpMatch match = mAdapter.getItem(position);
-        
+    private void handleItemClick(final int position) {
+        String[] menus = new String[2];
+        menus[0] = "分配主队";
+        menus[1] = "分配客队";
+        new AlertDialog.Builder(getActivity())
+                .setItems(menus, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dispatchTask(position, which);
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create().show();
+    }
+
+    private void dispatchTask(int position, int menuPosition) {
+        final TaskListResponse.HttpMatch match = mAdapter.getItem(position);
+
+        String dialogTitle = "分配任务";
+        int teamType = 1;
+        if (menuPosition == 0) {
+            //分配主队
+            dialogTitle = "分配主队任务";
+            teamType = 1;
+        } else {
+            dialogTitle = "分配客队任务";
+            teamType = 2;
+        }
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.layout_edit, null);
+        TextView textView = (TextView) view.findViewById(R.id.tv_recorderphone);
+        final EditText editText = (EditText) view.findViewById(R.id.et_dispatch_phone);
+
+        if (teamType == 1) {
+            if (match.recorderHome != null) {
+                textView.setText("当前主队任务领取人：" + match.recorderHome.phone);
+            } else {
+                textView.setText("当前主队任务无人领取");
+            }
+        } else {
+            if (match.recorderVisitor != null) {
+                textView.setText("当前客队任务领取人：" + match.recorderVisitor.phone);
+            } else {
+                textView.setText("当前客队任务无人领取");
+            }
+        }
+
+        final int finalTeamType = teamType;
+        new AlertDialog.Builder(getActivity())
+                .setTitle(dialogTitle)
+                .setView(view)
+                .setPositiveButton("分配", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newPhone = editText.getText().toString().trim();
+                        if (TextUtils.isEmpty(newPhone)) {
+                            ToastUtil.showToast(getActivity(), "请输入记录员的手机号码");
+                        } else {
+                            doAsignTask(match.id, newPhone, finalTeamType);
+                        }
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create().show();
+    }
+
+    private void doAsignTask(long matchId, String newPhone, int asignedTeam) {
+        AsignTaskRequest request = new AsignTaskRequest(getActivity());
+        request.matchId = matchId;
+        request.recorderPhone = newPhone;
+        request.asignedTeam = asignedTeam;
+
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("分配任务...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+
+        mLadderBallApi.doAsignTask(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        progressDialog.cancel();
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        progressDialog.cancel();
+                        if (baseResponse.header.resultCode == 0) {
+                            ToastUtil.showToast(getActivity(), "分配任务完成");
+                            doGetTasks();
+                        } else {
+                            ToastUtil.showToast(getActivity(), baseResponse.header.resultText);
+                        }
+                    }
+                });
     }
 
     private boolean isMainLooper() {

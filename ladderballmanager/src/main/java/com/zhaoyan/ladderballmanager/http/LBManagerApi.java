@@ -1,6 +1,7 @@
 package com.zhaoyan.ladderballmanager.http;
 
 
+import com.zhaoyan.ladderballmanager.http.request.AsignTaskRequest;
 import com.zhaoyan.ladderballmanager.http.request.BaseRequest;
 import com.zhaoyan.ladderballmanager.http.request.CreateMatchRequest;
 import com.zhaoyan.ladderballmanager.http.request.LoginRequest;
@@ -29,5 +30,9 @@ public interface LBManagerApi {
     /**创建比赛*/
     @POST("match/add")
     Observable<BaseResponse> doCreateMatch(@Body CreateMatchRequest request);
+
+    /***分配任务*/
+    @POST("match/asign")
+    Observable<BaseResponse> doAsignTask(@Body AsignTaskRequest request);
 
 }
