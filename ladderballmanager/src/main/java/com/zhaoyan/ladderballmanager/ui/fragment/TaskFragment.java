@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.zhaoyan.ladderballmanager.R;
 import com.zhaoyan.ladderballmanager.http.request.AsignTaskRequest;
 import com.zhaoyan.ladderballmanager.http.request.BaseRequest;
+import com.zhaoyan.ladderballmanager.http.request.CancelAsignRequest;
 import com.zhaoyan.ladderballmanager.http.response.BaseResponse;
 import com.zhaoyan.ladderballmanager.http.response.TaskListResponse;
 import com.zhaoyan.ladderballmanager.ui.adapter.TaskAdapter;
@@ -181,7 +182,7 @@ public class TaskFragment extends BaseFragment {
      */
     private void showData() {
         Log.d();
-            mAdapter.setDataList(mMatchList);
+        mAdapter.setDataList(mMatchList);
 
         if (mAdapter.getDataList().size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
@@ -192,9 +193,12 @@ public class TaskFragment extends BaseFragment {
     }
 
     private void handleItemClick(final int position) {
-        String[] menus = new String[2];
+        String[] menus = new String[4];
         menus[0] = "分配主队";
         menus[1] = "分配客队";
+        menus[2] = "取消主队已分配任务";
+        menus[3] = "取消客队已分配任务";
+
         new AlertDialog.Builder(getActivity())
                 .setItems(menus, new DialogInterface.OnClickListener() {
                     @Override
@@ -215,9 +219,23 @@ public class TaskFragment extends BaseFragment {
             //分配主队
             dialogTitle = "分配主队任务";
             teamType = 1;
-        } else {
+        } else if (menuPosition == 1) {
             dialogTitle = "分配客队任务";
             teamType = 2;
+        } else if (menuPosition == 2) {
+            if (match.recorderHome == null) {
+                ToastUtil.showToast(getActivity(), "主队还没分配出去，不用取消");
+                return;
+            }
+            showCancleDialog(1, match);
+            return;
+        } else {
+            if (match.recorderVisitor == null) {
+                ToastUtil.showToast(getActivity(), "客队还没分配出去，不用取消");
+                return;
+            }
+            showCancleDialog(2, match);
+            return;
         }
 
         View view = getActivity().getLayoutInflater().inflate(R.layout.layout_edit, null);
@@ -296,6 +314,75 @@ public class TaskFragment extends BaseFragment {
                         progressDialog.cancel();
                         if (baseResponse.header.resultCode == 0) {
                             ToastUtil.showToast(getActivity(), "分配任务完成");
+                            doGetTasks();
+                        } else {
+                            ToastUtil.showToast(getActivity(), baseResponse.header.resultText);
+                        }
+                    }
+                });
+    }
+
+    private void showCancleDialog(final int type, final TaskListResponse.HttpMatch match) {
+
+        String message;
+
+        if (type == 1) {
+            message = "将取消" + match.recorderHome.phone + "的任务";
+        } else {
+            message = "将取消" + match.recorderVisitor.phone + "的任务";
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle("取消任务分配")
+                .setMessage(message)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doCancleTask(match.id, type);
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create().show();
+    }
+
+    private void doCancleTask(long matchId, int teamType) {
+        CancelAsignRequest request = new CancelAsignRequest(getActivity());
+        request.matchId = matchId;
+        request.team = teamType;
+
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("取消任务...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+
+        mLadderBallApi.doCancelAsign(request)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progressDialog.show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseResponse>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Log.e(e.toString());
+                        progressDialog.cancel();
+                    }
+
+                    @Override
+                    public void onNext(BaseResponse baseResponse) {
+                        progressDialog.cancel();
+                        if (baseResponse.header.resultCode == 0) {
+                            ToastUtil.showToast(getActivity(), "取消任务完成");
                             doGetTasks();
                         } else {
                             ToastUtil.showToast(getActivity(), baseResponse.header.resultText);

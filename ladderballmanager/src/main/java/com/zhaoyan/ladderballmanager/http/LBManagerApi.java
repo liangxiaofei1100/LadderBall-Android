@@ -3,6 +3,7 @@ package com.zhaoyan.ladderballmanager.http;
 
 import com.zhaoyan.ladderballmanager.http.request.AsignTaskRequest;
 import com.zhaoyan.ladderballmanager.http.request.BaseRequest;
+import com.zhaoyan.ladderballmanager.http.request.CancelAsignRequest;
 import com.zhaoyan.ladderballmanager.http.request.CreateMatchRequest;
 import com.zhaoyan.ladderballmanager.http.request.LoginRequest;
 import com.zhaoyan.ladderballmanager.http.response.BaseResponse;
@@ -34,5 +35,9 @@ public interface LBManagerApi {
     /***分配任务*/
     @POST("match/asign")
     Observable<BaseResponse> doAsignTask(@Body AsignTaskRequest request);
+
+    /*取消分配任务*/
+    @POST("match/asign/delete")
+    Observable<BaseResponse> doCancelAsign(@Body CancelAsignRequest request);
 
 }
